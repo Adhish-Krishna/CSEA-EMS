@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model clubadmins {
+  id             Int    @id @default(autoincrement())
+  club_id        Int?
+  user_id        Int?
+  admin_password String
+  clubs          clubs? @relation(fields: [club_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users          users? @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model clubadvisors {
+  id                Int              @id @default(autoincrement())
+  facultyadvisor_id Int?
+  club_id           Int?
+  clubs             clubs?           @relation(fields: [club_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  facultyadvisors   facultyadvisors? @relation(fields: [facultyadvisor_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model clubmembers {
+  id      Int     @id @default(autoincrement())
+  user_id Int?
+  club_id Int?
+  role    String? @db.VarChar(100)
+  clubs   clubs?  @relation(fields: [club_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users   users?  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model clubs {
+  id              Int               @id @default(autoincrement())
+  name            String            @unique @db.VarChar(255)
+  about           String?
+  clubadmins      clubadmins[]
+  clubadvisors    clubadvisors[]
+  clubmembers     clubmembers[]
+  eventconvenors  eventconvenors[]
+  organizingclubs organizingclubs[]
+}
+
+model eventattendance {
+  id         Int     @id @default(autoincrement())
+  user_id    Int?
+  event_id   Int?
+  is_present Boolean
+  events     events? @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users      users?  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model eventconvenors {
+  id       Int     @id @default(autoincrement())
+  event_id Int?
+  user_id  Int?
+  club_id  Int?
+  clubs    clubs?  @relation(fields: [club_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  events   events? @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users    users?  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model eventregistration {
+  id       Int     @id @default(autoincrement())
+  event_id Int?
+  team_id  Int?
+  events   events? @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  teams    teams?  @relation(fields: [team_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model events {
+  id                Int                 @id @default(autoincrement())
+  name              String              @db.VarChar(255)
+  about             String?
+  date              DateTime            @db.Date
+  event_type        String?             @db.VarChar(100)
+  event_category    String?             @db.VarChar(100)
+  min_no_member     Int?
+  max_no_member     Int?
+  eventattendance   eventattendance[]
+  eventconvenors    eventconvenors[]
+  eventregistration eventregistration[]
+  eventwinners      eventwinners[]
+  exemption         exemption[]
+  feedback          feedback[]
+  organizingclubs   organizingclubs[]
+}
+
+model eventwinners {
+  id       Int     @id @default(autoincrement())
+  team_id  Int?
+  event_id Int?
+  position Int
+  events   events? @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  teams    teams?  @relation(fields: [team_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model exemption {
+  id        Int      @id @default(autoincrement())
+  user_id   Int?
+  event_id  Int?
+  starthour Int
+  endhour   Int
+  date      DateTime @db.Date
+  events    events?  @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users     users?   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model facultyadvisors {
+  id           Int            @id @default(autoincrement())
+  name         String         @db.VarChar(255)
+  department   String         @db.VarChar(100)
+  designation  String         @db.VarChar(100)
+  clubadvisors clubadvisors[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model feedback {
+  id         Int       @id @default(autoincrement())
+  user_id    Int?
+  event_id   Int?
+  feedback   String?
+  rating     Int?
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  events     events?   @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model organizingclubs {
+  id       Int     @id @default(autoincrement())
+  event_id Int?
+  club_id  Int?
+  clubs    clubs?  @relation(fields: [club_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  events   events? @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model teammembers {
+  id      Int    @id @default(autoincrement())
+  user_id Int?
+  team_id Int?
+  teams   teams? @relation(fields: [team_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users   users? @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model teams {
+  id                Int                 @id @default(autoincrement())
+  name              String              @db.VarChar(255)
+  eventregistration eventregistration[]
+  eventwinners      eventwinners[]
+  teammembers       teammembers[]
+}
+
+model users {
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(255)
+  rollno          String            @unique @db.VarChar(50)
+  password        String
+  department      String            @db.VarChar(100)
+  email           String            @unique @db.VarChar(255)
+  phoneno         BigInt            @unique
+  yearofstudy     Int
+  created_at      DateTime?         @default(now()) @db.Timestamp(6)
+  clubadmins      clubadmins[]
+  clubmembers     clubmembers[]
+  eventattendance eventattendance[]
+  eventconvenors  eventconvenors[]
+  exemption       exemption[]
+  feedback        feedback[]
+  teammembers     teammembers[]
+}
