@@ -1,4 +1,4 @@
-export interface User{
+export interface SignUpUser{
     name: string;
     rollno: string;
     password: string;
@@ -7,4 +7,9 @@ export interface User{
     phoneno: bigint;
     yearofstudy: number;
     created_at: Date;
+}
+
+export interface LoginUser{
+    name: string;
+    password: string;
 }

@@ -1,10 +1,10 @@
 import {Request, Response} from 'express'
-import { User } from './types';
+import { SignUpUser, LoginUser } from './types';
 import prisma from '../../../prisma.js';
-import { validatePhoneNumber, generateEmail, generateAccessToken, hashPassword } from './utils.js';
+import { validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword } from './utils.js';
 
 const signupController = async (req: Request, res: Response)=>{
-    const user: User = req.body;
+    const user: SignUpUser = req.body;
     try{
         if(!user.name || !user.rollno || !user.password || !user.department || !user.phoneno || !user.yearofstudy){
             return res.status(400).json({
@@ -40,4 +40,34 @@ const signupController = async (req: Request, res: Response)=>{
     }
 }
 
-export {signupController};
+const loginController = async (req: Request, res: Response)=>{
+    const user: LoginUser = req.body;
+    try{
+        const users = await prisma.users.findFirst({
+            where: {
+                name: user.name
+            }
+        })
+        if(!users){
+            return res.status(401).json({
+                error: "User does not exists"
+            })
+        }
+        if(!checkPassword(users.password, user.password)){
+            return res.status(401).json({
+                error: "Wrong password"
+            })
+        }
+        return res.status(200).json({
+            message: "User logged in successfully",
+            token: generateAccessToken(users.id)
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            error: err
+        })
+    }
+}
+
+export {signupController, loginController};

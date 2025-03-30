@@ -1,4 +1,4 @@
-import {genSaltSync, hashSync } from 'bcrypt-ts';
+import {genSaltSync, hashSync, compareSync } from 'bcrypt-ts';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 
@@ -40,4 +40,10 @@ const generateAccessToken = (id: number)=>{
     return token;
 }
 
-export {validatePhoneNumber, generateEmail, generateAccessToken, hashPassword}
+//login util
+
+const checkPassword = (hashpassword: string, password: string)=>{
+    return compareSync(password, hashpassword);
+}
+
+export {validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword}
