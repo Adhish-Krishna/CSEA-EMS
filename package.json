@@ -1,0 +1,32 @@
+{
+  "name": "daddy-ems",
+  "version": "1.0.0",
+  "description": "Work in Progress",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "node --no-warnings --loader ts-node/esm src/server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Adhish-Krishna/Daddy-EMS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Adhish-Krishna/Daddy-EMS/issues"
+  },
+  "homepage": "https://github.com/Adhish-Krishna/Daddy-EMS#readme",
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.13.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
