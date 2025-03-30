@@ -24,6 +24,10 @@ Daddy-EMS is a comprehensive event management system designed to simplify the pr
    ```bash
    npm install
    ```
+3. Generate the client library using Prisma
+   ```bash
+   npx prisma generate
+   ```
 
 3. Start the development server
    ```bash
