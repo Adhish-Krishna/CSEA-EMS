@@ -1,6 +1,9 @@
 import express, {Express, Request, Response} from "express";
+import dotenv from 'dotenv';
 
-const PORT: number = 3000;
+dotenv.config()
+
+const PORT: string = process.env.PORT || '3000'
 
 const app: Express = express();
 
