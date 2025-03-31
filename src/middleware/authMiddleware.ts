@@ -7,7 +7,7 @@ dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
-const authMiddleware = (req: Request, res: Response, next: NextFunction): void =>{
+const authMiddleware = (req: Request|any, res: Response, next: NextFunction): void =>{
     try{
         const token = req.cookies?.accesstoken;
         if(!token){
