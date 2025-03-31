@@ -3,18 +3,20 @@ import { SignUpUser, LoginUser } from './types';
 import prisma from '../../../prisma.js';
 import { validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword } from './utils.js';
 
-const signupController = async (req: Request, res: Response)=>{
+const signupController = async (req: Request, res: Response): Promise<void> =>{
     const user: SignUpUser = req.body;
     try{
         if(!user.name || !user.rollno || !user.password || !user.department || !user.phoneno || !user.yearofstudy){
-            return res.status(400).json({
+            res.status(400).json({
                 message: "Require all fields"
             })
+            return;
         }
         if(!validatePhoneNumber(user.phoneno)){
-            return res.status(400).json({
+            res.status(400).json({
                 message: "Phone number must contain 10 digits"
             })
+            return;
         }
         user.email = generateEmail(user.rollno);
         const new_user = await prisma.users.create({
@@ -34,18 +36,20 @@ const signupController = async (req: Request, res: Response)=>{
             secure: true,
             sameSite: 'strict'
         })
-        return res.status(201).json({
+        res.status(201).json({
             message: "User signed up successfully",
         });
+        return;
     }
     catch(err){
-        return res.status(500).json({
+        res.status(500).json({
             message: err
         })
+        return;
     }
 }
 
-const loginController = async (req: Request, res: Response)=>{
+const loginController = async (req: Request, res: Response): Promise<void> =>{
     const user: LoginUser = req.body;
     try{
         const users = await prisma.users.findFirst({
@@ -54,14 +58,16 @@ const loginController = async (req: Request, res: Response)=>{
             }
         })
         if(!users){
-            return res.status(401).json({
+            res.status(401).json({
                 message: "User does not exists"
             })
+            return;
         }
         if(!checkPassword(users.password, user.password)){
-            return res.status(401).json({
+            res.status(401).json({
                 message: "Wrong password"
             })
+            return;
         }
         const token = generateAccessToken(users.id);
         res.cookie('accesstoken', token, {
@@ -69,14 +75,16 @@ const loginController = async (req: Request, res: Response)=>{
             secure: true,
             sameSite: 'strict'
         })
-        return res.status(200).json({
+        res.status(200).json({
             message: "User logged in successfully"
         })
+        return;
     }
     catch(err){
-        return res.status(500).json({
+        res.status(500).json({
             message: err
         })
+        return;
     }
 }
 
