@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "nbfgknbdnblsdnb";
 
 const authMiddleware = (req: AuthenticationRequest, res: Response, next: NextFunction)=>{
     try{
-        const token = req.headers.authorization?.split(' ')[1];
+        const token = req.cookies?.accesstoken;
         if(!token){
             return res.status(401).json({
                 message: "No token provided"

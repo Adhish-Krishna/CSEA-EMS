@@ -28,9 +28,14 @@ const signupController = async (req: Request, res: Response)=>{
                 yearofstudy: user.yearofstudy
             }
         })
+        const token = generateAccessToken(new_user.id);
+        res.cookie('accesstoken', token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict'
+        })
         return res.status(201).json({
             message: "User signed up successfully",
-            token: generateAccessToken(new_user.id),
         });
     }
     catch(err){
@@ -58,9 +63,14 @@ const loginController = async (req: Request, res: Response)=>{
                 message: "Wrong password"
             })
         }
+        const token = generateAccessToken(users.id);
+        res.cookie('accesstoken', token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict'
+        })
         return res.status(200).json({
-            message: "User logged in successfully",
-            token: generateAccessToken(users.id)
+            message: "User logged in successfully"
         })
     }
     catch(err){
