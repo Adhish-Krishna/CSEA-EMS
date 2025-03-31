@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || "nbfgknbdnblsdnb";
-const JWT_TOKEN_EXPIRY_MINUTES = process.env.JWT_TOKEN_EXPIRY_MINUTES || '60';
+const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_TOKEN_EXPIRY_MINUTES = process.env.JWT_TOKEN_EXPIRY_MINUTES!;
 
 //signup util
 
