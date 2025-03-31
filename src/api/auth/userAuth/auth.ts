@@ -1,11 +1,11 @@
 import { Router} from 'express';
-import { loginController, signupController } from './controller.js';
+import { loginController, signupController, logoutController} from './controller.js';
 
 const userAuthRouter = Router();
 
 /**
  * @swagger
- * /auth/signup:
+ * /auth/user/signup:
  *   post:
  *     summary: Register a new user
  *     description: Creates a new user account
@@ -16,15 +16,25 @@ const userAuthRouter = Router();
  *           schema:
  *             type: object
  *             properties:
- *               username:
- *                 type: string
- *                 example: "johndoe"
- *               email:
- *                 type: string
- *                 example: "johndoe@example.com"
+ *               name:
+ *                  type: string
+ *                  example: "johndoe"
+ *               rollno:
+ *                  type: string
+ *                  example: "23N206"
  *               password:
- *                 type: string
- *                 example: "mypassword"
+ *                  type: string
+ *                  example: "securepassword"
+ *               department:
+ *                  type: string
+ *                  example: "CSE AI ML"
+ *               phoneno:
+ *                  type: bigint
+ *                  example: 1234567890
+ *               yearofstudy:
+ *                  type: number
+ *                  example: 2
+ *
  *     responses:
  *       201:
  *         description: User registered successfully
@@ -38,16 +48,24 @@ const userAuthRouter = Router();
  *                   example: "User registered successfully"
  *       400:
  *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Require all fields"
  */
 
 userAuthRouter.post('/signup', signupController);
 
 /**
  * @swagger
- * /auth/login:
+ * /auth/user/login:
  *   post:
  *     summary: User login
- *     description: Logs in a user and returns a JWT token
+ *     description: Logs in a user
  *     requestBody:
  *       required: true
  *       content:
@@ -55,12 +73,12 @@ userAuthRouter.post('/signup', signupController);
  *           schema:
  *             type: object
  *             properties:
- *               email:
+ *               name:
  *                 type: string
- *                 example: "johndoe@example.com"
+ *                 example: "johndoe"
  *               password:
  *                 type: string
- *                 example: "mypassword"
+ *                 example: "securepassword"
  *     responses:
  *       200:
  *         description: Successful login
@@ -69,12 +87,44 @@ userAuthRouter.post('/signup', signupController);
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 message:
  *                   type: string
- *                   example: "eyJhbGciOiJIUzI1NiIs..."
+ *                   example: "User logged in successfully"
+ *       401:
+ *         description: User does not exist
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User does not exists"
+ */
+userAuthRouter.post('/login', loginController);
+
+/**
+ * @swagger
+ * /auth/user/logout:
+ *   post:
+ *     summary: User logout
+ *     description: Logs out a user
+ *
+ *     responses:
+ *       200:
+ *         description: Successful logout
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 mesage:
+ *                   type: string
+ *                   example: "User logged out successfully"
  *       401:
  *         description: Invalid credentials
  */
-userAuthRouter.post('/login', loginController);
+
+userAuthRouter.post('/logout', logoutController);
 
 export default userAuthRouter;

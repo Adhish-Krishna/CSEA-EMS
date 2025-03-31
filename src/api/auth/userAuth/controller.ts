@@ -88,4 +88,15 @@ const loginController = async (req: Request, res: Response): Promise<void> =>{
     }
 }
 
-export {signupController, loginController};
+const logoutController = (req: Request, res: Response): void =>{
+    res.clearCookie('accesstoken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict'
+    })
+    res.status(200).json({
+        message: "User logged out successfully"
+    })
+}
+
+export {signupController, loginController, logoutController};
