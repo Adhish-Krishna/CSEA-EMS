@@ -63,7 +63,7 @@ const loginController = async (req: Request, res: Response): Promise<void> =>{
             })
             return;
         }
-        if(!checkPassword(users.password, user.password)){
+        if(!checkPassword(users.password!, user.password)){
             res.status(401).json({
                 message: "Wrong password"
             })

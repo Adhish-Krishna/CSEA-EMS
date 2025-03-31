@@ -1,7 +1,12 @@
--- This sql is seperate from the sql files in the sql folder because this is only executed in developement
--- Truncate command to delete all tables
-TRUNCATE TABLE
-    clubAdvisors, exemption, eventAttendance, eventWinners, feedback, organizingClubs,
-    teamMembers, eventRegistration, eventConvenors, clubAdmins, clubMembers,
-    events, teams, facultyAdvisors, clubs, users
-RESTART IDENTITY CASCADE;
+-- Start a transaction for safety
+BEGIN;
+
+-- First truncate tables with foreign key dependencies
+TRUNCATE TABLE invitation, clubAdvisors, eventAttendance, eventWinners,
+             feedback, organizingClubs, teamMembers, eventRegistration,
+             eventConvenors, clubMembers CASCADE;
+
+-- Then truncate base tables
+TRUNCATE TABLE facultyAdvisors, teams, events, clubs, users CASCADE;
+
+COMMIT;
