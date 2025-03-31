@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/Adhish-Krishna/Daddy-EMS#readme",
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.1",
@@ -34,6 +35,7 @@
   "dependencies": {
     "@prisma/client": "^6.5.0",
     "bcrypt-ts": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
