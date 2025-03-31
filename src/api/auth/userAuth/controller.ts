@@ -8,12 +8,12 @@ const signupController = async (req: Request, res: Response)=>{
     try{
         if(!user.name || !user.rollno || !user.password || !user.department || !user.phoneno || !user.yearofstudy){
             return res.status(400).json({
-                error: "Require all fields"
+                message: "Require all fields"
             })
         }
         if(!validatePhoneNumber(user.phoneno)){
             return res.status(400).json({
-                error: "Phone number must contain 10 digits"
+                message: "Phone number must contain 10 digits"
             })
         }
         user.email = generateEmail(user.rollno);
@@ -35,7 +35,7 @@ const signupController = async (req: Request, res: Response)=>{
     }
     catch(err){
         return res.status(500).json({
-            error: err
+            message: err
         })
     }
 }
@@ -50,12 +50,12 @@ const loginController = async (req: Request, res: Response)=>{
         })
         if(!users){
             return res.status(401).json({
-                error: "User does not exists"
+                message: "User does not exists"
             })
         }
         if(!checkPassword(users.password, user.password)){
             return res.status(401).json({
-                error: "Wrong password"
+                message: "Wrong password"
             })
         }
         return res.status(200).json({
@@ -65,7 +65,7 @@ const loginController = async (req: Request, res: Response)=>{
     }
     catch(err){
         return res.status(500).json({
-            error: err
+            message: err
         })
     }
 }
