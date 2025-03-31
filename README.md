@@ -67,8 +67,11 @@ This will compile TypeScript files into JavaScript in the `dist/` directory and 
 After defining the routes, add tickbox in respective rows in the table
 
 Daddy-Logger - Darshan
+
 Docker-compose for PostGres - Adhish
+
 Trigger setup for DB - Karthi
+
 
 ## Auth Routes
 
