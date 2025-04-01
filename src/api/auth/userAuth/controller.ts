@@ -1,7 +1,8 @@
 import {Request, Response} from 'express'
 import { SignUpUser, LoginUser } from './types';
 import prisma from '../../../prisma.js';
-import { validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword } from './utils.js';
+import { validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword, generateSecurityCode } from './utils.js';
+import { sendSecurityCodeEmail } from '../../../mailer/sendMail.js';
 
 const signupController = async (req: Request, res: Response): Promise<void> =>{
     const user: SignUpUser = req.body;
@@ -22,7 +23,7 @@ const signupController = async (req: Request, res: Response): Promise<void> =>{
         const new_user = await prisma.users.create({
             data: {
                 name : user.name,
-                rollno: user.rollno,
+                rollno: user.rollno.toLowerCase(),
                 password: hashPassword(user.password),
                 department: user.department,
                 email: user.email,
@@ -54,7 +55,7 @@ const loginController = async (req: Request, res: Response): Promise<void> =>{
     try{
         const users = await prisma.users.findFirst({
             where: {
-                name: user.name
+                rollno: user.rollno.toLowerCase()
             }
         })
         if(!users){
@@ -99,4 +100,135 @@ const logoutController = (req: Request, res: Response): void =>{
     })
 }
 
-export {signupController, loginController, logoutController};
+const generateSecurityCodeController = async (req: Request, res: Response): Promise<void> =>{
+    const {rollno} = req.body;
+    try{
+        const user = await prisma.users.findFirst({
+            where:{
+                rollno: rollno.toLowerCase()
+            }
+        });
+        if(!user){
+            res.status(401).json({
+                message: "User does not exist"
+            })
+            return;
+        }
+        const user_id = user.id;
+        const code = generateSecurityCode();
+        const userSecurityRecord = await prisma.usersecuritycode.findFirst({
+            where:{
+                user_id: user_id
+            }
+        });
+        if(!userSecurityRecord){
+            const newSecurityRecord = await prisma.usersecuritycode.create({
+                data:{
+                    user_id: user_id,
+                    code: code
+                }
+            });
+        }
+        else{
+            await prisma.usersecuritycode.update({
+                where:{
+                    user_id: user_id
+                },
+                data:{
+                    code: code
+                }
+            });
+        }
+        const user_email = user.email;
+        sendSecurityCodeEmail(user_email!, code);
+        res.status(200).json({
+            message: "Security Code Created"
+        });
+        return;
+    }
+    catch(err){
+        res.status(500).json({
+            message: err
+        });
+        return;
+    }
+}
+
+const verifySecurityCodeController = async (req: Request, res: Response): Promise<void> =>{
+    const {rollno, code} = req.body;
+    const userRecord = await prisma.users.findFirst({
+        where: {
+            rollno: rollno.toLowerCase()
+        }
+    });
+    if(!userRecord){
+        res.status(401).json({
+            message: "User does not exists"
+        });
+        return;
+    }
+    const user_id = userRecord.id;
+    const securityRecord = await prisma.usersecuritycode.findFirst({
+        where:{
+            user_id: user_id
+        }
+    });
+    if(!securityRecord){
+        res.status(401).json({
+            message: "Security code not found"
+        });
+        return;
+    }
+    if(code === securityRecord?.code){
+        res.status(200).json({
+            message: "Security Codes matched"
+        });
+        return;
+    }
+    else{
+        res.status(400).json({
+            message: "Security codes not matched"
+        });
+        return;
+    }
+}
+
+const resetpasswordController = async (req: Request, res: Response): Promise<void> =>{
+    const {rollno, password} = req.body;
+    try{
+        const userRecord = await prisma.users.findFirst({
+            where: {
+                rollno: rollno.toLowerCase()
+            }
+        });
+        if(!userRecord){
+            res.status(401).json({
+                message: "User does not exists"
+            });
+            return;
+        }
+        const user_id = userRecord.id;
+        const hashpassword = hashPassword(password);
+        await prisma.users.update({
+            where:{
+                id: user_id
+            },
+            data:{
+                password: hashpassword
+            }
+        });
+        res.status(200).json({
+            message: "Password reset successfully"
+        });
+        return;
+
+    }
+    catch(err){
+        res.status(500).json({
+            message: err
+        });
+        return;
+    }
+}
+
+export {signupController, loginController, logoutController, generateSecurityCodeController, verifySecurityCodeController, resetpasswordController};

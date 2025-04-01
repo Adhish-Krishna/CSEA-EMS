@@ -7,6 +7,8 @@ import userAuthRouter from "./api/auth/userAuth/auth.js";
 
 import { setupSwagger } from "./swagger.js";
 
+import { clearSecurityCodes } from "./jobs/securityCodeCleaner/securityCodeCleaner.js";
+
 dotenv.config();
 
 const PORT: string = process.env.PORT || "3000";
@@ -18,6 +20,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 setupSwagger(app);
+
+clearSecurityCodes();
 
 app.get("/", (req: Request, res: Response) => {
     res.json({
