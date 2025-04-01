@@ -44,6 +44,15 @@ CREATE TABLE facultyAdvisors (
     designation TEXT
 );
 
+--Table: userSecurityCode
+CREATE TABLE userSecurityCode (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER not NULL,
+    code TEXT,
+    created_at TIMESTAMP,
+    CONSTRAINT fk_userSecurityCode_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
 -- Table: clubMembers
 CREATE TABLE clubMembers (
     id SERIAL PRIMARY KEY,
