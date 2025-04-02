@@ -21,7 +21,11 @@ const options = {
             },
         ],
     },
-    apis: ["./src/api/auth/userAuth/*.ts"], // Update this if you have more routes
+    apis: [
+        "./src/api/auth/userAuth/*.ts",
+        "./src/api/user/*.ts",
+        "./src/api/event/*.ts"
+    ], // Update this if you have more routes
 };
 
 const swaggerSpec = swaggerJsDoc(options);

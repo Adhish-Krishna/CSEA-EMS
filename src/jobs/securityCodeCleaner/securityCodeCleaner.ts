@@ -3,10 +3,11 @@ import prisma from '../../prisma.js';
 
 const clearSecurityCodes = () => {
     const job = cron.schedule('* * * * *', async () => {
-        const currDate = new Date();
+        const twominago = new Date();
+        twominago.setMinutes(twominago.getMinutes() - 2);
         const deleted_records = await prisma.usersecuritycode.deleteMany({
             where: {
-                created_at: { lte: currDate }
+                created_at: { lte: twominago }
             }
         });
 
