@@ -21,11 +21,18 @@ const userRouter = Router();
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/TeamInvite'
+ *           example:
+ *             from_team_id: "team123"
+ *             to_team_id: "team456"
  *     responses:
  *       200:
  *         description: Team invite accepted.
+ *       400:
+ *         description: Missing eventId or required fields in request body.
  *       404:
  *         description: Invite not found.
+ *       500:
+ *         description: Internal server error.
  */
 userRouter.post('/acceptTeamInvite/:eventId', acceptTeamInviteController);
 
@@ -40,12 +47,35 @@ userRouter.post('/acceptTeamInvite/:eventId', acceptTeamInviteController);
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/TeamInvite'
+ *           example:
+ *             from_team_id: "team123"
+ *             to_team_id: "team456"
  *     responses:
  *       200:
  *         description: Team invite rejected.
  *       404:
  *         description: Invite not found.
+ *       500:
+ *         description: Internal server error.
  */
-userRouter.post('/rejectTeamInvite/', rejectTeamInviteController);
+userRouter.post('/rejectTeamInvite', rejectTeamInviteController);
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     TeamInvite:
+ *       type: object
+ *       required:
+ *         - from_team_id
+ *         - to_team_id
+ *       properties:
+ *         from_team_id:
+ *           type: string
+ *           description: ID of the team sending the invite
+ *         to_team_id:
+ *           type: string
+ *           description: ID of the team receiving the invite
+ */
 
 export default userRouter;

@@ -9,6 +9,8 @@ import { setupSwagger } from "./swagger.js";
 
 import { clearSecurityCodes } from "./jobs/securityCodeCleaner/securityCodeCleaner.js";
 
+import { authMiddleware } from "./middleware/authMiddleware.js";
+
 dotenv.config();
 
 const PORT: string = process.env.PORT || "3000";
@@ -30,7 +32,9 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/auth/user", userAuthRouter);
-app.use("/user",userRouter)
+
+app.use("/user", authMiddleware, userRouter);
+
 app.listen(PORT, () => {
     console.log(`Server running on : http://localhost:${PORT}`);
 });
