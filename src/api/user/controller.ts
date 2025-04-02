@@ -7,8 +7,21 @@ const acceptTeamInviteController = async (req: Request, res: Response): Promise<
     const user_id=req.user_id;
     const eventId = req.params.eventId;
     const Invite: TeamInvite = req.body;
-    const {from_team_id,to_team_id} = Invite;
+    
     try{
+        if(!eventId){
+            res.status(400).json({
+                message: "Requires eventId"
+            })
+            return;
+        }
+        if(!Invite.from_team_id || !Invite.to_team_id){
+            res.status(400).json({
+                message: "Require all fields"
+            })
+            return;
+        }
+        const {from_team_id,to_team_id} = Invite;
         const teamInvite = await prisma.invitation.findFirst({
             where: {
                 from_team_id: from_team_id,

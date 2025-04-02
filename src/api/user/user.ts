@@ -27,7 +27,7 @@ const userRouter = Router();
  *       404:
  *         description: Invite not found.
  */
-userRouter.post('/user/acceptTeamInvite/:eventId', acceptTeamInviteController);
+userRouter.post('/acceptTeamInvite/:eventId', acceptTeamInviteController);
 
 /**
  * @swagger
@@ -46,6 +46,6 @@ userRouter.post('/user/acceptTeamInvite/:eventId', acceptTeamInviteController);
  *       404:
  *         description: Invite not found.
  */
-userRouter.post('/user/rejectTeamInvite/', rejectTeamInviteController);
+userRouter.post('/rejectTeamInvite/', rejectTeamInviteController);
 
 export default userRouter;
