@@ -77,6 +77,7 @@ model events {
   eventwinners      eventwinners[]
   feedback          feedback[]
   organizingclubs   organizingclubs[]
+  teams             teams[]
 }
 
 model eventwinners {
@@ -134,6 +135,8 @@ model teammembers {
 model teams {
   id                                        Int                 @id @default(autoincrement())
   name                                      String?
+  event_id                                  Int?
+  teamto_event                              events?             @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teams_event")
   eventregistration                         eventregistration[]
   eventwinners                              eventwinners[]
   invitation_invitation_from_team_idToteams invitation[]        @relation("invitation_from_team_idToteams")

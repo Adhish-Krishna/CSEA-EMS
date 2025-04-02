@@ -4,7 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 
 import userAuthRouter from "./api/auth/userAuth/auth.js";
-
+import userRouter from "./api/user/user.js";
 import { setupSwagger } from "./swagger.js";
 
 import { clearSecurityCodes } from "./jobs/securityCodeCleaner/securityCodeCleaner.js";
@@ -30,7 +30,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/auth/user", userAuthRouter);
-
+app.use("/user",userRouter)
 app.listen(PORT, () => {
     console.log(`Server running on : http://localhost:${PORT}`);
 });
