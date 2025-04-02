@@ -20,6 +20,16 @@ const options = {
                 description: "Local server",
             },
         ],
+        tags: [
+            {
+                name: "UserAuth",
+                description: "User Authentication Routes",
+            },
+            {
+                name: "Users",
+                description: "User Routes"
+            },
+        ]
     },
     apis: [
         "./src/api/auth/userAuth/*.ts",

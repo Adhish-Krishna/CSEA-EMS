@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 export interface UserPayload extends jwt.JwtPayload{
-    id: string;
+    id: number;
 }
 declare global {
     namespace Express {

@@ -7,6 +7,7 @@ const userRouter = Router();
  * @swagger
  * /user/acceptTeamInvite/{eventId}:
  *   post:
+ *     tags: [Users]
  *     summary: Accept a team invite
  *     parameters:
  *       - in: path
@@ -40,6 +41,7 @@ userRouter.post('/acceptTeamInvite/:eventId', acceptTeamInviteController);
  * @swagger
  * /user/rejectTeamInvite:
  *   post:
+ *     tags: [Users]
  *     summary: Reject a team invite
  *     requestBody:
  *       required: true

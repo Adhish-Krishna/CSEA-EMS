@@ -5,7 +5,9 @@ import jwt from 'jsonwebtoken';
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
 const JWT_TOKEN_EXPIRY_MINUTES = process.env.JWT_TOKEN_EXPIRY_MINUTES!;
+const JWT_REFRESH_TOKEN_EXPIRY_MINUTES = process.env.JWT_REFRESH_TOKEN_EXPIRY_MINUTES!;
 
 //signup util
 
@@ -59,4 +61,19 @@ const generateSecurityCode = ()=>{
     return code;
 }
 
-export {validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword, generateSecurityCode}
+//common util
+
+const generateRefreshToken = (id:  number)=>{
+    const token = jwt.sign(
+        {
+            id: id
+        },
+        JWT_REFRESH_SECRET,
+        {
+            expiresIn: 60*parseInt(JWT_REFRESH_TOKEN_EXPIRY_MINUTES)
+        }
+    );
+    return token;
+}
+
+export {validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword, generateSecurityCode, generateRefreshToken}

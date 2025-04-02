@@ -1,8 +1,15 @@
 import {Request, Response} from 'express'
 import { SignUpUser, LoginUser } from './types';
 import prisma from '../../../prisma.js';
-import { validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword, generateSecurityCode } from './utils.js';
+import { validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword, generateSecurityCode, generateRefreshToken } from './utils.js';
 import { sendSecurityCodeEmail } from '../../../mailer/sendMail.js';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import { UserPayload } from '../../../middleware/types';
+
+dotenv.config();
+
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
 
 const signupController = async (req: Request, res: Response): Promise<void> =>{
     const user: SignUpUser = req.body;
@@ -31,12 +38,18 @@ const signupController = async (req: Request, res: Response): Promise<void> =>{
                 yearofstudy: user.yearofstudy
             }
         })
-        const token = generateAccessToken(new_user.id);
-        res.cookie('accesstoken', token, {
+        const accesstoken = generateAccessToken(new_user.id);
+        const refreshtoken = generateRefreshToken(new_user.id);
+        res.cookie('accesstoken', accesstoken, {
             httpOnly: true,
             secure: true,
             sameSite: 'strict'
-        })
+        });
+        res.cookie('refreshtoken', refreshtoken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict'
+        });
         res.status(201).json({
             message: "User signed up successfully",
         });
@@ -70,12 +83,18 @@ const loginController = async (req: Request, res: Response): Promise<void> =>{
             })
             return;
         }
-        const token = generateAccessToken(users.id);
-        res.cookie('accesstoken', token, {
+        const accesstoken = generateAccessToken(users.id);
+        const refreshtoken = generateRefreshToken(users.id);
+        res.cookie('accesstoken', accesstoken, {
             httpOnly: true,
             secure: true,
             sameSite: 'strict'
-        })
+        });
+        res.cookie('refreshtoken', refreshtoken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict'
+        });
         res.status(200).json({
             message: "User logged in successfully"
         })
@@ -94,10 +113,16 @@ const logoutController = (req: Request, res: Response): void =>{
         httpOnly: true,
         secure: true,
         sameSite: 'strict'
-    })
+    });
+    res.clearCookie('refreshtoken',{
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict'
+    });
     res.status(200).json({
         message: "User logged out successfully"
-    })
+    });
+    return;
 }
 
 const generateSecurityCodeController = async (req: Request, res: Response): Promise<void> =>{
@@ -231,4 +256,34 @@ const resetpasswordController = async (req: Request, res: Response): Promise<voi
     }
 }
 
-export {signupController, loginController, logoutController, generateSecurityCodeController, verifySecurityCodeController, resetpasswordController};
+const getNewAccessTokenController = (req: Request, res: Response): void =>{
+    try{
+        const refreshtoken = req.cookies.refreshtoken;
+        const payload = jwt.verify(refreshtoken, JWT_REFRESH_SECRET) as UserPayload;
+        const user_id = payload.id;
+        const accesstoken = generateAccessToken(user_id);
+        const newrefreshtoken = generateRefreshToken(user_id);
+        res.cookie('accesstoken', accesstoken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict'
+        });
+        res.cookie('refreshtoken', newrefreshtoken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict'
+        });
+        res.status(200).json({
+            message: "New access token generated",
+        });
+        return;
+    }
+    catch(err){
+        res.status(401).json({
+            message: err
+        });
+        return;
+    }
+}
+
+export {signupController, loginController, logoutController, generateSecurityCodeController, verifySecurityCodeController, resetpasswordController, getNewAccessTokenController};
