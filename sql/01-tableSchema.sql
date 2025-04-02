@@ -33,7 +33,9 @@ CREATE TABLE events (
 -- Table: teams
 CREATE TABLE teams (
     id SERIAL PRIMARY KEY,
-    name TEXT
+    name TEXT,
+    event_id INTEGER NOT NULL,
+    CONSTRAINT fk_teams_event FOREIGN KEY (event_id) REFERENCES events(id)
 );
 
 -- Table: facultyAdvisors
