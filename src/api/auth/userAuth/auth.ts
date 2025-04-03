@@ -75,9 +75,9 @@ userAuthRouter.post('/signup', signupController);
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               rollno:
  *                 type: string
- *                 example: "johndoe"
+ *                 example: "23N206"
  *               password:
  *                 type: string
  *                 example: "securepassword"
