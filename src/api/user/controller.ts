@@ -1,13 +1,13 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
 import RegisterController  from '../event/controller.js';
-import {TeamInvite} from './types.js';
+import {Feedback, TeamInvite} from './types.js';
 
 const acceptTeamInviteController = async (req: Request, res: Response): Promise<void> =>{
     const user_id=req.user_id;
     const eventId = req.params.eventId;
     const Invite: TeamInvite = req.body;
-    
+
     try{
         if(!eventId){
             res.status(400).json({
@@ -85,4 +85,29 @@ const rejectTeamInviteController = async (req: Request ,res:Response) :Promise<v
     }
 }
 
-export {acceptTeamInviteController, rejectTeamInviteController};
+const feedbackController = async (req: Request, res: Response): Promise<void> =>{
+    try{
+        const userFeedback: Feedback = req.body;
+        const user_id = req.user_id;
+        const feedbackdata = await prisma.feedback.create({
+            data:{
+                user_id: user_id,
+                event_id: userFeedback.event_id,
+                feedback: userFeedback.feedback,
+                rating: userFeedback.rating,
+            }
+        });
+        res.status(201).json({
+            message: "Feedback saved successfully"
+        });
+        return;
+    }
+    catch(err){
+        res.status(500).json({
+            message: err
+        });
+        return;
+    }
+}
+
+export {acceptTeamInviteController, rejectTeamInviteController, feedbackController};

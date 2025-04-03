@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { acceptTeamInviteController, rejectTeamInviteController } from './controller.js';
+import { acceptTeamInviteController, feedbackController, rejectTeamInviteController } from './controller.js';
 
 const userRouter = Router();
 
@@ -64,6 +64,42 @@ userRouter.post('/rejectTeamInvite', rejectTeamInviteController);
 
 /**
  * @swagger
+ * /user/feedback:
+ *   post:
+ *     tags: [Users]
+ *     summary: Submit user feedback for an event
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Feedback'
+ *           example:
+ *             event_id: 2
+ *             feedback: "Great event, really enjoyed it!"
+ *             rating: 5
+ *
+ *     responses:
+ *       201:
+ *         description: User feedback saved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Feedback saved successfully"
+ *
+ *
+ *       500:
+ *         description: Internal server error.
+ */
+
+userRouter.post('/feedback', feedbackController);
+
+/**
+ * @swagger
  * components:
  *   schemas:
  *     TeamInvite:
@@ -78,6 +114,31 @@ userRouter.post('/rejectTeamInvite', rejectTeamInviteController);
  *         to_team_id:
  *           type: string
  *           description: ID of the team receiving the invite
+ */
+
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Feedback:
+ *       type: object
+ *       required:
+ *         - event_id
+ *         - feedback
+ *         - rating
+ *       properties:
+ *         event_id:
+ *           type: number
+ *           description: ID of the event being rated
+ *         feedback:
+ *           type: string
+ *           description: User's text feedback about the event
+ *         rating:
+ *           type: number
+ *           description: Numerical rating for the event
+ *           minimum: 1
+ *           maximum: 5
  */
 
 export default userRouter;
