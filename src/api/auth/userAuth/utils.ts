@@ -5,7 +5,9 @@ import jwt from 'jsonwebtoken';
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
 const JWT_TOKEN_EXPIRY_MINUTES = process.env.JWT_TOKEN_EXPIRY_MINUTES!;
+const JWT_REFRESH_TOKEN_EXPIRY_MINUTES = process.env.JWT_REFRESH_TOKEN_EXPIRY_MINUTES!;
 
 //signup util
 
@@ -46,4 +48,32 @@ const checkPassword = (hashpassword: string, password: string)=>{
     return compareSync(password, hashpassword);
 }
 
-export {validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword}
+//reset password util
+
+const generateSecurityCode = ()=>{
+    const alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const length = 3;
+    let code = '';
+    for(let i=0; i<length; i++){
+        code += alphabets[Math.floor(Math.random()*alphabets.length)] + numbers[Math.floor(Math.random()*numbers.length)]
+    }
+    return code;
+}
+
+//common util
+
+const generateRefreshToken = (id:  number)=>{
+    const token = jwt.sign(
+        {
+            id: id
+        },
+        JWT_REFRESH_SECRET,
+        {
+            expiresIn: 60*parseInt(JWT_REFRESH_TOKEN_EXPIRY_MINUTES)
+        }
+    );
+    return token;
+}
+
+export {validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword, generateSecurityCode, generateRefreshToken}

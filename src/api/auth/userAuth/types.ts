@@ -10,6 +10,6 @@ export interface SignUpUser{
 }
 
 export interface LoginUser{
-    name: string;
+    rollno: string
     password: string;
 }

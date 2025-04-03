@@ -20,8 +20,22 @@ const options = {
                 description: "Local server",
             },
         ],
+        tags: [
+            {
+                name: "UserAuth",
+                description: "User Authentication Routes",
+            },
+            {
+                name: "Users",
+                description: "User Routes"
+            },
+        ]
     },
-    apis: ["./src/api/auth/userAuth/*.ts"], // Update this if you have more routes
+    apis: [
+        "./src/api/auth/userAuth/*.ts",
+        "./src/api/user/*.ts",
+        "./src/api/event/*.ts"
+    ], // Update this if you have more routes
 };
 
 const swaggerSpec = swaggerJsDoc(options);

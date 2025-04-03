@@ -2,13 +2,13 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name TEXT,
-    rollno VARCHAR(50),
+    rollno VARCHAR(50) UNIQUE,
     password TEXT,
     department TEXT,
-    email VARCHAR(100),
-    phoneno BIGINT,
+    email VARCHAR(100) UNIQUE,
+    phoneno BIGINT UNIQUE,
     yearofstudy INTEGER,
-    created_at TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Table: clubs
@@ -33,7 +33,9 @@ CREATE TABLE events (
 -- Table: teams
 CREATE TABLE teams (
     id SERIAL PRIMARY KEY,
-    name TEXT
+    name TEXT,
+    event_id INTEGER NOT NULL,
+    CONSTRAINT fk_teams_event FOREIGN KEY (event_id) REFERENCES events(id)
 );
 
 -- Table: facultyAdvisors
@@ -42,6 +44,15 @@ CREATE TABLE facultyAdvisors (
     name TEXT,
     department TEXT,
     designation TEXT
+);
+
+--Table: userSecurityCode
+CREATE TABLE userSecurityCode (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER UNIQUE NOT NULL,
+    code TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_userSecurityCode_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- Table: clubMembers
@@ -100,7 +111,7 @@ CREATE TABLE feedback (
     event_id INTEGER NOT NULL,
     feedback TEXT,
     rating INTEGER,
-    created_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_feedback_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_feedback_event FOREIGN KEY (event_id) REFERENCES events(id)
 );
