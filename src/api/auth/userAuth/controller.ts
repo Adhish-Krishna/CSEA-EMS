@@ -43,12 +43,12 @@ const signupController = async (req: Request, res: Response): Promise<void> =>{
         res.cookie('accesstoken', accesstoken, {
             httpOnly: true,
             secure: true,
-            sameSite: 'strict'
+            sameSite: 'none'
         });
         res.cookie('refreshtoken', refreshtoken, {
             httpOnly: true,
             secure: true,
-            sameSite: 'strict'
+            sameSite: 'none'
         });
         res.status(201).json({
             message: "User signed up successfully",
@@ -88,12 +88,12 @@ const loginController = async (req: Request, res: Response): Promise<void> =>{
         res.cookie('accesstoken', accesstoken, {
             httpOnly: true,
             secure: true,
-            sameSite: 'strict'
+            sameSite: 'none'
         });
         res.cookie('refreshtoken', refreshtoken, {
             httpOnly: true,
             secure: true,
-            sameSite: 'strict'
+            sameSite: 'none'
         });
         res.status(200).json({
             message: "User logged in successfully"
@@ -112,12 +112,12 @@ const logoutController = (req: Request, res: Response): void =>{
     res.clearCookie('accesstoken', {
         httpOnly: true,
         secure: true,
-        sameSite: 'strict'
+        sameSite: 'none'
     });
     res.clearCookie('refreshtoken',{
         httpOnly: true,
         secure: true,
-        sameSite: 'strict'
+        sameSite: 'none'
     });
     res.status(200).json({
         message: "User logged out successfully"
