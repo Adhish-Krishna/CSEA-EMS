@@ -4,12 +4,13 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 
 import userAuthRouter from "./api/auth/userAuth/auth.js";
+import adminAuthRouter from "./api/auth/adminAuth/auth.js";
 import userRouter from "./api/user/user.js";
 import { setupSwagger } from "./swagger.js";
 
 import { clearSecurityCodes } from "./jobs/securityCodeCleaner/securityCodeCleaner.js";
 
-import { authMiddleware } from "./middleware/authMiddleware.js";
+import {userAuthMiddleware } from "./middleware/authMiddleware.js";
 
 dotenv.config();
 
@@ -33,7 +34,9 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/auth/user", userAuthRouter);
 
-app.use("/user", authMiddleware, userRouter);
+app.use("/auth/admin", adminAuthRouter);
+
+app.use("/user", userAuthMiddleware, userRouter);
 
 app.listen(PORT, () => {
     console.log(`Server running on : http://localhost:${PORT}`);

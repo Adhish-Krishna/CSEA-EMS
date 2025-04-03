@@ -26,6 +26,10 @@ const options = {
                 description: "User Authentication Routes",
             },
             {
+                name: "AdminAuth",
+                description: "Admin Authentication Routes",
+            },
+            {
                 name: "Users",
                 description: "User Routes"
             },
@@ -33,6 +37,7 @@ const options = {
     },
     apis: [
         "./src/api/auth/userAuth/*.ts",
+        "./src/api/auth/adminAuth/*.ts",
         "./src/api/user/*.ts",
         "./src/api/event/*.ts"
     ], // Update this if you have more routes
