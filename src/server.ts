@@ -37,6 +37,7 @@ app.use("/auth/user", userAuthRouter);
 app.use("/auth/admin", adminAuthRouter);
 
 app.use("/user", userAuthMiddleware, userRouter);
+app.use("/admin",createEvent)
 
 app.listen(PORT, () => {
     console.log(`Server running on : http://localhost:${PORT}`);
