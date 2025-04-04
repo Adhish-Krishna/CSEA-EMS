@@ -15,26 +15,35 @@ Daddy-EMS is a comprehensive event management system designed to simplify the pr
 ## 💻 Installation
 
 1. Clone the repository
-   
+
    ```bash
    git clone https://github.com/Adhish-Krishna/Daddy-EMS.git
    cd Daddy-EMS
    ```
 2. Install dependencies
-   
+
    ```bash
    npm install
    ```
 3. Generate the client library using Prisma
-   
+
    ```bash
    npx prisma generate
    ```
 4. Start the development server
-   
+
    ```bash
    npm run dev
    ```
+
+## ⚙️ Installing using Docker:
+   ```bash
+      docker-compose build
+   ```
+   ```bash
+      docker-compose up -d
+   ```
+
 
 ## 🔍 TypeScript Setup
 
@@ -107,4 +116,3 @@ Trigger setup for DB - Karthi
 | /user/membership       | GET    | Fetching membership details |     Pravith          |
 | /user/invitations | GET | Fetching current Invitation | Darshan |
 | /user/submit/feedback/:eventId  | POST   | Feedback submission by user                                                    |           Adhish    |
-
