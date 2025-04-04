@@ -1,9 +1,8 @@
-import express from "express";
-import createEvent  from "./createEventController.ts"; // ✅ Correct import
+import { Router} from 'express';
 
-const router = express.Router();
 
-// ✅ Correct usage of the route
-router.post("/create", createEvent);
+import RegisterController from './controller.js';
 
-export default router;
+const eventRouter = Router();
+eventRouter.post('/user/register/:eventId',RegisterController)
+export default eventRouter;
