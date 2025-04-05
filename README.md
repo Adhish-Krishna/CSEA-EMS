@@ -107,6 +107,7 @@ Trigger setup for DB - Karthi
 
 | Endpoint                         | Method | Purpose                                                                        | To be done by |
 | -------------------------------- | ------ | ------------------------------------------------------------------------------ | ------------- |
+| /event/modify                    | POST   | Admin modifying the event details                                              |  Chandru |
 | /event/stats/:eventId            | GET    | Fetching stats of particular event by admin                                    |    Chandru   |
 | /event/addPlaceHolders/:eventId  | POST   | Providing the details of winners and runners by club admin of particular event |         Pravith   |
 | /event/attendance/:eventId       | POST   | Marking attendance for particular event by 
