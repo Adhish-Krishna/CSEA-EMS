@@ -2,13 +2,27 @@ name: Notify Discord on GitHub Events
 
 on:
   push:
+    branches:
+      - main
   pull_request:
+    types:
+      - opened
+      - closed
+      - reopened
   issues:
+    types:
+      - opened
+      - closed
+      - reopened
   issue_comment:
+    types:
+      - created
   fork:
   create:
   delete:
   release:
+    types:
+      - published
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
@@ -23,9 +37,18 @@ jobs:
           REPO: ${{ github.repository }}
           RUN_ID: ${{ github.run_id }}
         run: |
-          MESSAGE="🔔 *GitHub Event Triggered!\n📢 **Event:* $EVENT_NAME\n👤 *Triggered by:* $ACTOR\n📂 *Repository:* $REPO\n🔗 [View Workflow Run](https://github.com/$REPO/actions/runs/$RUN_ID)"
-          echo "$MESSAGE"
+          MESSAGE=$(cat <<EOF
+          🔔 **GitHub Event Triggered!**
+          📢 **Event:** $EVENT_NAME
+          👤 **Triggered by:** $ACTOR
+          📂 **Repository:** $REPO
+          🔗 [View Workflow Run](https://github.com/$REPO/actions/runs/$RUN_ID)
+          EOF
+          )
+
+          ESCAPED_MESSAGE=$(echo "$MESSAGE" | jq -Rs .)
+
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d "{\"username\": \"GitHub Actions\", \"content\": \"$MESSAGE\"}" \
+               -d "{\"username\": \"GitHub Actions\", \"content\": $ESCAPED_MESSAGE}" \
                "$DISCORD_WEBHOOK"
