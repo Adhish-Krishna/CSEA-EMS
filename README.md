@@ -97,12 +97,12 @@ Trigger setup for DB - Karthi
 
 | Endpoint                         | Method | Purpose                                                                        | To be done by |
 | -------------------------------- | ------ | ------------------------------------------------------------------------------ | ------------- |
-| /event/create                    | POST   | Admin creating a event                                                         |  SU rya Prakash |
+| /admin/create-event                   | POST   | Admin creating a event                                                         |  SU rya Prakash |
 | /event/modify                    | POST   | Admin modifying the event details                                              |  Chandru |
 | /event/stats/:eventId            | GET    | Fetching stats of particular event by admin                                    |    Chandru   |
 | /event/addPlaceHolders/:eventId  | POST   | Providing the details of winners and runners by club admin of particular event |         Pravith   |
 | /event/attendance/:eventId       | POST   | Marking attendance for particular event by admin                               |            Darshan   |
-| /event/history                   | GET    | Fetching past events history by admin                                          |        SU rya Prakash       |
+| /admin/events-history?club_id=1  | GET    | Fetching past events history by admin                                          |        SU rya Prakash       |
 | /event/register/:eventId         | POST   | User registering for a event                                                   |     Darshan      |
 | /event/teamInvite/:eventId       | POST   | User requesting other users to be in their team                                |    Karthi   |
 | /event/acceptTeamInvite/:eventId | POST   | User accepting the other user's team invite                                    |    Pravith |
