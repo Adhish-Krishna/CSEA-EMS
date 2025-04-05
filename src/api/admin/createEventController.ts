@@ -1,67 +1,56 @@
 import { Request, Response } from 'express';
 import prisma from '../../prisma.js';
-import { CreateEventDTO } from './types.js'
+import { CreateEventDTO } from './types.js';
 
 export const createEventController = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {
-            name,
-            about,
-            date,
-            event_type,
-            event_category,
-            min_no_member,
-            max_no_member,
-            club_id,
-            user_id
-        }: CreateEventDTO = req.body;
+        const EventDetails: CreateEventDTO = req.body;
 
-        
-        if (!name || !date || !event_type || !event_category || !club_id || !user_id) {
+        if (
+            !EventDetails.name ||
+            !EventDetails.date ||
+            !EventDetails.event_type ||
+            !EventDetails.event_category ||
+            !EventDetails.min_no_member||
+            !EventDetails.max_no_member||
+            !EventDetails.club_id ||
+            !EventDetails.venue
+        ) {
             res.status(400).json({ message: "Missing required fields." });
             return;
         }
 
-      
+   
         const event = await prisma.events.create({
             data: {
-                name,
-                about,
-                date: new Date(date),
-                event_type,
-                event_category,
-                min_no_member,
-                max_no_member,
+                name: EventDetails.name,
+                about: EventDetails.about,
+                date: new Date(EventDetails.date),
+                event_type: EventDetails.event_type,
+                venue: EventDetails.venue,
+                event_category: EventDetails.event_category,
+                min_no_member: EventDetails.min_no_member,
+                max_no_member: EventDetails.max_no_member,
             },
         });
 
-       
+    
         await prisma.organizingclubs.create({
             data: {
-                club_id,
+                club_id: EventDetails.club_id,
                 event_id: event.id,
-            },
-        });
-
-       
-        await prisma.eventconvenors.create({
-            data: {
-                event_id: event.id,
-                user_id,
-                club_id,
             },
         });
 
         res.status(201).json({
             message: "Event created successfully.",
-            event,
+            
         });
 
-    } catch(err: any){
+    } catch (err: any) {
         console.error("admin Error:", err);
         res.status(500).json({
-            message: err.message || "Something went wrong"
+            message:  "Something went wrong"
         });
-        return;
     }
-}
+};
