@@ -11,8 +11,8 @@ export const createEventController = async (req: Request, res: Response): Promis
             !EventDetails.date ||
             !EventDetails.event_type ||
             !EventDetails.event_category ||
-            !EventDetails.min_no_member||
-            !EventDetails.max_no_member||
+            !EventDetails.min_no_member ||
+            !EventDetails.max_no_member ||
             !EventDetails.club_id ||
             !EventDetails.venue
         ) {
@@ -20,7 +20,21 @@ export const createEventController = async (req: Request, res: Response): Promis
             return;
         }
 
-   
+        // Check for duplicate event (by name + date + venue)
+        const existingEvent = await prisma.events.findFirst({
+            where: {
+                name: EventDetails.name,
+                date: new Date(EventDetails.date),
+                venue: EventDetails.venue,
+            },
+        });
+
+        if (existingEvent) {
+            res.status(409).json({ message: "Event already exists with the same name, date, and venue." });
+            return;
+        }
+
+       
         const event = await prisma.events.create({
             data: {
                 name: EventDetails.name,
@@ -34,7 +48,7 @@ export const createEventController = async (req: Request, res: Response): Promis
             },
         });
 
-    
+        // Link event with organizing club
         await prisma.organizingclubs.create({
             data: {
                 club_id: EventDetails.club_id,
@@ -44,13 +58,12 @@ export const createEventController = async (req: Request, res: Response): Promis
 
         res.status(201).json({
             message: "Event created successfully.",
-            
         });
 
     } catch (err: any) {
-        console.error("admin Error:", err);
+        console.error("Event creation error:", err);
         res.status(500).json({
-            message:  "Something went wrong"
+            message: "Something went wrong.",
         });
     }
 };

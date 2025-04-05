@@ -31,6 +31,7 @@ const userAuthMiddleware = (req: Request, res: Response, next: NextFunction): vo
 const adminAuthMiddleware = (req: Request, res: Response, next: NextFunction): void =>{
     try{
         const token = req.cookies?.adminaccesstoken;
+        console.log("auth triggered")
         if(!token){
             res.status(401).json({
                 message: "No token provided"
