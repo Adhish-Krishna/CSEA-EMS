@@ -11,6 +11,8 @@ import { setupSwagger } from "./swagger.js";
 import { clearSecurityCodes } from "./jobs/securityCodeCleaner/securityCodeCleaner.js";
 import {adminAuthMiddleware, userAuthMiddleware } from "./middleware/authMiddleware.js";
 import { createEventController } from "./api/admin/createEventController.js";
+import { getPastEventsByClubController } from "./api/admin/getPastEvent.js";
+import adminRouter from "./api/admin/admin.js";
 
 dotenv.config();
 
@@ -38,7 +40,7 @@ app.use("/auth/user", userAuthRouter);
 app.use("/auth/admin", adminAuthRouter);
 
 app.use("/user", userAuthMiddleware, userRouter);
-app.use("/admin",adminAuthMiddleware,createEventController)
+app.use("/admin",adminRouter)
 
 app.listen(PORT, () => {
     console.log(`Server running on : http://localhost:${PORT}`);

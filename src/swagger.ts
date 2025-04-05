@@ -34,8 +34,8 @@ const options = {
                 description: "User Routes"
             },
             {
-                name: "Event Creation",
-                description: "Event creation routes by admins"
+                name: "Events",
+                description: "Event creation and past history routes by admins"
             },
         ]
     },

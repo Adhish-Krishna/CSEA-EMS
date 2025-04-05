@@ -1,7 +1,11 @@
 import { Router } from 'express';
-import { createEventController } from './createEventController';
+import { createEventController } from './createEventController.js'
+import { adminAuthMiddleware } from '../../middleware/authMiddleware.js';
+import { getPastEventsByClubController } from './getPastEvent.js';
 
-const eventRouter = Router();
+
+const adminRouter = Router();
+
 
 /**
  * @swagger
@@ -43,7 +47,7 @@ const eventRouter = Router();
 
 /**
  * @swagger
- * /admin/create:
+ * /admin/create-event:
  *   post:
  *     tags: [Events]
  *     summary: Create a new event by a club admin
@@ -72,7 +76,90 @@ const eventRouter = Router();
  *         description: Unauthorized
  *       500:
  *         description: Server error
+ * 
  */
-eventRouter.post('/create', createEventController);
 
-export default eventRouter;
+
+/**
+ * @swagger
+ * /admin/events-history:
+ *   get:
+ *     tags: [Events]
+ *     summary: Get past events for a specific club
+ *     description: Fetches events that have already occurred for a given club ID.
+ *     parameters:
+ *       - in: query
+ *         name: club_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the club to fetch past events for
+ *     responses:
+ *       200:
+ *         description: Past events fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                       about:
+ *                         type: string
+ *                       date:
+ *                         type: string
+ *                         format: date
+ *                       venue:
+ *                         type: string
+ *                       event_type:
+ *                         type: string
+ *                       event_category:
+ *                         type: string
+ *                       eventConvenors:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             name:
+ *                               type: string
+ *                             department:
+ *                               type: string
+ *                             yearofstudy:
+ *                               type: string
+ *                       eventWinners:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             position:
+ *                               type: string
+ *                             team_name:
+ *                               type: string
+ *                       average_rating:
+ *                         type: number
+ *                       total_feedbacks:
+ *                         type: integer
+ *                       total_registered_teams:
+ *                         type: integer
+ *                       total_attendance:
+ *                         type: integer
+ *       400:
+ *         description: Missing required fields (club_id not provided)
+ *       401:
+ *         description: Unauthorized (admin access token missing or invalid)
+ *       500:
+ *         description: Server error
+ */
+
+adminRouter.post('/create-event',adminAuthMiddleware,createEventController);
+adminRouter.get('/events-history', adminAuthMiddleware,getPastEventsByClubController);
+
+
+export default adminRouter;
