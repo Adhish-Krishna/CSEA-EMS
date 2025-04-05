@@ -71,6 +71,7 @@ model events {
   event_category    String?
   min_no_member     Int?
   max_no_member     Int?
+  venue             String?
   eventattendance   eventattendance[]
   eventconvenors    eventconvenors[]
   eventregistration eventregistration[]
