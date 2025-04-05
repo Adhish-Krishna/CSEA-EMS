@@ -71,6 +71,7 @@ model events {
   event_category    String?
   min_no_member     Int?
   max_no_member     Int?
+  venue             String?
   eventattendance   eventattendance[]
   eventconvenors    eventconvenors[]
   eventregistration eventregistration[]
@@ -135,13 +136,13 @@ model teammembers {
 model teams {
   id                                        Int                 @id @default(autoincrement())
   name                                      String?
-  event_id                                  Int?
-  teamto_event                              events?             @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teams_event")
+  event_id                                  Int
   eventregistration                         eventregistration[]
   eventwinners                              eventwinners[]
   invitation_invitation_from_team_idToteams invitation[]        @relation("invitation_from_team_idToteams")
   invitation_invitation_to_team_idToteams   invitation[]        @relation("invitation_to_team_idToteams")
   teammembers                               teammembers[]
+  events                                    events              @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teams_event")
 }
 
 model users {

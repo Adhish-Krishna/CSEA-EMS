@@ -25,6 +25,7 @@ CREATE TABLE events (
     about TEXT,
     date DATE,
     event_type TEXT,
+    venue TEXT,
     event_category TEXT,
     min_no_member INTEGER,
     max_no_member INTEGER
