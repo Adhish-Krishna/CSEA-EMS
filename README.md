@@ -110,7 +110,7 @@ Trigger setup for DB - Karthi
 | /event/modify                    | POST   | Admin modifying the event details                                              |  Chandru |
 | /event/stats/:eventId            | GET    | Fetching stats of particular event by admin                                    |    Chandru   |
 | /event/addPlaceHolders/:eventId  | POST   | Providing the details of winners and runners by club admin of particular event |         Pravith   |
-| /event/attendance/:eventId       | POST   | Marking attendance for particular event by 
+| /event/attendance/:eventId       | POST   | Marking attendance for particular event by |Darshan|
 | /event/register/:eventId         | POST   | User registering for a event                                                   |     Darshan      |
 | /event/teamInvite/:eventId       | POST   | User requesting other users to be in their team                                |    Karthi   |
 | /event/acceptTeamInvite/:eventId | POST   | User accepting the other user's team invite                                    |    Pravith |
