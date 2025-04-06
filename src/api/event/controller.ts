@@ -1,6 +1,6 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
-import { EventRegistration } from './type.js';
+import { EventRegistration } from './types.js';
 const RegisterController = async(req : Request,res:Response): Promise<void> =>{
     try{    
         const user_id=req.user_id;
