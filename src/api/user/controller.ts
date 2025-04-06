@@ -42,7 +42,12 @@ const acceptTeamInviteController = async (req: Request, res: Response): Promise<
             }
         });
         if (updatedTeamMember.count === 0) {
-            await RegisterController(req, res);
+            const addTeamMember = await prisma.teammembers.create({
+                data:{
+                    user_id:user_id,
+                    team_id:Invite.from_team_id
+                }
+            })
         }
         res.status(200).json({
             message:"Team invite accepted."
