@@ -7,7 +7,7 @@ import userAuthRouter from "./api/auth/userAuth/auth.js";
 import adminAuthRouter from "./api/auth/adminAuth/auth.js";
 import userRouter from "./api/user/user.js";
 import { setupSwagger } from "./swagger.js";
-
+import eventRouter from "./api/event/event.js";
 import { clearSecurityCodes } from "./jobs/securityCodeCleaner/securityCodeCleaner.js";
 import {adminAuthMiddleware, userAuthMiddleware } from "./middleware/authMiddleware.js";
 import { createEventController } from "./api/admin/createEventController.js";
@@ -36,12 +36,10 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/auth/user", userAuthRouter);
-
 app.use("/auth/admin", adminAuthRouter);
-
 app.use("/user", userAuthMiddleware, userRouter);
-app.use("/admin",adminRouter)
-
+app.use("/admin",adminRouter);
+app.use("/event",eventRouter);
 app.listen(PORT, () => {
     console.log(`Server running on : http://localhost:${PORT}`);
 });

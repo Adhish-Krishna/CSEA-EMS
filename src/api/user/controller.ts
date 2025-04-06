@@ -1,6 +1,5 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
-import RegisterController  from '../event/controller.js';
 import {Feedback, TeamInvite} from './types.js';
 
 const acceptTeamInviteController = async (req: Request, res: Response): Promise<void> =>{

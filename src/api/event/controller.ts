@@ -1,6 +1,7 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
-import { EventRegistration } from './types.js';
+import { EventRegistration ,UpdateEventDto} from './types.js';
+
 const RegisterController = async(req : Request,res:Response): Promise<void> =>{
     try{    
         const user_id=req.user_id;
@@ -71,4 +72,20 @@ const RegisterController = async(req : Request,res:Response): Promise<void> =>{
     }
 }
 
-export default RegisterController;
+const updateEventcontroller = async (req: Request, res: Response) => {
+    const eventId = Number(req.params.id); // assuming you're using /events/:id
+    const updates: UpdateEventDto = req.body;
+  
+    try {
+      const updatedEvent = await prisma.events.update({
+        where: { id: eventId },
+        data: updates,
+      });
+  
+      res.status(200).json({message : 'Event Updated successfully'});
+      
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to update event.' });
+    }
+  };
+export {RegisterController,updateEventcontroller };
