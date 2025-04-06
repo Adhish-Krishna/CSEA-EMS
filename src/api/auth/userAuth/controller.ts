@@ -100,12 +100,14 @@ const loginController = async (req: Request, res: Response): Promise<void> =>{
         })
         return;
     }
-    catch(err){
+    catch(err: any){
+        console.error("Signup Error:", err);
         res.status(500).json({
-            message: err
-        })
+            message: err.message || "Something went wrong"
+        });
         return;
     }
+    
 }
 
 const logoutController = (req: Request, res: Response): void =>{

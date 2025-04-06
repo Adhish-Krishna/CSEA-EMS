@@ -33,13 +33,18 @@ const options = {
                 name: "Users",
                 description: "User Routes"
             },
+            {
+                name: "Events",
+                description: "Event creation and past history routes by admins"
+            },
         ]
     },
     apis: [
         "./src/api/auth/userAuth/*.ts",
         "./src/api/auth/adminAuth/*.ts",
         "./src/api/user/*.ts",
-        "./src/api/event/*.ts"
+        "./src/api/event/*.ts",
+        "./src/api/admin/*.ts"
     ], // Update this if you have more routes
 };
 
