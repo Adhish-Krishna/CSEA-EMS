@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { acceptTeamInviteController, feedbackController, rejectTeamInviteController } from './controller.js';
-
+import { userAuthMiddleware } from '../../middleware/authMiddleware.js';
 const userRouter = Router();
 
 /**
@@ -35,7 +35,7 @@ const userRouter = Router();
  *       500:
  *         description: Internal server error.
  */
-userRouter.post('/acceptTeamInvite/:eventId', acceptTeamInviteController);
+userRouter.post('/acceptTeamInvite/:eventId', userAuthMiddleware,acceptTeamInviteController);
 
 /**
  * @swagger
@@ -60,7 +60,7 @@ userRouter.post('/acceptTeamInvite/:eventId', acceptTeamInviteController);
  *       500:
  *         description: Internal server error.
  */
-userRouter.post('/rejectTeamInvite', rejectTeamInviteController);
+userRouter.post('/rejectTeamInvite', userAuthMiddleware,rejectTeamInviteController);
 
 /**
  * @swagger
@@ -96,7 +96,7 @@ userRouter.post('/rejectTeamInvite', rejectTeamInviteController);
  *         description: Internal server error.
  */
 
-userRouter.post('/feedback', feedbackController);
+userRouter.post('/feedback', userAuthMiddleware,feedbackController);
 
 /**
  * @swagger
