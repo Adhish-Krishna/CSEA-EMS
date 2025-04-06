@@ -83,9 +83,9 @@ const updateEventcontroller = async (req: Request, res: Response) => {
       });
   
       res.status(200).json({message : 'Event Updated successfully'});
-      
     } catch (err) {
+      console.error('Error updating event:', err);
       res.status(500).json({ error: 'Failed to update event.' });
     }
   };
-export {RegisterController,updateEventcontroller };
+export {RegisterController,updateEventcontroller };
