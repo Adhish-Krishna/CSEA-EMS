@@ -45,7 +45,7 @@ const acceptTeamInviteController = async (req: Request, res: Response): Promise<
             const addTeamMember = await prisma.teammembers.create({
                 data:{
                     user_id:user_id,
-                    team_id:Invite.from_team_id
+                    team_id:from_team_id
                 }
             })
         }
