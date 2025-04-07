@@ -1,6 +1,6 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
-import {Feedback, TeamInvite,EventRegistration} from './types.js';
+import {Feedback, TeamInvite,EventRegistration, ClubMember, Club,MembershipDetails, invite} from './types.js';
 
 const RegisterController = async(req : Request,res:Response): Promise<void> =>{
     try{    
@@ -236,8 +236,8 @@ const feedbackController = async (req: Request, res: Response): Promise<void> =>
 }
 
 
-const FetchMembersController =async (req:Request,res:Response):Promise<void>=>{
-    const user_id=req.user_id;
+const fetchMembersController =async (req:Request,res:Response):Promise<void>=>{
+    const user_id=req.body.user_id;
     if(!user_id){
         res.status(400).json({
             message: "Requires user_id"
@@ -245,7 +245,7 @@ const FetchMembersController =async (req:Request,res:Response):Promise<void>=>{
         return;
     }
     try{
-        const clubs= await prisma.clubmembers.findMany({
+        const clubs:ClubMember[]= await prisma.clubmembers.findMany({
             where:{
                 user_id:user_id
             },
@@ -254,8 +254,14 @@ const FetchMembersController =async (req:Request,res:Response):Promise<void>=>{
                 role:true
             }
         })
+        if(!clubs || clubs.length===0){
+            res.status(200).json({
+                message:"No clubs found for the user"
+            });
+            return;
+        }
         const clubIds=clubs.map((club)=>club.club_id);
-        const name =await prisma.clubs.findMany({
+        const name: Club[] =await prisma.clubs.findMany({
             where:{
                 id:{
                     in:clubIds
@@ -266,14 +272,17 @@ const FetchMembersController =async (req:Request,res:Response):Promise<void>=>{
                 id:true
             }
         });
-        const Details= clubs.map((club)=>{
-            const clubDetails = name.find((clubName)=>clubName.id===club.club_id);
-            return {
-                id: club.club_id,
-                role: club.role,
-                name: clubDetails?.name,
+        const Details: MembershipDetails[] = clubs.reduce((acc, club) => {
+            const clubDetails = name.find((clubName) => clubName.id === club.club_id);
+            if (clubDetails) {
+                acc.push({
+                    id: club.club_id,
+                    role: club.role,
+                    name: clubDetails.name
+                });
             }
-        });
+            return acc;
+        }, [] as MembershipDetails[]);
         res.status(200).json({
             message:"Fetched club members",
             data: Details
@@ -290,7 +299,7 @@ const FetchMembersController =async (req:Request,res:Response):Promise<void>=>{
 const fetchInvitations = async (req:Request,res:Response) : Promise<void>=>{
     try{
         const user_id = req.user_id;
-        const invitations = await prisma.invitation.findMany({
+        const invitations:invite[] = await prisma.invitation.findMany({
             where:{
                 to_user_id:user_id
             },
@@ -366,7 +375,7 @@ const fetchProfile = async (req:Request,res:Response) : Promise<void>=>{
 
 export {
     RegisterController,
-    FetchMembersController,
+    fetchMembersController,
     acceptTeamInviteController, 
     rejectTeamInviteController, 
     feedbackController,
