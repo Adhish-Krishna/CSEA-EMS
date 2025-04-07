@@ -72,6 +72,10 @@ const RegisterController = async(req : Request,res:Response): Promise<void> =>{
     }
 }
 
+const putEventAttendance = async(req: Request, res: Response )=>{
+
+}
+
 const updateEventcontroller = async (req: Request, res: Response) => {
     const eventId = Number(req.params.id); // assuming you're using /events/:id
     const updates: UpdateEventDto = req.body;
@@ -88,4 +92,4 @@ const updateEventcontroller = async (req: Request, res: Response) => {
       res.status(500).json({ error: 'Failed to update event.' });
     }
   };
-export {RegisterController,updateEventcontroller };
+export {RegisterController,updateEventcontroller,putEventAttendance };
