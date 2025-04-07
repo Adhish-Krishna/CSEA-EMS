@@ -49,7 +49,7 @@ const adminRouter = Router();
  * @swagger
  * /admin/create-event:
  *   post:
- *     tags: [Events]
+ *     tags: [Admin]
  *     summary: Create a new event by a club admin
  *     requestBody:
  *       required: true
@@ -84,7 +84,7 @@ const adminRouter = Router();
  * @swagger
  * /admin/events-history:
  *   get:
- *     tags: [Events]
+ *     tags: [Admin]
  *     summary: Get past events for a specific club
  *     description: Fetches events that have already occurred for a given club ID.
  *     parameters:

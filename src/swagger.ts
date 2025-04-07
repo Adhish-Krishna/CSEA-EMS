@@ -35,7 +35,11 @@ const options = {
             },
             {
                 name: "Events",
-                description: "Event creation and past history routes by admins"
+                description: "Event Registration"
+            },
+            {
+                name: "Admin",
+                description: "Club Admin routes"
             },
         ]
     },

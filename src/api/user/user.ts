@@ -1,7 +1,13 @@
 import { Router } from 'express';
 import { acceptTeamInviteController, feedbackController, rejectTeamInviteController,FetchMembersController,RegisterController } from './controller.js';
-import { userAuthMiddleware } from '../../middleware/authMiddleware.js';
+
 const userRouter = Router();
+userRouter.post('/register/:eventId',RegisterController);
+userRouter.post('/acceptTeamInvite/:eventId',acceptTeamInviteController);
+userRouter.get('/MembershipDetails',FetchMembersController);
+userRouter.post('/rejectTeamInvite',rejectTeamInviteController);
+userRouter.post('/feedback',feedbackController);
+export default userRouter;
 
 /**
  * @swagger
@@ -35,7 +41,7 @@ const userRouter = Router();
  *
 */
 
-userRouter.post('/register/:eventId',RegisterController);
+
 /**
  * @swagger
  * /user/acceptTeamInvite/{eventId}:
@@ -68,7 +74,7 @@ userRouter.post('/register/:eventId',RegisterController);
  *       500:
  *         description: Internal server error.
  */
-userRouter.post('/acceptTeamInvite/:eventId',acceptTeamInviteController);
+
 
 /**
  * @swagger
@@ -82,7 +88,7 @@ userRouter.post('/acceptTeamInvite/:eventId',acceptTeamInviteController);
  *       500:
  *         description: Internal server error.
  */
-userRouter.get('/MembershipDetails',FetchMembersController);
+
 /**
  * @swagger
  * /user/rejectTeamInvite:
@@ -106,7 +112,7 @@ userRouter.get('/MembershipDetails',FetchMembersController);
  *       500:
  *         description: Internal server error.
  */
-userRouter.post('/rejectTeamInvite',rejectTeamInviteController);
+
 
 /**
  * @swagger
@@ -142,7 +148,6 @@ userRouter.post('/rejectTeamInvite',rejectTeamInviteController);
  *         description: Internal server error.
  */
 
-userRouter.post('/feedback',feedbackController);
 
 /**
  * @swagger
@@ -187,4 +192,3 @@ userRouter.post('/feedback',feedbackController);
  *           maximum: 5
  */
 
-export default userRouter;
