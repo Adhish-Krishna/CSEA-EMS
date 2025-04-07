@@ -1,8 +1,41 @@
 import { Router } from 'express';
-import { acceptTeamInviteController, feedbackController, rejectTeamInviteController } from './controller.js';
+import { acceptTeamInviteController, feedbackController, rejectTeamInviteController,FetchMembersController,RegisterController } from './controller.js';
 import { userAuthMiddleware } from '../../middleware/authMiddleware.js';
 const userRouter = Router();
 
+/**
+ * @swagger
+ * /user/register:
+ *   post:
+ *     summary: Register a user for an event
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/EventRegistration'
+ *     responses:
+ *       201:
+ *         description: Event Registration Successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Event Registration Successful"
+ *       400:
+ *         description: Bad Request - Missing required fields or event not found
+ *       404:
+ *         description: Event not found
+ *       500:
+ *         description: Failed to register for event
+ *
+*/
+
+userRouter.post('/register/:eventId',RegisterController);
 /**
  * @swagger
  * /user/acceptTeamInvite/{eventId}:
@@ -35,8 +68,21 @@ const userRouter = Router();
  *       500:
  *         description: Internal server error.
  */
-userRouter.post('/acceptTeamInvite/:eventId', userAuthMiddleware,acceptTeamInviteController);
+userRouter.post('/acceptTeamInvite/:eventId',acceptTeamInviteController);
 
+/**
+ * @swagger
+ * /user/MembershipDetails:
+ *   get:
+ *     tags: [Users]
+ *     summary: Fetch membership details of a user
+ *     responses:
+ *       200:
+ *         description: Membership details fetched successfully.
+ *       500:
+ *         description: Internal server error.
+ */
+userRouter.get('/MembershipDetails',FetchMembersController);
 /**
  * @swagger
  * /user/rejectTeamInvite:
@@ -60,7 +106,7 @@ userRouter.post('/acceptTeamInvite/:eventId', userAuthMiddleware,acceptTeamInvit
  *       500:
  *         description: Internal server error.
  */
-userRouter.post('/rejectTeamInvite', userAuthMiddleware,rejectTeamInviteController);
+userRouter.post('/rejectTeamInvite',rejectTeamInviteController);
 
 /**
  * @swagger
@@ -96,7 +142,7 @@ userRouter.post('/rejectTeamInvite', userAuthMiddleware,rejectTeamInviteControll
  *         description: Internal server error.
  */
 
-userRouter.post('/feedback', userAuthMiddleware,feedbackController);
+userRouter.post('/feedback',feedbackController);
 
 /**
  * @swagger
