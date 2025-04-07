@@ -244,7 +244,7 @@ const fetchInvitations = async (req:Request,res:Response) : Promise<void>=>{
             },
             select:{
                 event_id:true,
-                from_user_name:true,
+                from_user_id:true,
                 from_team_id:true,
             }
         })
@@ -263,7 +263,7 @@ const fetchInvitations = async (req:Request,res:Response) : Promise<void>=>{
             });
             const user = await prisma.users.findUnique({
                 where:{
-                    id:invitation.from_user_id
+                    id: invitation.from_user_id
                 },
                 select:{
                     name:true,
@@ -271,7 +271,7 @@ const fetchInvitations = async (req:Request,res:Response) : Promise<void>=>{
             })
             return {
                 event_id: invitation.event_id,
-                from_user_name: user.name || 'Unknown User',
+                from_user_name: user?.name || 'Unknown User',
                 teamName: team?.name || 'Unknown team'
             };
         }));

@@ -68,18 +68,18 @@ model events {
   about             String?
   date              DateTime?           @db.Date
   event_type        String?
+  venue             String?
   event_category    String?
   min_no_member     Int?
   max_no_member     Int?
-  venue             String?
   eventattendance   eventattendance[]
   eventconvenors    eventconvenors[]
   eventregistration eventregistration[]
   eventwinners      eventwinners[]
   feedback          feedback[]
+  invitation        invitation[]
   organizingclubs   organizingclubs[]
   teams             teams[]
-  invitation        invitation[]
 }
 
 model eventwinners {
@@ -112,12 +112,16 @@ model feedback {
 
 model invitation {
   id                                   Int    @id @default(autoincrement())
-  event_id                             Int
+  from_user_id                         Int
   from_team_id                         Int
-  to_team_id                           Int
+  to_user_id                           Int
+  event_id                             Int
   event                                events @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invitation_event")
   teams_invitation_from_team_idToteams teams  @relation("invitation_from_team_idToteams", fields: [from_team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invitation_from_team")
-  teams_invitation_to_team_idToteams   teams  @relation("invitation_to_team_idToteams", fields: [to_team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invitation_to_team")
+  users_invitation_from_user_idTousers users  @relation("invitation_from_user_idTousers", fields: [from_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invitation_from_user")
+  users_invitation_to_user_idTousers   users  @relation("invitation_to_user_idTousers", fields: [to_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invitation_to_user")
+
+  @@index([event_id], map: "idx_invitation_event_id")
 }
 
 model organizingclubs {
@@ -135,8 +139,8 @@ model teammembers {
   teams   teams @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teammembers_team")
   users   users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teammembers_user")
 
-  @@index([team_id], name: "idx_teammembers_team_id")
-  @@index([user_id], name: "idx_teammembers_user_id")
+  @@index([team_id], map: "idx_teammembers_team_id")
+  @@index([user_id], map: "idx_teammembers_user_id")
 }
 
 model teams {
@@ -146,29 +150,30 @@ model teams {
   eventregistration                         eventregistration[]
   eventwinners                              eventwinners[]
   invitation_invitation_from_team_idToteams invitation[]        @relation("invitation_from_team_idToteams")
-  invitation_invitation_to_team_idToteams   invitation[]        @relation("invitation_to_team_idToteams")
   teammembers                               teammembers[]
   events                                    events              @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teams_event")
 
-  @@index([event_id], name: "idx_teams_event_id")
+  @@index([event_id], map: "idx_teams_event_id")
 }
 
 model users {
-  id               Int               @id @default(autoincrement())
-  name             String?
-  rollno           String?           @unique @db.VarChar(50)
-  password         String?
-  department       String?
-  email            String?           @unique @db.VarChar(100)
-  phoneno          BigInt?           @unique
-  yearofstudy      Int?
-  created_at       DateTime?         @default(now()) @db.Timestamp(6)
-  clubmembers      clubmembers[]
-  eventattendance  eventattendance[]
-  eventconvenors   eventconvenors[]
-  feedback         feedback[]
-  teammembers      teammembers[]
-  usersecuritycode usersecuritycode?
+  id                                        Int               @id @default(autoincrement())
+  name                                      String?
+  rollno                                    String?           @unique @db.VarChar(50)
+  password                                  String?
+  department                                String?
+  email                                     String?           @unique @db.VarChar(100)
+  phoneno                                   BigInt?           @unique
+  yearofstudy                               Int?
+  created_at                                DateTime?         @default(now()) @db.Timestamp(6)
+  clubmembers                               clubmembers[]
+  eventattendance                           eventattendance[]
+  eventconvenors                            eventconvenors[]
+  feedback                                  feedback[]
+  invitation_invitation_from_user_idTousers invitation[]      @relation("invitation_from_user_idTousers")
+  invitation_invitation_to_user_idTousers   invitation[]      @relation("invitation_to_user_idTousers")
+  teammembers                               teammembers[]
+  usersecuritycode                          usersecuritycode?
 }
 
 model usersecuritycode {
