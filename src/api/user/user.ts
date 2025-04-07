@@ -32,8 +32,9 @@ const userRouter = Router();
  *         description: Event not found
  *       500:
  *         description: Failed to register for event
- * /** */
- 
+ *
+*/
+
 userRouter.post('/register/:eventId',RegisterController);
 /**
  * @swagger
