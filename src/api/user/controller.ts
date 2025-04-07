@@ -115,4 +115,56 @@ const feedbackController = async (req: Request, res: Response): Promise<void> =>
     }
 }
 
-export {acceptTeamInviteController, rejectTeamInviteController, feedbackController};
+
+const FetchMembersController =async (req:Request,res:Response):Promise<void>=>{
+    const user_id=req.user_id;
+    if(!user_id){
+        res.status(400).json({
+            message: "Requires user_id"
+        })
+        return;
+    }
+    try{
+        const clubs= await prisma.clubmembers.findMany({
+            where:{
+                user_id:user_id
+            },
+            select:{
+                club_id:true,
+                role:true
+            }
+        })
+        const clubIds=clubs.map((club)=>club.club_id);
+        const name =await prisma.clubs.findMany({
+            where:{
+                id:{
+                    in:clubIds
+                }
+            },
+            select:{
+                name:true,
+                id:true
+            }
+        });
+        const Details= clubs.map((club)=>{
+            const clubDetails = name.find((clubName)=>clubName.id===club.club_id);
+            return {
+                id: club.club_id,
+                role: club.role,
+                name: clubDetails?.name,
+            }
+        });
+        res.status(200).json({
+            message:"Fetched club members",
+            data: Details
+        })
+        return;
+    }catch(err){
+        res.status(500).json({
+            message: err
+        });
+        return;
+    }
+}
+
+export {FetchMembersController,acceptTeamInviteController, rejectTeamInviteController, feedbackController};
