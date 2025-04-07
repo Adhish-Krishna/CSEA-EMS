@@ -15,23 +15,23 @@ Daddy-EMS is a comprehensive event management system designed to simplify the pr
 ## 💻 Installation
 
 1. Clone the repository
-   
+
    ```bash
    git clone https://github.com/Adhish-Krishna/Daddy-EMS.git
    cd Daddy-EMS
    ```
 2. Install dependencies
-   
+
    ```bash
    npm install
    ```
 3. Generate the client library using Prisma
-   
+
    ```bash
    npx prisma generate
    ```
 4. Start the development server
-   
+
    ```bash
    npm run dev
    ```
@@ -92,6 +92,10 @@ Trigger setup for DB - Karthi
 | /auth/user/reset-password | POST   | -       | Adhish        | **✅**   |
 | /auth/club/login          | POST   | -       | Adhish        | **✅**   |
 | /auth/club/logout         | POST   | -       | Adhish        | **✅**   |
+| /auth/global/login        | POST   | -       | SU rya Prakash |
+| /auth/global/logout       | POST   | -       | SU rya Prakash       |
+| /auth/global/signup | POST | - | SU rya Prakash | |
+
 
 ## Admin Routes
 
@@ -122,3 +126,8 @@ Trigger setup for DB - Karthi
 | /user/invitations              | GET    | Fetching current Invitation | Darshan       |          |
 | /user/feedback/ | POST   | Feedback submission by user | Adhish        | **✅**   |
 
+## Global Admin Routes
+| Endpoint                       | Method | Purpose                     | To be done by | progress |
+| ------------------------------ | ------ | --------------------------- | ------------- | -------- |
+| /global/createclub | POST | - | Adhish | |
+| /global/addadmin | POST | - | Adhish | |
