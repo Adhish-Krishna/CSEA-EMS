@@ -151,6 +151,8 @@ CREATE TABLE invitation (
     id SERIAL PRIMARY KEY,
     from_team_id INTEGER NOT NULL,
     to_team_id INTEGER NOT NULL,
+    event_id INTEGER NOT NULL,
+    CONSTRAINT fk_invitation_event FOREIGN KEY (event_id) REFERENCES events(id),
     CONSTRAINT fk_invitation_from_team FOREIGN KEY (from_team_id) REFERENCES teams(id),
     CONSTRAINT fk_invitation_to_team FOREIGN KEY (to_team_id) REFERENCES teams(id)
 );
