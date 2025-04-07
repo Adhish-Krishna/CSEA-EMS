@@ -2,17 +2,14 @@ import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
 import userAuthRouter from "./api/auth/userAuth/auth.js";
 import adminAuthRouter from "./api/auth/adminAuth/auth.js";
 import userRouter from "./api/user/user.js";
 import eventRouter from "./api/event/event.js";
 import { setupSwagger } from "./swagger.js";
-import eventRouter from "./api/event/event.js";
 import { clearSecurityCodes } from "./jobs/securityCodeCleaner/securityCodeCleaner.js";
 import {adminAuthMiddleware, userAuthMiddleware } from "./middleware/authMiddleware.js";
-import { createEventController } from "./api/admin/createEventController.js";
-import { getPastEventsByClubController } from "./api/admin/getPastEvent.js";
+
 import adminRouter from "./api/admin/admin.js";
 
 dotenv.config();
@@ -39,7 +36,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/auth/user", userAuthRouter);
 app.use("/auth/admin", adminAuthRouter);
 app.use("/user", userAuthMiddleware, userRouter);
-app.use("/events",adminAuthRouter,eventRouter);
+app.use("/events",adminAuthMiddleware,eventRouter);
 app.use("/admin",adminRouter);
 
 app.listen(PORT, () => {
