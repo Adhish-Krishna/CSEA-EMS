@@ -1,6 +1,8 @@
 export interface TeamInvite {
     from_team_id: number,
-    to_team_id: number
+    to_team_id: number,
+    user_id:number,
+    event_id: number,
 }
 
 export interface Feedback{
@@ -10,6 +12,6 @@ export interface Feedback{
 }
 
 export interface EventRegistration {
-    event_id: number,
-    teamName: string
+    event_id: number;
+    teamName: string;
 }
