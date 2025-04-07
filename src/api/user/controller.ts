@@ -57,7 +57,9 @@ const RegisterController = async(req : Request,res:Response): Promise<void> =>{
         const addTeamMember = await prisma.teammembers.create({
             data: {
                 user_id:user_id,
-                team_id: team.id
+                team_id: team.id,
+                event_id: event_registration.event_id,
+                is_present : false
             }
         });
 
@@ -93,7 +95,7 @@ const acceptTeamInviteController = async (req: Request, res: Response): Promise<
         const teamInvite = await prisma.invitation.findFirst({
             where: {
                 from_team_id: from_team_id,
-                to_team_id: to_team_id
+                to_user_id: to_team_id
             }
         });
         if (!teamInvite) {
@@ -113,7 +115,9 @@ const acceptTeamInviteController = async (req: Request, res: Response): Promise<
             const addTeamMember = await prisma.teammembers.create({
                 data:{
                     user_id:user_id,
-                    team_id:from_team_id
+                    team_id:from_team_id,
+                    event_id:Number(eventId),
+                    is_present:false
                 }
             })
         }
@@ -136,7 +140,7 @@ const rejectTeamInviteController = async (req: Request ,res:Response) :Promise<v
         const teamInvite = await prisma.invitation.findFirst({
             where: {
                 from_team_id: from_team_id,
-                to_team_id: to_team_id
+                to_user_id: to_team_id
             }
         });
         if(!teamInvite){
@@ -283,9 +287,41 @@ const fetchInvitations = async (req:Request,res:Response) : Promise<void>=>{
         return;
     }catch(error){
         res.status(500).json({
-            message:"Error while fetching Invitations"
+            message:"Error while fetching Invitations",
+            error: error
         });
     }
 }
 
-export {RegisterController,FetchMembersController,acceptTeamInviteController, rejectTeamInviteController, feedbackController,fetchInvitations};
+const fetchProfile = async (req:Request,res:Response) : Promise<void>=>{
+    try{
+        const user_id = req.user_id;
+        const profile = await prisma.users.findUnique({
+            where:{
+                id:user_id
+            }
+        })
+        if (!profile){
+            res.status(404).json({message:"User not found"});
+            return;
+        }
+        res.status(200).json({message : "User profile Fetched successfully",profile})
+        return;
+    }catch(error){
+        res.status(500).json({
+            message : "Error while fetching user profile",
+            error: error
+        })
+        return;
+    }
+}
+
+export {
+    RegisterController,
+    FetchMembersController,
+    acceptTeamInviteController, 
+    rejectTeamInviteController, 
+    feedbackController,
+    fetchInvitations,
+    fetchProfile
+};

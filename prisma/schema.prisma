@@ -35,15 +35,6 @@ model clubs {
   organizingclubs organizingclubs[]
 }
 
-model eventattendance {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  event_id   Int
-  is_present Boolean?
-  events     events   @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_eventattendance_event")
-  users      users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_eventattendance_user")
-}
-
 model eventconvenors {
   id       Int    @id @default(autoincrement())
   event_id Int
@@ -72,13 +63,13 @@ model events {
   event_category    String?
   min_no_member     Int?
   max_no_member     Int?
-  eventattendance   eventattendance[]
   eventconvenors    eventconvenors[]
   eventregistration eventregistration[]
   eventwinners      eventwinners[]
   feedback          feedback[]
   invitation        invitation[]
   organizingclubs   organizingclubs[]
+  teammembers       teammembers[]
   teams             teams[]
 }
 
@@ -133,14 +124,14 @@ model organizingclubs {
 }
 
 model teammembers {
-  id      Int   @id @default(autoincrement())
-  user_id Int
-  team_id Int
-  teams   teams @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teammembers_team")
-  users   users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teammembers_user")
-
-  @@index([team_id], map: "idx_teammembers_team_id")
-  @@index([user_id], map: "idx_teammembers_user_id")
+  id         Int     @id @default(autoincrement())
+  user_id    Int
+  team_id    Int
+  event_id   Int
+  is_present Boolean
+  events     events  @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teammembers_event")
+  teams      teams   @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teammembers_team")
+  users      users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teammembers_user")
 }
 
 model teams {
@@ -167,7 +158,6 @@ model users {
   yearofstudy                               Int?
   created_at                                DateTime?         @default(now()) @db.Timestamp(6)
   clubmembers                               clubmembers[]
-  eventattendance                           eventattendance[]
   eventconvenors                            eventconvenors[]
   feedback                                  feedback[]
   invitation_invitation_from_user_idTousers invitation[]      @relation("invitation_from_user_idTousers")

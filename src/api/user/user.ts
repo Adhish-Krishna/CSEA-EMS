@@ -1,13 +1,22 @@
 import { Router } from 'express';
-import { acceptTeamInviteController, feedbackController, rejectTeamInviteController,FetchMembersController,RegisterController,fetchInvitations } from './controller.js';
+import { 
+    acceptTeamInviteController, 
+    feedbackController, 
+    rejectTeamInviteController,
+    FetchMembersController,
+    RegisterController,
+    fetchInvitations,
+} from './controller.js';
 
 const userRouter = Router();
-userRouter.post('/register/:eventId',RegisterController);
+userRouter.post('/register',RegisterController);
 userRouter.post('/acceptTeamInvite/:eventId',acceptTeamInviteController);
 userRouter.get('/MembershipDetails',FetchMembersController);
 userRouter.post('/rejectTeamInvite',rejectTeamInviteController);
 userRouter.get('/fetch/invitations',fetchInvitations);
+//userRouter.get('/fetch/profile',fetchProfile)
 userRouter.post('/feedback',feedbackController);
+
 export default userRouter;
 
 /**

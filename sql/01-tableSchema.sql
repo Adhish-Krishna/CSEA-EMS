@@ -92,8 +92,11 @@ CREATE TABLE teamMembers (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     team_id INTEGER NOT NULL,
+    event_id INTEGER NOT NULL,
+    is_present BOOLEAN NOT NULL,
     CONSTRAINT fk_teamMembers_user FOREIGN KEY (user_id) REFERENCES users(id),
-    CONSTRAINT fk_teamMembers_team FOREIGN KEY (team_id) REFERENCES teams(id)
+    CONSTRAINT fk_teamMembers_team FOREIGN KEY (team_id) REFERENCES teams(id),
+    CONSTRAINT fk_teamMembers_event FOREIGN KEY (event_id) REFERENCES events(id)
 );
 
 -- Table: organizingClubs
@@ -125,16 +128,6 @@ CREATE TABLE eventWinners (
     position INTEGER,
     CONSTRAINT fk_eventWinners_team FOREIGN KEY (team_id) REFERENCES teams(id),
     CONSTRAINT fk_eventWinners_event FOREIGN KEY (event_id) REFERENCES events(id)
-);
-
--- Table: eventAttendance
-CREATE TABLE eventAttendance (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    event_id INTEGER NOT NULL,
-    is_present BOOLEAN,
-    CONSTRAINT fk_eventAttendance_user FOREIGN KEY (user_id) REFERENCES users(id),
-    CONSTRAINT fk_eventAttendance_event FOREIGN KEY (event_id) REFERENCES events(id)
 );
 
 -- Table: clubAdvisors

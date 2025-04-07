@@ -5,7 +5,8 @@ import { getPastEventsByClubController } from './getPastEvent.js';
 
 
 const adminRouter = Router();
-
+adminRouter.post('/create-event',adminAuthMiddleware,createEventController);
+adminRouter.get('/events-history', adminAuthMiddleware,getPastEventsByClubController);
 
 /**
  * @swagger
@@ -158,8 +159,7 @@ const adminRouter = Router();
  *         description: Server error
  */
 
-adminRouter.post('/create-event',adminAuthMiddleware,createEventController);
-adminRouter.get('/events-history', adminAuthMiddleware,getPastEventsByClubController);
+
 
 
 export default adminRouter;
