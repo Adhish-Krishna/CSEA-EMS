@@ -235,4 +235,57 @@ const FetchMembersController =async (req:Request,res:Response):Promise<void>=>{
     }
 }
 
-export {RegisterController,FetchMembersController,acceptTeamInviteController, rejectTeamInviteController, feedbackController};
+const fetchInvitations = async (req:Request,res:Response) : Promise<void>=>{
+    try{
+        const user_id = req.user_id;
+        const invitations = await prisma.invitation.findMany({
+            where:{
+                to_user_id:user_id
+            },
+            select:{
+                event_id:true,
+                from_user_name:true,
+                from_team_id:true,
+            }
+        })
+        if(!invitations){
+            res.status(200).json({message:"No Invitations found for the user"});
+            return;
+        }
+        const invitationsWithTeamNames = await Promise.all(invitations.map(async (invitation) => {
+            const team = await prisma.teams.findFirst({
+                where: {
+                    id: invitation.from_team_id
+                },
+                select: {
+                    name: true,
+                }
+            });
+            const user = await prisma.users.findUnique({
+                where:{
+                    id:invitation.from_user_id
+                },
+                select:{
+                    name:true,
+                }
+            })
+            return {
+                event_id: invitation.event_id,
+                from_user_name: user.name || 'Unknown User',
+                teamName: team?.name || 'Unknown team'
+            };
+        }));
+        
+        res.status(200).json({
+            message: "Invitations retrieved successfully",
+            data: invitationsWithTeamNames
+        });
+        return;
+    }catch(error){
+        res.status(500).json({
+            message:"Error while fetching Invitations"
+        });
+    }
+}
+
+export {RegisterController,FetchMembersController,acceptTeamInviteController, rejectTeamInviteController, feedbackController,fetchInvitations};

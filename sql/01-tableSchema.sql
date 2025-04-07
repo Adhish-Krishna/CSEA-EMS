@@ -149,12 +149,14 @@ CREATE TABLE clubAdvisors (
 -- Table: invitation
 CREATE TABLE invitation (
     id SERIAL PRIMARY KEY,
+    from_user_id INTEGER NOT NULL,
     from_team_id INTEGER NOT NULL,
-    to_team_id INTEGER NOT NULL,
+    to_user_id INTEGER NOT NULL,
     event_id INTEGER NOT NULL,
     CONSTRAINT fk_invitation_event FOREIGN KEY (event_id) REFERENCES events(id),
     CONSTRAINT fk_invitation_from_team FOREIGN KEY (from_team_id) REFERENCES teams(id),
-    CONSTRAINT fk_invitation_to_team FOREIGN KEY (to_team_id) REFERENCES teams(id)
+    CONSTRAINT fk_invitation_to_user FOREIGN KEY (to_user_id) REFERENCES users(id),
+    CONSTRAINT fk_invitation_from_user FOREIGN KEY (from_user_id) REFERENCES users(id)
 );
 
 CREATE INDEX idx_teams_event_id ON teams(event_id);
