@@ -15,3 +15,8 @@ export interface WinnerDetails{
     team_id:number,
     position:number
 }
+
+export interface DeleteWinners{
+    event_id:number;
+    position:number;
+}

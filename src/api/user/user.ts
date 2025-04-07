@@ -3,7 +3,7 @@ import {
     acceptTeamInviteController, 
     feedbackController, 
     rejectTeamInviteController,
-    FetchMembersController,
+    fetchMembersController,
     RegisterController,
     fetchInvitations,
 } from './controller.js';
@@ -11,7 +11,7 @@ import {
 const userRouter = Router();
 userRouter.post('/register',RegisterController);
 userRouter.post('/acceptTeamInvite',acceptTeamInviteController);
-userRouter.get('/MembershipDetails',FetchMembersController);
+userRouter.get('/MembershipDetails',fetchMembersController);
 userRouter.post('/rejectTeamInvite',rejectTeamInviteController);
 userRouter.get('/fetch/invitations',fetchInvitations);
 //userRouter.get('/fetch/profile',fetchProfile)
@@ -54,74 +54,170 @@ export default userRouter;
 
 /**
  * @swagger
- * /user/acceptTeamInvite/{eventId}:
+ * /acceptTeamInvite:
  *   post:
- *     tags: [Users]
  *     summary: Accept a team invite
- *     parameters:
- *       - in: path
- *         name: eventId
- *         required: true
- *         schema:
- *           type: string
- *         description: The event ID.
+ *     tags: [Team]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/TeamInvite'
- *           example:
- *             from_team_id: "team123"
- *             to_team_id: "team456"
+ *             type: object
+ *             required:
+ *               - from_team_id
+ *               - to_user_id
+ *               - event_id
+ *             properties:
+ *               from_team_id:
+ *                 type: integer
+ *                 example: 1
+ *               to_user_id:
+ *                 type: integer
+ *                 example: 42
+ *               event_id:
+ *                 type: integer
+ *                 example: 10
  *     responses:
  *       200:
- *         description: Team invite accepted.
+ *         description: Successfully joined the team
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Successfully joined the team!
  *       400:
- *         description: Missing eventId or required fields in request body.
+ *         description: Bad request or team full
  *       404:
- *         description: Invite not found.
+ *         description: Invite, event, or team not found
  *       500:
- *         description: Internal server error.
+ *         description: Internal server error
  */
+
 
 
 /**
  * @swagger
- * /user/MembershipDetails:
- *   get:
- *     tags: [Users]
- *     summary: Fetch membership details of a user
- *     responses:
- *       200:
- *         description: Membership details fetched successfully.
- *       500:
- *         description: Internal server error.
- */
-
-/**
- * @swagger
- * /user/rejectTeamInvite:
+ * /fetchClubMemberships:
  *   post:
- *     tags: [Users]
- *     summary: Reject a team invite
+ *     summary: Fetch all clubs a user is a member of
+ *     tags: [Club]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/TeamInvite'
- *           example:
- *             from_team_id: "team123"
- *             to_team_id: "team456"
+ *             type: object
+ *             required:
+ *               - user_id
+ *             properties:
+ *               user_id:
+ *                 type: integer
+ *                 example: 23
  *     responses:
  *       200:
- *         description: Team invite rejected.
- *       404:
- *         description: Invite not found.
+ *         description: Successfully fetched club memberships
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Fetched club members
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       name:
+ *                         type: string
+ *                         example: Coding Club
+ *                       role:
+ *                         type: string
+ *                         example: President
+ *       400:
+ *         description: Missing user_id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Requires user_id
  *       500:
- *         description: Internal server error.
+ *         description: Internal server error
  */
+
+
+/**
+ * @swagger
+ * /rejectTeamInvite:
+ *   post:
+ *     summary: Reject a team invitation
+ *     tags: [Team]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - from_team_id
+ *               - to_user_id
+ *               - event_id
+ *             properties:
+ *               from_team_id:
+ *                 type: integer
+ *                 example: 12
+ *               to_user_id:
+ *                 type: integer
+ *                 example: 45
+ *               event_id:
+ *                 type: integer
+ *                 example: 3
+ *     responses:
+ *       200:
+ *         description: Team invite rejected
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Team invite rejected.
+ *       400:
+ *         description: Missing required fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Require all fields
+ *       404:
+ *         description: Team invite not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Team invite not found
+ *       500:
+ *         description: Internal server error
+ */
+
 
 
 /**
