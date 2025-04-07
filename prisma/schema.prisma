@@ -79,6 +79,7 @@ model events {
   feedback          feedback[]
   organizingclubs   organizingclubs[]
   teams             teams[]
+  invitation        invitation[]
 }
 
 model eventwinners {
@@ -110,11 +111,13 @@ model feedback {
 }
 
 model invitation {
-  id                                   Int   @id @default(autoincrement())
+  id                                   Int    @id @default(autoincrement())
+  event_id                             Int
   from_team_id                         Int
   to_team_id                           Int
-  teams_invitation_from_team_idToteams teams @relation("invitation_from_team_idToteams", fields: [from_team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invitation_from_team")
-  teams_invitation_to_team_idToteams   teams @relation("invitation_to_team_idToteams", fields: [to_team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invitation_to_team")
+  event                                events @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invitation_event")
+  teams_invitation_from_team_idToteams teams  @relation("invitation_from_team_idToteams", fields: [from_team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invitation_from_team")
+  teams_invitation_to_team_idToteams   teams  @relation("invitation_to_team_idToteams", fields: [to_team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invitation_to_team")
 }
 
 model organizingclubs {
@@ -131,6 +134,9 @@ model teammembers {
   team_id Int
   teams   teams @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teammembers_team")
   users   users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teammembers_user")
+
+  @@index([team_id], name: "idx_teammembers_team_id")
+  @@index([user_id], name: "idx_teammembers_user_id")
 }
 
 model teams {
@@ -143,6 +149,8 @@ model teams {
   invitation_invitation_to_team_idToteams   invitation[]        @relation("invitation_to_team_idToteams")
   teammembers                               teammembers[]
   events                                    events              @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teams_event")
+
+  @@index([event_id], name: "idx_teams_event_id")
 }
 
 model users {

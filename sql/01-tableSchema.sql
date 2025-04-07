@@ -154,3 +154,8 @@ CREATE TABLE invitation (
     CONSTRAINT fk_invitation_from_team FOREIGN KEY (from_team_id) REFERENCES teams(id),
     CONSTRAINT fk_invitation_to_team FOREIGN KEY (to_team_id) REFERENCES teams(id)
 );
+
+CREATE INDEX idx_teams_event_id ON teams(event_id);
+CREATE INDEX idx_teamMembers_user_id ON teamMembers(user_id);
+CREATE INDEX idx_teamMembers_team_id ON teamMembers(team_id);
+CREATE INDEX idx_invitation_event_id ON invitation(event_id);
