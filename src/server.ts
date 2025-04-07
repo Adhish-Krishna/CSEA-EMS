@@ -41,7 +41,7 @@ app.use("/auth/user", userAuthRouter);
 app.use("/auth/admin", adminAuthRouter);
 
 app.use("/user", userAuthMiddleware, userRouter);
-app.use("/events",eventRouter);
+app.use("/events",adminAuthRouter,eventRouter);
 app.use("/admin",adminRouter);
 
 app.listen(PORT, () => {
