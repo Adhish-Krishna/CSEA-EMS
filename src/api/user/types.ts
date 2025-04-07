@@ -8,3 +8,8 @@ export interface Feedback{
     feedback: string;
     rating: number;
 }
+
+export interface EventRegistration {
+    event_id: number,
+    teamName: string
+}

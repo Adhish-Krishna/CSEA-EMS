@@ -1,8 +1,40 @@
 import { Router } from 'express';
-import { acceptTeamInviteController, feedbackController, rejectTeamInviteController,FetchMembersController } from './controller.js';
+import { acceptTeamInviteController, feedbackController, rejectTeamInviteController,FetchMembersController,RegisterController } from './controller.js';
 import { userAuthMiddleware } from '../../middleware/authMiddleware.js';
 const userRouter = Router();
 
+/**
+ * @swagger
+ * /user/register:
+ *   post:
+ *     summary: Register a user for an event
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/EventRegistration'
+ *     responses:
+ *       201:
+ *         description: Event Registration Successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Event Registration Successful"
+ *       400:
+ *         description: Bad Request - Missing required fields or event not found
+ *       404:
+ *         description: Event not found
+ *       500:
+ *         description: Failed to register for event
+ * /** */
+ 
+userRouter.post('/register/:eventId',RegisterController);
 /**
  * @swagger
  * /user/acceptTeamInvite/{eventId}:

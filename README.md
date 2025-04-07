@@ -118,7 +118,7 @@ Trigger setup for DB - Karthi
 | ------------------------------ | ------ | --------------------------- | ------------- | -------- |
 | /user/profile                  | GET    | Fetching user details       | Darshan       |          |
 | /user/registeredEvents         | GET    | Fetching Registered Events  | Karthi        |          |
-| /user/membership               | GET    | Fetching membership details | Pravith       |          |
+| /user/membership               | GET    | Fetching membership details | Pravith       |  **✅**  |
 | /user/invitations              | GET    | Fetching current Invitation | Darshan       |          |
 | /user/feedback/ | POST   | Feedback submission by user | Adhish        | **✅**   |
 

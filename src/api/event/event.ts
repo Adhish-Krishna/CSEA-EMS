@@ -1,9 +1,9 @@
 import { Router} from 'express';
 
-import {RegisterController,updateEventcontroller} from './controller.js';
-import { userAuthMiddleware } from '../../middleware/authMiddleware.js';
+import {updateEventcontroller,AddingWinnerController} from './controller.js';
 const eventRouter = Router();
 
-eventRouter.post('/user/register/:eventId',userAuthMiddleware,RegisterController);
-eventRouter.put('/events/:id',userAuthMiddleware,updateEventcontroller);
+
+eventRouter.put('/:id',updateEventcontroller);
+eventRouter.post('/addWinners',AddingWinnerController);
 export default eventRouter;

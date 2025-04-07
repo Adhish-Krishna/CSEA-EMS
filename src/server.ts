@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import userAuthRouter from "./api/auth/userAuth/auth.js";
 import adminAuthRouter from "./api/auth/adminAuth/auth.js";
 import userRouter from "./api/user/user.js";
+import eventRouter from "./api/event/event.js";
 import { setupSwagger } from "./swagger.js";
 
 import { clearSecurityCodes } from "./jobs/securityCodeCleaner/securityCodeCleaner.js";
@@ -40,7 +41,8 @@ app.use("/auth/user", userAuthRouter);
 app.use("/auth/admin", adminAuthRouter);
 
 app.use("/user", userAuthMiddleware, userRouter);
-app.use("/admin",adminRouter)
+app.use("/events",eventRouter);
+app.use("/admin",adminRouter);
 
 app.listen(PORT, () => {
     console.log(`Server running on : http://localhost:${PORT}`);
