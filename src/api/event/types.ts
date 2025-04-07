@@ -20,3 +20,6 @@ export interface DeleteWinners{
     event_id:number;
     position:number;
 }
+export interface club{
+    club_id:number;
+}
