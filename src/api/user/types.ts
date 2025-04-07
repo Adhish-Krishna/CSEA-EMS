@@ -1,8 +1,7 @@
 export interface TeamInvite {
-    from_team_id: number,
-    to_team_id: number,
-    user_id:number,
-    event_id: number,
+    from_team_id: number;
+    to_user_id:number;
+    event_id: number;
 }
 
 export interface Feedback{

@@ -12,7 +12,7 @@ const RegisterController = async(req : Request,res:Response): Promise<void> =>{
                 id:event_registration.event_id
             }
         });
-
+        
         if (!event) {
             res.status(404).json({message: 'Event not found'});
             return;
@@ -73,54 +73,95 @@ const RegisterController = async(req : Request,res:Response): Promise<void> =>{
         res.status(500).json({ message: 'Failed to register for event' });
     }
 }
+
 const acceptTeamInviteController = async (req: Request, res: Response): Promise<void> =>{
     const user_id=req.user_id;
-    const eventId = req.params.eventId;
     const Invite: TeamInvite = req.body;
-
     try{
-        if(!eventId){
-            res.status(400).json({
-                message: "Requires eventId"
-            })
-            return;
-        }
-        if(!Invite.from_team_id || !Invite.to_team_id){
+        if(!Invite.from_team_id || !Invite.to_user_id || !Invite.event_id){
             res.status(400).json({
                 message: "Require all fields"
             })
             return;
         }
-        const {from_team_id,to_team_id} = Invite;
+        const {from_team_id,to_user_id,event_id} = Invite;
+        const max_no_member = await prisma.events.findUnique({
+            where:{
+                id:event_id
+            },
+            select:{
+                max_no_member:true
+            }
+        });
+        if (!max_no_member) {
+            res.status(404).json({message: 'Event not found'});
+            return;
+        }
+        const currentMembers = await prisma.teammembers.count({
+            where:{
+                team_id:from_team_id,
+                event_id:event_id
+            }
+        });
+        if (!currentMembers){
+            res.status(404).json({message: 'Team not found'});
+            return;
+        }
         const teamInvite = await prisma.invitation.findFirst({
             where: {
                 from_team_id: from_team_id,
-                to_user_id: to_team_id
+                to_user_id: to_user_id,
+                event_id: event_id
             }
         });
         if (!teamInvite) {
             res.status(404).json({error: 'Team invite not found'});
             return;
         }
-        const updatedTeamMember = await prisma.teammembers.updateMany({
+
+        if (currentMembers == max_no_member?.max_no_member) {
+            res.status(400).json({
+                message: "Team is already full"
+            })
+            return;
+        }
+
+        const to_team_id = await prisma.teammembers.findFirst({
             where:{
-                user_id: user_id,
-                team_id: to_team_id
+                user_id:to_user_id,
+                event_id:event_id
             },
-            data:{
-                team_id: from_team_id,
+            select:{
+                team_id:true
             }
         });
-        if (updatedTeamMember.count === 0) {
+        if (!to_team_id) {
             const addTeamMember = await prisma.teammembers.create({
                 data:{
                     user_id:user_id,
                     team_id:from_team_id,
-                    event_id:Number(eventId),
+                    event_id:event_id,
                     is_present:false
                 }
             })
         }
+        else{
+            const updateteamMember = await prisma.teammembers.updateMany({
+                where:{
+                    user_id:to_user_id,
+                    team_id:to_team_id?.team_id,
+                    event_id:event_id
+                },
+                data:{
+                    team_id:from_team_id
+                }
+            });
+        }
+        const inviteDeleted = await prisma.invitation.delete({
+            where:{
+                id: teamInvite.id
+            }
+        });
         res.status(200).json({
             message:"Team invite accepted."
         });
@@ -135,12 +176,19 @@ const acceptTeamInviteController = async (req: Request, res: Response): Promise<
 const rejectTeamInviteController = async (req: Request ,res:Response) :Promise<void>=>{
     const user_id=req.user_id;
     const Invite: TeamInvite = req.body;
-    const {from_team_id,to_team_id} = Invite;
+    if(!Invite.from_team_id || !Invite.to_user_id || !Invite.event_id){
+        res.status(400).json({
+            message: "Require all fields"
+        })
+        return;
+    }
+    const {from_team_id,to_user_id,event_id} = Invite;
     try{
         const teamInvite = await prisma.invitation.findFirst({
             where: {
                 from_team_id: from_team_id,
-                to_user_id: to_team_id
+                to_user_id: to_user_id,
+                event_id: event_id
             }
         });
         if(!teamInvite){

@@ -10,7 +10,7 @@ import {
 
 const userRouter = Router();
 userRouter.post('/register',RegisterController);
-userRouter.post('/acceptTeamInvite/:eventId',acceptTeamInviteController);
+userRouter.post('/acceptTeamInvite',acceptTeamInviteController);
 userRouter.get('/MembershipDetails',FetchMembersController);
 userRouter.post('/rejectTeamInvite',rejectTeamInviteController);
 userRouter.get('/fetch/invitations',fetchInvitations);
