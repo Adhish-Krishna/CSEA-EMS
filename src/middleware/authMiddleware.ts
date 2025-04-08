@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import {AdminPayload, UserPayload} from "./types.js";
+import {AdminPayload, UserPayload, GlobalAdminPayload} from "./types.js";
 import {get_club_id} from "../api/event/utils.js";
 dotenv.config();
 
@@ -60,4 +60,30 @@ const adminAuthMiddleware = async (req: Request, res: Response, next: NextFuncti
     }
 }
 
-export {userAuthMiddleware, adminAuthMiddleware}
+const globalAuthMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+    try {
+        const token = req.cookies?.globaladminaccesstoken;
+        if(!token){
+            res.status(401).json({
+                message: "No token provided"
+            });
+            return;
+        }
+        const decoded = jwt.verify(token, JWT_SECRET) as GlobalAdminPayload;
+        if(!decoded.is_global_admin){
+            res.status(403).json({
+                message: "Not authorized as global admin"
+            });
+            return;
+        }
+        req.global_admin_id = decoded.id;
+        next();
+    }
+    catch(err){
+        res.status(401).json({
+            message: "Invalid Token"
+        });
+    }
+}
+
+export {userAuthMiddleware, adminAuthMiddleware, globalAuthMiddleware}
