@@ -1,6 +1,6 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
-import {Feedback, TeamInvite,EventRegistration, ClubMember, Club,MembershipDetails, invite} from './types.js';
+import {Feedback, TeamInvite,EventRegistration, ClubMember, Club,MembershipDetails, Invite} from './types.js';
 
 const RegisterController = async(req : Request,res:Response): Promise<void> =>{
     try{    
@@ -299,7 +299,7 @@ const fetchMembersController =async (req:Request,res:Response):Promise<void>=>{
 const fetchInvitations = async (req:Request,res:Response) : Promise<void>=>{
     try{
         const user_id = req.user_id;
-        const invitations:invite[] = await prisma.invitation.findMany({
+        const invitations: Invite[] = await prisma.invitation.findMany({
             where:{
                 to_user_id:user_id
             },
@@ -330,8 +330,17 @@ const fetchInvitations = async (req:Request,res:Response) : Promise<void>=>{
                     name:true,
                 }
             })
+            const eventName = await prisma.events.findUnique({
+                where:{
+                    id:invitation.event_id
+                },
+                select:{
+                    name:true
+                }
+            })
             return {
                 event_id: invitation.event_id,
+                event_name : eventName?.name || 'Unknown Event Name',
                 from_user_name: user?.name || 'Unknown User',
                 teamName: team?.name || 'Unknown team'
             };

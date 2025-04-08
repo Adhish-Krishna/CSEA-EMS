@@ -2,11 +2,71 @@ import { Router } from 'express';
 import { createEventController } from './createEventController.js'
 import { adminAuthMiddleware } from '../../middleware/authMiddleware.js';
 import { getPastEventsByClubController } from './getPastEvent.js';
+import putAttendance from './controller.js';
 
 
 const adminRouter = Router();
 adminRouter.post('/create-event',adminAuthMiddleware,createEventController);
 adminRouter.get('/events-history', adminAuthMiddleware,getPastEventsByClubController);
+adminRouter.post('/attendance',putAttendance);
+
+/**
+ * @swagger
+ * /admin/attendance:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Update attendance for a user in an event
+ *     description: Updates the attendance status (`is_present`) of a specific user for a given event. Requires `event_id`, `user_id`, and `is_present` fields in the request body.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AttendanceUpdateDTO'
+ *     responses:
+ *       200:
+ *         description: Attendance updated successfully for the given user_id and event_id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Attendance updated successfully for the given user_id and event_id
+ *       400:
+ *         description: Required fields missing (event_id, user_id, and is_present)
+ *       404:
+ *         description: No matching record found for the given event_id and user_id
+ *       500:
+ *         description: Internal server error while updating attendance
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     AttendanceUpdateDTO:
+ *       type: object
+ *       required:
+ *         - event_id
+ *         - user_id
+ *         - is_present
+ *       properties:
+ *         event_id:
+ *           type: integer
+ *           description: ID of the event
+ *           example: 7
+ *         user_id:
+ *           type: integer
+ *           description: ID of the user
+ *           example: 103
+ *         is_present:
+ *           type: boolean
+ *           description: Attendance status of the user
+ *           example: true
+ */
+
 
 /**
  * @swagger

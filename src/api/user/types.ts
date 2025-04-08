@@ -12,26 +12,26 @@ export interface Feedback{
 
 export interface EventRegistration {
     event_id: number;
-    teamName: string;
+    teamName: string ;
 }
 export interface ClubMember {
     club_id: number;
-    role: string;
+    role: string|null;
 }
 
 export interface Club  {
-    name: string;
+    name: string | null;
     id: number;
 }
 
 export interface MembershipDetails{
-    name:string;
+    name:string|null;
     id:number;
-    role:string;
+    role:string|null;
 }
 
-export interface invite{
-    event_id:Number;
-    from_user_id:Number;
-    from_team_id:Number;
+export interface Invite{
+    event_id:number;
+    from_user_id:number;
+    from_team_id:number;
 }

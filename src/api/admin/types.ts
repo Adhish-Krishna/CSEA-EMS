@@ -10,3 +10,9 @@ export interface CreateEventDTO {
     club_id: number;
     user_id: number; 
 }
+
+export interface Attendance {
+    user_id : number,
+    event_id : number,
+    is_present : boolean,
+}
