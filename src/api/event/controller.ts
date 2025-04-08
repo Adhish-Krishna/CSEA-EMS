@@ -68,7 +68,7 @@ const removeWinnerController = async (req:Request,res:Response) : Promise<void>=
         })
     }
     try{
-        const data = await prisma.eventwinners.fetch({
+        const data = await prisma.eventwinners.findFirst({
             where:{
                 event_id:to_del.event_id,
                 position:to_del.position
@@ -80,13 +80,13 @@ const removeWinnerController = async (req:Request,res:Response) : Promise<void>=
             })
             return;
         }
-        const del = await prisma.eventwinners.delete({
+        const del = await prisma.eventwinners.deleteMany({
             where:{
                 event_id:to_del.event_id,
                 position:to_del.position
             }
         });
-        res.status(204).json({
+        res.status(200).json({
             message:"Winners deleted succesfully"
         })
 

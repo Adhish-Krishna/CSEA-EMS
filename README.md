@@ -15,23 +15,23 @@ Daddy-EMS is a comprehensive event management system designed to simplify the pr
 ## 💻 Installation
 
 1. Clone the repository
-
+   
    ```bash
    git clone https://github.com/Adhish-Krishna/Daddy-EMS.git
    cd Daddy-EMS
    ```
 2. Install dependencies
-
+   
    ```bash
    npm install
    ```
 3. Generate the client library using Prisma
-
+   
    ```bash
    npx prisma generate
    ```
 4. Start the development server
-
+   
    ```bash
    npm run dev
    ```
@@ -84,18 +84,17 @@ Trigger setup for DB - Karthi
 
 ## Auth Routes
 
-| Endpoint                  | Method | Purpose | To be done By | progress |
-| ------------------------- | ------ | ------- | ------------- | -------- |
-| /auth/user/login          | POST   | -       | Adhish        | **✅**   |
-| /auth/user/signup         | POST   | -       | Adhish        | **✅**   |
-| /auth/user/logout         | POST   | -       | Adhish        | **✅**   |
-| /auth/user/reset-password | POST   | -       | Adhish        | **✅**   |
-| /auth/club/login          | POST   | -       | Adhish        | **✅**   |
-| /auth/club/logout         | POST   | -       | Adhish        | **✅**   |
-| /auth/global/login        | POST   | -       | SU rya Prakash |
-| /auth/global/logout       | POST   | -       | SU rya Prakash       |
-| /auth/global/signup | POST | - | SU rya Prakash | |
-
+| Endpoint                  | Method | Purpose | To be done By  | progress |
+| ------------------------- | ------ | ------- | -------------- | -------- |
+| /auth/user/login          | POST   | -       | Adhish         | **✅**   |
+| /auth/user/signup         | POST   | -       | Adhish         | **✅**   |
+| /auth/user/logout         | POST   | -       | Adhish         | **✅**   |
+| /auth/user/reset-password | POST   | -       | Adhish         | **✅**   |
+| /auth/club/login          | POST   | -       | Adhish         | **✅**   |
+| /auth/club/logout         | POST   | -       | Adhish         | **✅**   |
+| /auth/global/login        | POST   | -       | SU rya Prakash |          |
+| /auth/global/logout       | POST   | -       | SU rya Prakash |          |
+| /auth/global/signup       | POST   | -       | SU rya Prakash |          |
 
 ## Admin Routes
 
@@ -106,29 +105,31 @@ Trigger setup for DB - Karthi
 
 ## Event Routes
 
-| Endpoint                         | Method | Purpose                                                                        | To be done by | Progress |
-| -------------------------------- | ------ | ------------------------------------------------------------------------------ | ------------- | -------- |
-| /event/modify                    | POST   | Admin modifying the event details                                              | Chandru       |          |
-| /event/stats/:eventId            | GET    | Fetching stats of particular event by admin                                    | Chandru       |          |
-| /event/addPlaceHolders/:eventId  | POST   | Providing the details of winners and runners by club admin of particular event | Pravith       | **✅**   |
-| /event/removePlaceHolders/:eventId  | POST   | Providing the details of winners and runners by club admin of particular event | Pravith       | **✅**   |
-| /event/attendance/:eventId       | POST   | Marking attendance for particular event by                                     | Darshan       |   |
-| /event/register                  | POST   | User registering for a event                                                   | Darshan       |         **✅**   |
-| /event/teamInvite/:eventId       | POST   | User requesting other users to be in their team                                | Karthi        |          |
-| /event/acceptTeamInvite/:eventId | POST   | User accepting the other user's team invite                                    | Pravith       | **✅**   |
+| Endpoint                           | Method | Purpose                                                                        | To be done by | Progress |
+| ---------------------------------- | ------ | ------------------------------------------------------------------------------ | ------------- | -------- |
+| /event/modify                      | POST   | Admin modifying the event details                                              | Chandru       |          |
+| /event/stats/:eventId              | GET    | Fetching stats of particular event by admin                                    | Chandru       |          |
+| /event/addPlaceHolders/:eventId    | POST   | Providing the details of winners and runners by club admin of particular event | Pravith       | **✅**   |
+| /event/removePlaceHolders/:eventId | POST   | Providing the details of winners and runners by club admin of particular event | Pravith       | **✅**   |
+| /event/attendance       | POST   | Marking attendance for particular event by                                     | Darshan       |      **✅**     |
+| /event/register                    | POST   | User registering for a event                                                   | Darshan       | **✅**   |
+| /event/teamInvite/:eventId         | POST   | User requesting other users to be in their team                                | Karthi        |          |
+| /event/acceptTeamInvite/:eventId   | POST   | User accepting the other user's team invite                                    | Pravith       | **✅**   |
 
 ## User Routes
 
 | Endpoint               | Method | Purpose                     | To be done by | progress |
 | ---------------------- | ------ | --------------------------- | ------------- | -------- |
-| /user/profile          | GET    | Fetching user details       | Darshan       |          |
+| /user/profile          | GET    | Fetching user details       | Darshan       |         **✅**  |
 | /user/registeredEvents | GET    | Fetching Registered Events  | Karthi        |          |
 | /user/membership       | GET    | Fetching membership details | Pravith       | **✅**   |
-| /user/invitations      | GET    | Fetching current Invitation | Darshan       | **✅**           |
+| /user/invitations      | GET    | Fetching current Invitation | Darshan       | **✅**   |
 | /user/feedback/        | POST   | Feedback submission by user | Adhish        | **✅**   |
 
 ## Global Admin Routes
-| Endpoint                       | Method | Purpose                     | To be done by | progress |
-| ------------------------------ | ------ | --------------------------- | ------------- | -------- |
-| /global/createclub | POST | - | Adhish | |
-| /global/addadmin | POST | - | Adhish | |
+
+| Endpoint           | Method | Purpose | To be done by | progress |
+| ------------------ | ------ | ------- | ------------- | -------- |
+| /global/createclub | POST   | -       | Adhish        |          |
+| /global/addadmin   | POST   | -       | Adhish        |          |
+
