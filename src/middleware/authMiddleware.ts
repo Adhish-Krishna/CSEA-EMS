@@ -28,7 +28,7 @@ const userAuthMiddleware = (req: Request, res: Response, next: NextFunction): vo
     }
 }
 
-const adminAuthMiddleware = (req: Request, res: Response, next: NextFunction): void =>{
+const adminAuthMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> =>{
     try{
         const token = req.cookies?.adminaccesstoken;
         console.log("auth triggered")
@@ -41,22 +41,16 @@ const adminAuthMiddleware = (req: Request, res: Response, next: NextFunction): v
         const decoded = jwt.verify(token, JWT_SECRET) as AdminPayload;
         req.admin_user_id = decoded.id;
         req.admin_club_id = decoded.club_id;
-        let {club_id,event_id}=req.body;
-        if(!club_id && !event_id){
+        let {event_id}=req.body;
+        if(event_id){
+        const club_id = await get_club_id(event_id); 
+        if(req.admin_club_id !== club_id){
             res.status(401).json({
-                message:"Requires club_id or event_id"
+                message: "You cannot access other clubs"
             });
             return;
         }
-        if(!club_id && event_id){
-            club_id = get_club_id(event_id); 
-        }
-        if(decoded.club_id !== club_id){
-            res.status(401).json({
-                message: "You cannot access this club"
-            });
-            return;
-        }
+    }
         next();
     }
     catch(err){
