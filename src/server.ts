@@ -4,11 +4,13 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import userAuthRouter from "./api/auth/userAuth/auth.js";
 import adminAuthRouter from "./api/auth/adminAuth/auth.js";
+import globalAuthRouter from "./api/auth/globalAuth/auth.js";
 import userRouter from "./api/user/user.js";
 import eventRouter from "./api/event/event.js";
+import globalRouter from "./api/global/global.js";
 import { setupSwagger } from "./swagger.js";
 import { clearSecurityCodes } from "./jobs/securityCodeCleaner/securityCodeCleaner.js";
-import {adminAuthMiddleware, userAuthMiddleware } from "./middleware/authMiddleware.js";
+import {adminAuthMiddleware, userAuthMiddleware, globalAuthMiddleware } from "./middleware/authMiddleware.js";
 
 import adminRouter from "./api/admin/admin.js";
 
@@ -35,9 +37,11 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/auth/user", userAuthRouter);
 app.use("/auth/admin", adminAuthRouter);
+app.use("/auth/global", globalAuthRouter);
 app.use("/user", userAuthMiddleware, userRouter);
-app.use("/events",adminAuthMiddleware,eventRouter);
-app.use("/admin",adminRouter);
+app.use("/events", adminAuthMiddleware, eventRouter);
+app.use("/admin", adminRouter);
+app.use("/global", globalRouter);
 
 app.listen(PORT, () => {
     console.log(`Server running on : http://localhost:${PORT}`);
