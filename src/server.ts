@@ -7,29 +7,40 @@ import adminAuthRouter from "./api/auth/adminAuth/auth.js";
 import globalAuthRouter from "./api/auth/globalAuth/auth.js";
 import userRouter from "./api/user/user.js";
 import eventRouter from "./api/event/event.js";
+
+import logsRouter from "./api/logs/logs.js";
 import globalRouter from "./api/global/global.js";
 import { setupSwagger } from "./swagger.js";
 import { clearSecurityCodes } from "./jobs/securityCodeCleaner/securityCodeCleaner.js";
 import {adminAuthMiddleware, userAuthMiddleware, globalAuthMiddleware } from "./middleware/authMiddleware.js";
 
 import adminRouter from "./api/admin/admin.js";
+import logger from "./utils/logger.js";
+import { requestLogger, errorLogger } from "./middleware/loggerMiddleware.js";
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-
 const app: Express = express();
 
+// Basic middleware
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
+// Add request logger before routes
+app.use(requestLogger);
+
+// Swagger setup
 setupSwagger(app);
 
+// Start scheduled tasks
 clearSecurityCodes();
 
+// Routes
 app.get("/", (req: Request, res: Response) => {
+    logger.info("Root endpoint accessed");
     res.json({
         message: "Daddy-EMS server is running...",
     });
@@ -40,9 +51,28 @@ app.use("/auth/admin", adminAuthRouter);
 app.use("/auth/global", globalAuthRouter);
 app.use("/user", userAuthMiddleware, userRouter);
 app.use("/events", adminAuthMiddleware, eventRouter);
+
+//app.use("/admin", adminRouter);
+app.use("/logs",adminAuthMiddleware,logsRouter);
 app.use("/admin", adminRouter);
 app.use("/global", globalRouter);
 
+
+// Add error logger after routes
+app.use(errorLogger);
+
+// Global error handler
+app.use((err: any, req: Request, res: Response, next: any) => {
+    logger.error(`Unhandled error: ${err.message}`, { 
+        stack: err.stack,
+        path: req.path
+    });
+    res.status(500).json({
+        message: "Internal Server Error",
+        error: process.env.NODE_ENV === 'production' ? undefined : err.message
+    });
+});
+
 app.listen(PORT, () => {
-    console.log(`Server running on : http://localhost:${PORT}`);
+    logger.info(`Server running on : http://localhost:${PORT}`);
 });
