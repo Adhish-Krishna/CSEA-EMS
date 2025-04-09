@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { LoginGlobalAdmin, GlobalAdminSignUp } from "./types.js";
+import { LoginGlobalAdmin, SignUpGlobalAdmin } from "./types.js";
 import prisma from "../../../prisma.js";
-import { checkPassword, generateEmail, hashPassword, validatePhoneNumber } from "../userAuth/utils.js";
-import { generateGlobalAdminAccessToken, generateGlobalAdminRefreshToken } from "./util.js";
+import { checkPassword, hashPassword } from "../userAuth/utils.js";
+import { generateGlobalAdminAccessToken, generateGlobalAdminRefreshToken } from "./utils.js";
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { GlobalAdminPayload } from "../../../middleware/types.js";
@@ -11,102 +11,120 @@ dotenv.config();
 
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
 
+/**
+ * Controller for global admin signup
+ */
 const signupController = async (req: Request, res: Response): Promise<void> => {
-    const globalAdmin: GlobalAdminSignUp = req.body;
+    const globalAdmin: SignUpGlobalAdmin = req.body;
+    
     try {
-        if (!globalAdmin.name || !globalAdmin.rollno || !globalAdmin.password || !globalAdmin.department || !globalAdmin.phoneno || !globalAdmin.yearofstudy) {
+        if (!globalAdmin.username || !globalAdmin.password) {
             res.status(400).json({
-                message: "All fields are required"
+                message: "Username and password are required"
             });
             return;
         }
         
-        if (!validatePhoneNumber(globalAdmin.phoneno)) {
-            res.status(400).json({
-                message: "Phone number must contain 10 digits"
-            });
-            return;
-        }
-        
-        globalAdmin.email = generateEmail(globalAdmin.rollno);
-        
-        // Create user with global admin flag
-        const newGlobalAdmin = await prisma.users.create({
-            data: {
-                name: globalAdmin.name,
-                rollno: globalAdmin.rollno.toLowerCase(),
-                password: hashPassword(globalAdmin.password),
-                department: globalAdmin.department,
-                email: globalAdmin.email,
-                phoneno: globalAdmin.phoneno,
-                yearofstudy: globalAdmin.yearofstudy
+        // Check if global admin with same username already exists
+        const existingAdmin = await prisma.globaladmins.findFirst({
+            where: {
+                username: globalAdmin.username
             }
         });
         
-        // Set global admin token values
-        const accesstoken = generateGlobalAdminAccessToken(newGlobalAdmin.id);
-        const refreshtoken = generateGlobalAdminRefreshToken(newGlobalAdmin.id);
+        if (existingAdmin) {
+            res.status(409).json({
+                message: "Global admin with this username already exists"
+            });
+            return;
+        }
         
-        res.cookie('globaladminaccesstoken', accesstoken, {
+        // Create global admin record with hashed password
+        const newGlobalAdmin = await prisma.globaladmins.create({
+            data: {
+                username: globalAdmin.username,
+                password: hashPassword(globalAdmin.password)
+            }
+        });
+        
+        // Generate tokens
+        const accessToken = generateGlobalAdminAccessToken(newGlobalAdmin.id, newGlobalAdmin.username);
+        const refreshToken = generateGlobalAdminRefreshToken(newGlobalAdmin.id, newGlobalAdmin.username);
+        
+        // Set cookies
+        res.cookie('globaladminaccesstoken', accessToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'none'
         });
         
-        res.cookie('globaladminrefreshtoken', refreshtoken, {
+        res.cookie('globaladminrefreshtoken', refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'none'
         });
         
         res.status(201).json({
-            message: "Global admin registered successfully"
+            message: "Global admin created successfully"
         });
         return;
     } catch (err) {
-        console.error("Global admin signup error:", err);
+        console.error("Error in global admin signup:", err);
         res.status(500).json({
-            message: "Failed to register global admin"
+            message: "Internal server error"
         });
         return;
     }
-}
+};
 
+/**
+ * Controller for global admin login
+ */
 const loginController = async (req: Request, res: Response): Promise<void> => {
     const loginCredentials: LoginGlobalAdmin = req.body;
+    
     try {
-        const userRecord = await prisma.users.findFirst({
+        if (!loginCredentials.username || !loginCredentials.password) {
+            res.status(400).json({
+                message: "Username and password are required"
+            });
+            return;
+        }
+        
+        // Find global admin by username
+        const adminRecord = await prisma.globaladmins.findFirst({
             where: {
-                rollno: loginCredentials.rollno.toLowerCase()
+                username: loginCredentials.username
             }
         });
         
-        if (!userRecord) {
-            res.status(401).json({
-                message: "User does not exist"
+        if (!adminRecord) {
+            res.status(404).json({
+                message: "Global admin not found"
             });
             return;
         }
         
-        // Verify password
-        if (!checkPassword(userRecord.password!, loginCredentials.password)) {
+        // Check password
+        if (!checkPassword(adminRecord.password, loginCredentials.password)) {
             res.status(401).json({
-                message: "Wrong password"
+                message: "Invalid password"
             });
             return;
         }
         
-        // Generate global admin tokens
-        const accesstoken = generateGlobalAdminAccessToken(userRecord.id);
-        const refreshtoken = generateGlobalAdminRefreshToken(userRecord.id);
+        // Generate tokens
+        const accessToken = generateGlobalAdminAccessToken(adminRecord.id, adminRecord.username);
+        const refreshToken = generateGlobalAdminRefreshToken(adminRecord.id, adminRecord.username);
         
-        res.cookie('globaladminaccesstoken', accesstoken, {
+        // Set cookies
+        res.cookie('globaladminaccesstoken', accessToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'none'
         });
         
-        res.cookie('globaladminrefreshtoken', refreshtoken, {
+        res.cookie('globaladminrefreshtoken', refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'none'
@@ -117,15 +135,19 @@ const loginController = async (req: Request, res: Response): Promise<void> => {
         });
         return;
     } catch (err) {
-        console.error("Global admin login error:", err);
+        console.error("Error in global admin login:", err);
         res.status(500).json({
-            message: "Login failed"
+            message: "Internal server error"
         });
         return;
     }
-}
+};
 
+/**
+ * Controller for global admin logout
+ */
 const logoutController = (req: Request, res: Response): void => {
+    // Clear cookies
     res.clearCookie('globaladminaccesstoken', {
         httpOnly: true,
         secure: true,
@@ -142,54 +164,57 @@ const logoutController = (req: Request, res: Response): void => {
         message: "Global admin logged out successfully"
     });
     return;
-}
+};
 
+/**
+ * Controller for getting a new access token
+ */
 const getNewAccessTokenController = (req: Request, res: Response): void => {
     try {
-        const refreshtoken = req.cookies?.globaladminrefreshtoken;
-        if (!refreshtoken) {
+        const refreshToken = req.cookies?.globaladminrefreshtoken;
+        
+        if (!refreshToken) {
             res.status(401).json({
                 message: "No refresh token provided"
             });
             return;
         }
         
-        const payload = jwt.verify(refreshtoken, JWT_REFRESH_SECRET) as GlobalAdminPayload;
+        const payload = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as GlobalAdminPayload;
         
         if (!payload.is_global_admin) {
             res.status(403).json({
-                message: "Not authorized as global admin"
+                message: "Invalid token - not a global admin token"
             });
             return;
         }
         
-        const id = payload.id;
+        // Generate new tokens with username from payload
+        const newAccessToken = generateGlobalAdminAccessToken(payload.id, payload.username);
+        const newRefreshToken = generateGlobalAdminRefreshToken(payload.id, payload.username);
         
-        const newGlobalAdminAccessToken = generateGlobalAdminAccessToken(id);
-        const newGlobalAdminRefreshToken = generateGlobalAdminRefreshToken(id);
-        
-        res.cookie('globaladminaccesstoken', newGlobalAdminAccessToken, {
+        res.cookie('globaladminaccesstoken', newAccessToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'none'
         });
         
-        res.cookie('globaladminrefreshtoken', newGlobalAdminRefreshToken, {
+        res.cookie('globaladminrefreshtoken', newRefreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'none'
         });
         
         res.status(200).json({
-            message: "New global admin access token generated"
+            message: "New access token generated"
         });
         return;
     } catch (err) {
         res.status(401).json({
-            message: "Invalid token"
+            message: "Invalid or expired token"
         });
         return;
     }
-}
+};
 
 export { signupController, loginController, logoutController, getNewAccessTokenController };

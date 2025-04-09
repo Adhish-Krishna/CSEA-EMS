@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import prisma from "../../prisma.js";
 import { AddClubAdminDTO, CreateClubDTO } from "./types.js";
 
+
+
 export const createClubController = async (req: Request, res: Response): Promise<void> => {
     try {
         const clubData: CreateClubDTO = req.body;
@@ -12,8 +14,7 @@ export const createClubController = async (req: Request, res: Response): Promise
             });
             return;
         }
-        
-        // Check if club with same name already exists
+      
         const existingClub = await prisma.clubs.findFirst({
             where: {
                 name: clubData.name
@@ -35,8 +36,8 @@ export const createClubController = async (req: Request, res: Response): Promise
         });
         
         res.status(201).json({
-            message: "Club created successfully",
-          
+            message: "Club created successfully"
+           
         });
         return;
     } catch (err) {
@@ -59,7 +60,7 @@ export const addClubAdminController = async (req: Request, res: Response): Promi
             return;
         }
         
-        // Check if user exists
+     
         const user = await prisma.users.findUnique({
             where: {
                 id: adminData.user_id
@@ -73,7 +74,7 @@ export const addClubAdminController = async (req: Request, res: Response): Promi
             return;
         }
         
-        // Check if club exists
+     
         const club = await prisma.clubs.findUnique({
             where: {
                 id: adminData.club_id
@@ -87,7 +88,7 @@ export const addClubAdminController = async (req: Request, res: Response): Promi
             return;
         }
         
-        // Check if user is already an admin of this club
+     
         const existingClubMember = await prisma.clubmembers.findFirst({
             where: {
                 user_id: adminData.user_id,
@@ -96,7 +97,7 @@ export const addClubAdminController = async (req: Request, res: Response): Promi
         });
         
         if (existingClubMember) {
-            // If user is already a member but not an admin, update their role
+
             if (!existingClubMember.is_admin) {
                 const updatedMember = await prisma.clubmembers.update({
                     where: {
@@ -121,7 +122,7 @@ export const addClubAdminController = async (req: Request, res: Response): Promi
             }
         }
         
-        // Add user as club admin
+      
         const newClubAdmin = await prisma.clubmembers.create({
             data: {
                 user_id: adminData.user_id,
@@ -132,7 +133,8 @@ export const addClubAdminController = async (req: Request, res: Response): Promi
         });
         
         res.status(201).json({
-            message: "Club admin added successfully",
+            message: "Club admin added successfully"
+            
             
         });
         return;

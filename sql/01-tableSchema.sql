@@ -152,6 +152,14 @@ CREATE TABLE invitation (
     CONSTRAINT fk_invitation_from_user FOREIGN KEY (from_user_id) REFERENCES users(id)
 );
 
+-- Table: globalAdmins
+CREATE TABLE globalAdmins (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX idx_teams_event_id ON teams(event_id);
 CREATE INDEX idx_teamMembers_user_id ON teamMembers(user_id);
 CREATE INDEX idx_teamMembers_team_id ON teamMembers(team_id);

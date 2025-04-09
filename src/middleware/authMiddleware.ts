@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import {AdminPayload, UserPayload, GlobalAdminPayload} from "./types.js";
 import {get_club_id} from "../api/event/utils.js";
+import prisma from "../prisma.js";
+
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -60,7 +62,7 @@ const adminAuthMiddleware = async (req: Request, res: Response, next: NextFuncti
     }
 }
 
-const globalAuthMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+const globalAuthMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const token = req.cookies?.globaladminaccesstoken;
         if(!token){
@@ -69,13 +71,30 @@ const globalAuthMiddleware = (req: Request, res: Response, next: NextFunction): 
             });
             return;
         }
+        
         const decoded = jwt.verify(token, JWT_SECRET) as GlobalAdminPayload;
+        
         if(!decoded.is_global_admin){
             res.status(403).json({
                 message: "Not authorized as global admin"
             });
             return;
         }
+        
+        // Check if the global admin exists in the standalone globaladmins table
+        const globalAdminRecord = await prisma.globaladmins.findUnique({
+            where: {
+                id: decoded.id
+            }
+        });
+        
+        if (!globalAdminRecord) {
+            res.status(403).json({
+                message: "Invalid global admin credentials"
+            });
+            return;
+        }
+        
         req.global_admin_id = decoded.id;
         next();
     }

@@ -11,6 +11,7 @@ export interface AdminPayload extends jwt.JwtPayload{
 
 export interface GlobalAdminPayload extends jwt.JwtPayload{
     id: number;
+    username: string;
     is_global_admin: boolean;
 }
 

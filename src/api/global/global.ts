@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addClubAdminController, createClubController } from "./controller.js";
+import { addClubAdminController, createClubController} from "./controller.js";
 import { globalAuthMiddleware } from "../../middleware/authMiddleware.js";
 
 const globalRouter = Router();
@@ -7,6 +7,12 @@ const globalRouter = Router();
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     globalAdminAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *       description: JWT token for global admin authentication
  *   schemas:
  *     CreateClubDTO:
  *       type: object
@@ -35,7 +41,7 @@ const globalRouter = Router();
  *           type: string
  *           example: "President"
  */
-
+ 
 /**
  * @swagger
  * /global/createclub:
@@ -141,5 +147,6 @@ globalRouter.post('/createclub', globalAuthMiddleware, createClubController);
  *         description: Server error
  */
 globalRouter.post('/addadmin', globalAuthMiddleware, addClubAdminController);
+
 
 export default globalRouter;
