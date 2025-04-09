@@ -1,13 +1,14 @@
 import { Router } from 'express';
-import { createEventController } from './createEventController.js'
-import { adminAuthMiddleware } from '../../middleware/authMiddleware.js';
-import { getPastEventsByClubController } from './getPastEvent.js';
-import putAttendance from './controller.js';
+import {
+    putAttendance,
+    createEventController,
+    getPastEventsByClubController
+} from './controller.js';
 
 
 const adminRouter = Router();
-adminRouter.post('/create-event',adminAuthMiddleware,createEventController);
-adminRouter.get('/events-history', adminAuthMiddleware,getPastEventsByClubController);
+adminRouter.post('/create-event',createEventController);
+adminRouter.get('/events-history', getPastEventsByClubController);
 adminRouter.post('/attendance',putAttendance);
 
 /**

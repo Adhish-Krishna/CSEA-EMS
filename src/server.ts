@@ -30,9 +30,7 @@ app.use(cookieParser());
 
 app.use(requestLogger);
 
-
 setupSwagger(app);
-
 
 clearSecurityCodes();
 
@@ -48,11 +46,10 @@ app.use("/auth/user", userAuthRouter);
 app.use("/auth/admin", adminAuthRouter);
 app.use("/auth/global", globalAuthRouter);
 app.use("/user", userAuthMiddleware, userRouter);
-app.use("/events", adminAuthMiddleware, eventRouter);
-
-//app.use("/admin", adminRouter);
-app.use("/logs",adminAuthMiddleware,logsRouter);
+app.use("/event", adminAuthMiddleware, eventRouter);
 app.use("/admin", adminRouter);
+app.use("/logs",adminAuthMiddleware,logsRouter);
+app.use("/admin", adminAuthMiddleware,adminRouter);
 app.use("/global", globalRouter);
 
 
