@@ -81,7 +81,7 @@ const globalAuthMiddleware = async (req: Request, res: Response, next: NextFunct
             return;
         }
         
-        // Check if the global admin exists in the standalone globaladmins table
+     
         const globalAdminRecord = await prisma.globaladmins.findUnique({
             where: {
                 id: decoded.id

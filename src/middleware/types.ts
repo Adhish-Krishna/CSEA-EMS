@@ -15,7 +15,7 @@ export interface GlobalAdminPayload extends jwt.JwtPayload{
     is_global_admin: boolean;
 }
 
-//declaring global epxress type
+
 declare global {
     namespace Express {
         interface Request  {
