@@ -41,7 +41,9 @@ if (process.env.LOKI_URL) {
   transports.push(
     new LokiTransport({
       host: process.env.LOKI_URL!,
-      labels: { app: 'daddy-ems' },
+      labels: { 
+        job: 'daddy-ems-backend',
+        app: 'daddy-ems' },
       json: true,
       format: winston.format.json(),
       replaceTimestamp: true,

@@ -2,17 +2,17 @@
 
 > The Event Management System - Streamline your event planning and management
 
-## 📖 Overview
+## Overview
 
 Daddy-EMS is a comprehensive event management system designed to simplify the process of planning, organizing, and managing events. This system provides the tools you need to handle registrations, scheduling, attendee management, and more.
 
-## 🔧 Prerequisites
+## Prerequisites
 
 - Node.js (v14.x or later)
 - npm (v6.x or later)
 - Git
 
-## 💻 Installation
+## Installation
 
 1. Clone the repository
    
@@ -36,7 +36,7 @@ Daddy-EMS is a comprehensive event management system designed to simplify the pr
    npm run dev
    ```
 
-## ⚙️ Installing using Docker:
+## Installing using Docker:
 
 ```bash
 docker-compose build
@@ -46,7 +46,75 @@ docker-compose build
 docker-compose up -d
 ```
 
-## 🔍 TypeScript Setup
+Here's a complete `README.md` file in markdown format that explains how to:
+
+# DaddyEMS Logging Setup with Grafana + Loki
+
+This project demonstrates logging in a Node.js application using **Winston**, with logs sent to **Grafana Loki** for monitoring and analysis.
+
+- `loki`: Log aggregation system
+- `grafana`: Visualization and dashboard UI
+
+To get started with just the **logging dashboard**, you can run only **Loki** and **Grafana**.
+
+### Start Loki and Grafana
+
+```bash
+docker-compose up -d loki grafana
+```
+
+This will start:
+
+* **Loki** on [http://localhost:3100](http://localhost:3100/)
+* **Grafana** on [http://localhost:3000](http://localhost:3000/)
+
+>  Default Grafana credentials:
+> 
+> * **Username:** admin
+> * **Password:** admin
+
+---
+
+### Connect Loki to Grafana
+
+1. Go to [http://localhost:3000](http://localhost:3000/) and log in.
+2. Click the ⚙️ **"Settings"** (left sidebar) → **"Data Sources"**
+3. Click **"Add data source"**
+4. Select **"Loki"**
+5. Set:
+   * ​**URL**​: `http://loki:3100`
+6. Click **Save & Test** — it should show `Data source is working`.
+
+---
+
+## Viewing Logs
+
+After your Node.js backend starts generating logs, you can view them in Grafana.
+
+### Available Job Labels
+
+| Job Name                       | Description                                               |
+| -------------------------------- | ----------------------------------------------------------- |
+| `daddy-ems-backend`        | Custom app-level logs using`logger.ts`                |
+| `daddy-ems-backend-routes` | HTTP request/response logs using`loggerMiddleware.ts` |
+
+### Sample Queries in Grafana Explore
+
+#### View General App Logs (from `logger.ts`)
+
+```logql
+{job="daddy-ems-backend", app="daddy-ems"}
+```
+
+#### View HTTP Request Logs (from `express-winston`)
+
+```logql
+{job="daddy-ems-backend-routes", app="daddy-ems-requests"}
+```
+
+---
+
+## TypeScript Setup
 
 This project uses TypeScript for type safety and better developer experience. Here's how to get started with TypeScript:
 
@@ -111,7 +179,7 @@ Trigger setup for DB - Karthi
 | /event/stats/:eventId              | GET    | Fetching stats of particular event by admin                                    | Chandru       |          |
 | /event/addPlaceHolders/:eventId    | POST   | Providing the details of winners and runners by club admin of particular event | Pravith       | **✅**   |
 | /event/removePlaceHolders/:eventId | POST   | Providing the details of winners and runners by club admin of particular event | Pravith       | **✅**   |
-| /event/attendance       | POST   | Marking attendance for particular event by                                     | Darshan       |      **✅**     |
+| /event/attendance                  | POST   | Marking attendance for particular event by                                     | Darshan       | **✅**   |
 | /event/register                    | POST   | User registering for a event                                                   | Darshan       | **✅**   |
 | /event/teamInvite/:eventId         | POST   | User requesting other users to be in their team                                | Karthi        |          |
 | /event/acceptTeamInvite/:eventId   | POST   | User accepting the other user's team invite                                    | Pravith       | **✅**   |
@@ -120,7 +188,7 @@ Trigger setup for DB - Karthi
 
 | Endpoint               | Method | Purpose                     | To be done by | progress |
 | ---------------------- | ------ | --------------------------- | ------------- | -------- |
-| /user/profile          | GET    | Fetching user details       | Darshan       |         **✅**  |
+| /user/profile          | GET    | Fetching user details       | Darshan       | **✅**   |
 | /user/registeredEvents | GET    | Fetching Registered Events  | Karthi        |          |
 | /user/membership       | GET    | Fetching membership details | Pravith       | **✅**   |
 | /user/invitations      | GET    | Fetching current Invitation | Darshan       | **✅**   |
