@@ -11,10 +11,11 @@ export interface AdminPayload extends jwt.JwtPayload{
 
 export interface GlobalAdminPayload extends jwt.JwtPayload{
     id: number;
+    username: string;
     is_global_admin: boolean;
 }
 
-//declaring global epxress type
+
 declare global {
     namespace Express {
         interface Request  {
