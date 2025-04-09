@@ -30,11 +30,11 @@ const options = {
                 description: "Admin Authentication Routes",
             },
             {
-                name: "Users",
+                name: "User",
                 description: "User Routes"
             },
             {
-                name: "Events",
+                name: "Event",
                 description: "Event Registration"
             },
             {

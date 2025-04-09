@@ -33,7 +33,7 @@ const RegisterController = async(req : Request,res:Response): Promise<void> =>{
                 return;
             }
             if (user.rollno === null) {
-                res.status(400).json({message: 'User roll number is required'});
+                res.status(400).json({message: 'User roll number is null in database'});
                 return;
             }
             teamName = user.rollno;
