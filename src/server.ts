@@ -24,21 +24,19 @@ const PORT = process.env.PORT || 3000;
 
 const app: Express = express();
 
-// Basic middleware
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-// Add request logger before routes
 app.use(requestLogger);
 
-// Swagger setup
+
 setupSwagger(app);
 
-// Start scheduled tasks
+
 clearSecurityCodes();
 
-// Routes
+
 app.get("/", (req: Request, res: Response) => {
     logger.info("Root endpoint accessed");
     res.json({
@@ -58,10 +56,10 @@ app.use("/admin", adminRouter);
 app.use("/global", globalRouter);
 
 
-// Add error logger after routes
+
 app.use(errorLogger);
 
-// Global error handler
+
 app.use((err: any, req: Request, res: Response, next: any) => {
     logger.error(`Unhandled error: ${err.message}`, { 
         stack: err.stack,
