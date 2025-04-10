@@ -20,6 +20,17 @@ const signupController = async (req: Request, res: Response): Promise<void> =>{
             })
             return;
         }
+        const olduser = await prisma.users.findFirst({
+            where:{
+                rollno: user.rollno.toLowerCase()
+            }
+        });
+        if(olduser){
+            res.status(400).json({
+                message: "User already exists"
+            });
+            return;
+        }
         if(!validatePhoneNumber(user.phoneno)){
             res.status(400).json({
                 message: "Phone number must contain 10 digits"
@@ -107,7 +118,7 @@ const loginController = async (req: Request, res: Response): Promise<void> =>{
         });
         return;
     }
-    
+
 }
 
 const logoutController = (req: Request, res: Response): void =>{

@@ -12,11 +12,12 @@ DROP TABLE IF EXISTS clubmembers;
 DROP TABLE IF EXISTS userSecurityCode;
 
 -- Drop independent tables last
-DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS facultyAdvisors;
 DROP TABLE IF EXISTS clubs;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS globalAdmins;
 
 -- Truncating Tables
 BEGIN;

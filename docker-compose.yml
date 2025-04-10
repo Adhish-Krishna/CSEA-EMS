@@ -27,7 +27,7 @@ services:
       - "4418:4318"      # OTLP HTTP
       - "9411:9411"      # Zipkin ingest
     user: "${UID}:${UID}"
-    
+
   loki:
     image: grafana/loki:2.9.10
     ports:
@@ -37,7 +37,7 @@ services:
       - ./loki-data:/loki
     command: -config.file=/etc/loki/local-config.yaml
     user: "${UID}:${UID}"
-  
+
   grafana:
     image: grafana/grafana:latest
     ports:
@@ -58,7 +58,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/DaddyEMS
     ports:
-      - "3000:3000"
+      - "4000:4000"
     command: npm run start
 
 volumes:

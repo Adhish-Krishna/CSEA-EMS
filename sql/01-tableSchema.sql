@@ -160,7 +160,8 @@ CREATE TABLE globalAdmins (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_teams_event_id ON teams(event_id);
+
 CREATE INDEX idx_teamMembers_user_id ON teamMembers(user_id);
 CREATE INDEX idx_teamMembers_team_id ON teamMembers(team_id);
 CREATE INDEX idx_invitation_event_id ON invitation(event_id);
+CREATE INDEX idx_teams_event_id ON teams(event_id);
