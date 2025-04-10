@@ -1,3 +1,4 @@
+import "./tracer.js"
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -17,6 +18,9 @@ import {adminAuthMiddleware, userAuthMiddleware, globalAuthMiddleware } from "./
 import adminRouter from "./api/admin/admin.js";
 import logger from "./utils/logger.js";
 import { requestLogger, errorLogger } from "./middleware/loggerMiddleware.js";
+
+
+
 
 dotenv.config();
 
@@ -51,8 +55,6 @@ app.use("/admin", adminRouter);
 app.use("/logs",adminAuthMiddleware,logsRouter);
 app.use("/admin", adminAuthMiddleware,adminRouter);
 app.use("/global", globalRouter);
-
-
 
 app.use(errorLogger);
 

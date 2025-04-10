@@ -11,6 +11,23 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./sql:/docker-entrypoint-initdb.d  # Mount SQL scripts for initialization
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: -config.file=/etc/tempo.yaml
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml
+      - ./tempo-data:/var/tempo
+    ports:
+      - "3200:80"        # Tempo UI
+      - "14268:14268"    # Jaeger ingest (thrift)
+      - "9095:9095"      # gRPC (used in some Tempo setups)
+      - "4417:4317"      # OTLP gRPC
+      - "4418:4318"      # OTLP HTTP
+      - "9411:9411"      # Zipkin ingest
+    user: "${UID}:${UID}"
+    
   loki:
     image: grafana/loki:2.9.10
     ports:
