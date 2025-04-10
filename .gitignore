@@ -6,5 +6,6 @@ dist
 grafana-data
 logs
 loki-data
+tempo-data
 /.env
 /.log
