@@ -9,7 +9,6 @@ import {
     fetchProfile
 } from './controller.js';
 
-// press ctrl+F and type the route to find the respective swagger comments
 
 const userRouter = Router();
 userRouter.post('/register',RegisterController);
@@ -321,18 +320,12 @@ export default userRouter;
  *     UserProfile:
  *       type: object
  *       properties:
- *         id:
- *           type: integer
- *           example: 1
  *         name:
  *           type: string
  *           example: John Doe
  *         rollno:
  *           type: string
  *           example: 22CSR045
- *         password:
- *           type: string
- *           example: hashed_password_value
  *         department:
  *           type: string
  *           example: CSE - AIML
@@ -345,10 +338,6 @@ export default userRouter;
  *         yearofstudy:
  *           type: integer
  *           example: 2
- *         created_at:
- *           type: string
- *           format: date-time
- *           example: 2025-04-09T10:15:00Z
  */
 
 /**

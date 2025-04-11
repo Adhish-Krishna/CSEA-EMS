@@ -365,6 +365,14 @@ const fetchProfile = async (req:Request,res:Response) : Promise<void>=>{
         const profile = await prisma.users.findUnique({
             where:{
                 id:user_id
+            },
+            select:{
+                name : true,
+                rollno:true,
+                department:true,
+                email:true,
+                phoneno:true,
+                yearofstudy:true
             }
         })
         if (!profile){
