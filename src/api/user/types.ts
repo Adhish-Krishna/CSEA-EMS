@@ -35,3 +35,23 @@ export interface Invite{
     from_user_id:number;
     from_team_id:number;
 }
+
+export interface EventListItem {
+    id: number;
+    name: string | null;
+    about: string | null;
+    date: Date | null;
+    venue: string | null;
+    event_type: string | null;
+    event_category: string | null;
+    min_no_member: number | null;
+    max_no_member: number | null;
+    club_name: string | null;
+    status: 'past' | 'ongoing' | 'upcoming';
+}
+
+export interface EventsResponse {
+    past: EventListItem[];
+    ongoing: EventListItem[];
+    upcoming: EventListItem[];
+}

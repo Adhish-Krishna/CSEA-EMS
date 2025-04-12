@@ -6,18 +6,28 @@ import {
     fetchMembersController,
     RegisterController,
     fetchInvitations,
-    fetchProfile
+    fetchProfile,
+    getPastEventsController,
+    getOngoingEventsController,
+    getUpcomingEventsController
 } from './controller.js';
 
 
 const userRouter = Router();
-userRouter.post('/register',RegisterController);
-userRouter.post('/acceptTeamInvite',acceptTeamInviteController);
-userRouter.get('/membershipDetails',fetchMembersController);
-userRouter.post('/rejectTeamInvite',rejectTeamInviteController);
-userRouter.get('/fetch/invitations',fetchInvitations);
-userRouter.get('/fetch/profile',fetchProfile)
-userRouter.post('/feedback',feedbackController);
+userRouter.post('/register', RegisterController);
+userRouter.post('/acceptTeamInvite', acceptTeamInviteController);
+userRouter.get('/membershipDetails', fetchMembersController);
+userRouter.post('/rejectTeamInvite', rejectTeamInviteController);
+userRouter.get('/fetch/invitations', fetchInvitations);
+userRouter.get('/fetch/profile', fetchProfile);
+userRouter.post('/feedback', feedbackController);
+
+// Removed '/events' POST route that was using fetchAllEventsController
+
+// Specialized event routes
+userRouter.get('/events/past', getPastEventsController);
+userRouter.get('/events/ongoing', getOngoingEventsController);
+userRouter.get('/events/upcoming', getUpcomingEventsController);
 
 export default userRouter;
 
@@ -401,3 +411,148 @@ export default userRouter;
  *           example: 4.5
  */
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     EventListItem:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 42
+ *         name:
+ *           type: string
+ *           example: Code Carnival
+ *         about:
+ *           type: string
+ *           example: A 24-hour coding competition
+ *         date:
+ *           type: string
+ *           format: date
+ *           example: 2025-05-15
+ *         venue:
+ *           type: string
+ *           example: Main Auditorium
+ *         event_type:
+ *           type: string
+ *           example: Technical
+ *         event_category:
+ *           type: string
+ *           example: Team
+ *         min_no_member:
+ *           type: integer
+ *           example: 2
+ *         max_no_member:
+ *           type: integer
+ *           example: 4
+ *         club_name:
+ *           type: string
+ *           example: Coding Club
+ *         status:
+ *           type: string
+ *           enum: [past, ongoing, upcoming]
+ *           example: upcoming
+ */
+
+/**
+ * @swagger
+ * /user/events/past:
+ *   get:
+ *     tags: [User]
+ *     summary: Fetch all past events
+ *     description: Retrieves all events with dates before the current date, sorted by most recent first.
+ *     responses:
+ *       200:
+ *         description: Past events fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Past events fetched successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/EventListItem'
+ *       500:
+ *         description: Error while fetching past events
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error fetching past events
+ */
+
+/**
+ * @swagger
+ * /user/events/ongoing:
+ *   get:
+ *     tags: [User]
+ *     summary: Fetch all ongoing events
+ *     description: Retrieves all events happening on the current date, sorted chronologically.
+ *     responses:
+ *       200:
+ *         description: Ongoing events fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Ongoing events fetched successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/EventListItem'
+ *       500:
+ *         description: Error while fetching ongoing events
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error fetching ongoing events
+ */
+
+/**
+ * @swagger
+ * /user/events/upcoming:
+ *   get:
+ *     tags: [User]
+ *     summary: Fetch all upcoming events
+ *     description: Retrieves all events with dates after the current date, sorted chronologically.
+ *     responses:
+ *       200:
+ *         description: Upcoming events fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Upcoming events fetched successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/EventListItem'
+ *       500:
+ *         description: Error while fetching upcoming events
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error fetching upcoming events
+ */
