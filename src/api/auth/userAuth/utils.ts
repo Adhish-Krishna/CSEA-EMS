@@ -61,6 +61,19 @@ const generateSecurityCode = ()=>{
     return code;
 }
 
+const generateSecurityToken = (code: string)=>{
+    const securityToken = jwt.sign(
+        {
+            code: code
+        },
+        JWT_SECRET,
+        {
+            expiresIn: 60*3
+        }
+    );
+    return securityToken;
+}
+
 //common util
 
 const generateRefreshToken = (id:  number)=>{
@@ -76,4 +89,4 @@ const generateRefreshToken = (id:  number)=>{
     return token;
 }
 
-export {validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword, generateSecurityCode, generateRefreshToken}
+export {validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword, generateSecurityCode, generateRefreshToken, generateSecurityToken}

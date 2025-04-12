@@ -9,6 +9,10 @@ export interface AdminPayload extends jwt.JwtPayload{
     club_id: number;
 }
 
+export interface SecurityCodePayload extends jwt.JwtPayload{
+    code: string;
+}
+
 export interface GlobalAdminPayload extends jwt.JwtPayload{
     id: number;
     username: string;

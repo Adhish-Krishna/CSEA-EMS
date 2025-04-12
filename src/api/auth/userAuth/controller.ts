@@ -1,15 +1,16 @@
 import {Request, Response} from 'express'
 import { SignUpUser, LoginUser } from './types';
 import prisma from '../../../prisma.js';
-import { validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword, generateSecurityCode, generateRefreshToken } from './utils.js';
+import { validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword, generateSecurityCode, generateRefreshToken, generateSecurityToken } from './utils.js';
 import { sendSecurityCodeEmail } from '../../../mailer/sendMail.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { UserPayload } from '../../../middleware/types';
+import { SecurityCodePayload, UserPayload } from '../../../middleware/types';
 
 dotenv.config();
 
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
+const JWT_SECRET = process.env.JWT_SECRET!;
 
 const signupController = async (req: Request, res: Response): Promise<void> =>{
     const user: SignUpUser = req.body;
@@ -20,7 +21,7 @@ const signupController = async (req: Request, res: Response): Promise<void> =>{
             })
             return;
         }
-        const olduser = await prisma.users.findFirst({
+        let olduser = await prisma.users.findFirst({
             where:{
                 rollno: user.rollno.toLowerCase()
             }
@@ -35,6 +36,17 @@ const signupController = async (req: Request, res: Response): Promise<void> =>{
             res.status(400).json({
                 message: "Phone number must contain 10 digits"
             })
+            return;
+        }
+        olduser = await prisma.users.findFirst({
+            where:{
+                phoneno: user.phoneno
+            }
+        });
+        if(olduser){
+            res.status(400).json({
+                message: "Phone number already exists"
+            });
             return;
         }
         user.email = generateEmail(user.rollno);
@@ -122,20 +134,27 @@ const loginController = async (req: Request, res: Response): Promise<void> =>{
 }
 
 const logoutController = (req: Request, res: Response): void =>{
-    res.clearCookie('accesstoken', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none'
-    });
-    res.clearCookie('refreshtoken',{
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none'
-    });
-    res.status(200).json({
-        message: "User logged out successfully"
-    });
-    return;
+    try{
+        res.clearCookie('accesstoken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none'
+        });
+        res.clearCookie('refreshtoken',{
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none'
+        });
+        res.status(200).json({
+            message: "User logged out successfully"
+        });
+        return;
+    }catch(err){
+        res.status(500).json({
+            message: err
+        });
+        return;
+    }
 }
 
 const generateSecurityCodeController = async (req: Request, res: Response): Promise<void> =>{
@@ -219,7 +238,8 @@ const verifySecurityCodeController = async (req: Request, res: Response): Promis
     }
     if(code === securityRecord?.code){
         res.status(200).json({
-            message: "Security Codes matched"
+            message: "Security Codes matched",
+            token: generateSecurityToken(code)
         });
         return;
     }
@@ -232,8 +252,27 @@ const verifySecurityCodeController = async (req: Request, res: Response): Promis
 }
 
 const resetpasswordController = async (req: Request, res: Response): Promise<void> =>{
-    const {rollno, password} = req.body;
+    const {rollno, password, token} = req.body;
     try{
+        if(!token){
+            res.status(401).json({
+                message: "No Security Token provided"
+            });
+            return;
+        }
+        const decoded = jwt.verify(token, JWT_SECRET) as SecurityCodePayload;
+        const code = decoded.code;
+        const securityCodeRecord = await prisma.usersecuritycode.findFirst({
+            where:{
+                code: code
+            }
+        });
+        if(!securityCodeRecord){
+            res.status(401).json({
+                message: "Unauthorized access"
+            });
+            return;
+        }
         const userRecord = await prisma.users.findFirst({
             where: {
                 rollno: rollno.toLowerCase()

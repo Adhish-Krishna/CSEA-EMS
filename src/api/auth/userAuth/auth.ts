@@ -204,6 +204,9 @@ userAuthRouter.post('/generatecode', generateSecurityCodeController);
  *                 message:
  *                   type: string
  *                   example: "Security Codes matched"
+ *                 token:
+ *                   type: string
+ *                   example: "rhnhflndopnboje5oiuoeirwnneoihgo"
  *       400:
  *         description: Security code doesn't match
  *         content:
@@ -239,6 +242,10 @@ userAuthRouter.post('/verifycode', verifySecurityCodeController);
  *               password:
  *                 type: string
  *                 example: "newSecurePassword"
+ *               token:
+ *                 type: string
+ *                 example: "rhnhflndopnboje5oiuoeirwnneoihgo"
+ *
  *     responses:
  *       200:
  *         description: Password reset successful
