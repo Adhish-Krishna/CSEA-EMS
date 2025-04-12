@@ -24,7 +24,7 @@ export default userRouter;
 
 /**
  * @swagger
- * /register:
+ * /user/register:
  *   post:
  *     tags: [User]
  *     summary: Register for an event
@@ -77,7 +77,7 @@ export default userRouter;
 
 /**
  * @swagger
- * /acceptTeamInvite:
+ * /user/acceptTeamInvite:
  *   post:
  *     tags: [User]
  *     summary: Accept a team invitation
@@ -136,7 +136,7 @@ export default userRouter;
 
 /**
  * @swagger
- * /membershipDetails:
+ * /user/membershipDetails:
  *   get:
  *     tags: [User]
  *     summary: Get membership details of a user
@@ -198,7 +198,7 @@ export default userRouter;
 
 /**
  * @swagger
- * /rejectTeamInvite:
+ * /user/rejectTeamInvite:
  *   post:
  *     tags: [User]
  *     summary: Reject a team invitation
@@ -230,7 +230,7 @@ export default userRouter;
 
 /**
  * @swagger
- * /fetch/invitations:
+ * /user/fetch/invitations:
  *   get:
  *     tags: [User]
  *     summary: Fetch all invitations received by the logged-in user
@@ -281,7 +281,7 @@ export default userRouter;
 
 /**
  * @swagger
- * /fetch/profile:
+ * /user/fetch/profile:
  *   get:
  *     tags: [User]
  *     summary: Fetch profile of the logged-in user
@@ -342,7 +342,7 @@ export default userRouter;
 
 /**
  * @swagger
- * /feedback:
+ * /user/feedback:
  *   post:
  *     tags: [User]
  *     summary: Submit feedback for an event
