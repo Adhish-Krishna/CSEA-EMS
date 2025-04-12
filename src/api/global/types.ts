@@ -4,7 +4,7 @@ export interface CreateClubDTO {
 }
 
 export interface AddClubAdminDTO {
-    user_id: number;
+    rollno: string;
     club_id: number;
     role?: string;
 }

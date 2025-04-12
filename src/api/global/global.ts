@@ -28,12 +28,12 @@ const globalRouter = Router();
  *     AddClubAdminDTO:
  *       type: object
  *       required:
- *         - user_id
+ *         - rollno
  *         - club_id
  *       properties:
- *         user_id:
- *           type: integer
- *           example: 1
+ *         rollno:
+ *           type: string
+ *           example: "23N206"
  *         club_id:
  *           type: integer
  *           example: 1
@@ -41,7 +41,7 @@ const globalRouter = Router();
  *           type: string
  *           example: "President"
  */
- 
+
 /**
  * @swagger
  * /global/createclub:
