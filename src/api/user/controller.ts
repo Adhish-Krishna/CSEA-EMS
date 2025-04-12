@@ -1,6 +1,6 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
-import {Feedback, TeamInvite,EventRegistration, ClubMember, Club,MembershipDetails, Invite} from './types.js';
+import {Feedback, TeamInvite, EventRegistration, ClubMember, Club, MembershipDetails, Invite, EventListItem, EventsResponse} from './types.js';
 
 const RegisterController = async(req : Request,res:Response): Promise<void> =>{
     try{    
@@ -390,6 +390,206 @@ const fetchProfile = async (req:Request,res:Response) : Promise<void>=>{
     }
 }
 
+
+const getPastEventsController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const today = new Date();
+        const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        
+        
+        const events = await prisma.events.findMany({
+            where: {
+                date: {
+                    lt: todayOnly
+                }
+            },
+            include: {
+                organizingclubs: {
+                    include: {
+                        clubs: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+       
+        const pastEvents: EventListItem[] = events
+            .filter(event => event.date !== null)
+            .map(event => {
+                // Get club name
+                const clubName = event.organizingclubs[0]?.clubs?.name || null;
+                
+                return {
+                    id: event.id,
+                    name: event.name,
+                    about: event.about,
+                    date: event.date,
+                    venue: event.venue,
+                    event_type: event.event_type,
+                    event_category: event.event_category,
+                    min_no_member: event.min_no_member,
+                    max_no_member: event.max_no_member,
+                    club_name: clubName,
+                    status: 'past'
+                };
+            });
+
+      
+        pastEvents.sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
+
+        res.status(200).json({
+            message: "Past events fetched successfully",
+            data: pastEvents
+        });
+        return;
+    } catch (error) {
+        console.error('Error fetching past events:', error);
+        res.status(500).json({
+            message: "Error fetching past events",
+            error: error
+        });
+        return;
+    }
+};
+
+
+const getOngoingEventsController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const today = new Date();
+        const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const tomorrowOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+        
+        // Query specifically for today's events (optimization)
+        const events = await prisma.events.findMany({
+            where: {
+                date: {
+                    gte: todayOnly,
+                    lt: tomorrowOnly
+                }
+            },
+            include: {
+                organizingclubs: {
+                    include: {
+                        clubs: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+       
+        const ongoingEvents: EventListItem[] = events
+            .filter(event => event.date !== null)
+            .map(event => {
+               
+                const clubName = event.organizingclubs[0]?.clubs?.name || null;
+                
+                return {
+                    id: event.id,
+                    name: event.name,
+                    about: event.about,
+                    date: event.date,
+                    venue: event.venue,
+                    event_type: event.event_type,
+                    event_category: event.event_category,
+                    min_no_member: event.min_no_member,
+                    max_no_member: event.max_no_member,
+                    club_name: clubName,
+                    status: 'ongoing'
+                };
+            });
+
+    
+        ongoingEvents.sort((a, b) => (a.date?.getTime() || 0) - (b.date?.getTime() || 0));
+
+        res.status(200).json({
+            message: "Ongoing events fetched successfully",
+            data: ongoingEvents
+        });
+        return;
+    } catch (error) {
+        console.error('Error fetching ongoing events:', error);
+        res.status(500).json({
+            message: "Error fetching ongoing events",
+            error: error
+        });
+        return;
+    }
+};
+
+
+const getUpcomingEventsController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const today = new Date();
+        const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const tomorrowOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+        
+        const events = await prisma.events.findMany({
+            where: {
+                date: {
+                    gte: tomorrowOnly
+                }
+            },
+            include: {
+                organizingclubs: {
+                    include: {
+                        clubs: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+       
+        const upcomingEvents: EventListItem[] = events
+            .filter(event => event.date !== null)
+            .map(event => {
+              
+                const clubName = event.organizingclubs[0]?.clubs?.name || null;
+                
+                return {
+                    id: event.id,
+                    name: event.name,
+                    about: event.about,
+                    date: event.date,
+                    venue: event.venue,
+                    event_type: event.event_type,
+                    event_category: event.event_category,
+                    min_no_member: event.min_no_member,
+                    max_no_member: event.max_no_member,
+                    club_name: clubName,
+                    status: 'upcoming'
+                };
+            });
+
+        // Sort upcoming events by date (chronologically)
+        upcomingEvents.sort((a, b) => (a.date?.getTime() || 0) - (b.date?.getTime() || 0));
+
+        res.status(200).json({
+            message: "Upcoming events fetched successfully",
+            data: upcomingEvents
+        });
+        return;
+    } catch (error) {
+        console.error('Error fetching upcoming events:', error);
+        res.status(500).json({
+            message: "Error fetching upcoming events",
+            error: error
+        });
+        return;
+    }
+};
+
 export {
     RegisterController,
     fetchMembersController,
@@ -397,5 +597,8 @@ export {
     rejectTeamInviteController, 
     feedbackController,
     fetchInvitations,
-    fetchProfile
+    fetchProfile,
+    getPastEventsController,
+    getOngoingEventsController,
+    getUpcomingEventsController
 };

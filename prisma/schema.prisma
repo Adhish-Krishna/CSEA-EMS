@@ -132,6 +132,9 @@ model teammembers {
   events     events  @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teammembers_event")
   teams      teams   @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teammembers_team")
   users      users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_teammembers_user")
+
+  @@index([team_id], map: "idx_teammembers_team_id")
+  @@index([user_id], map: "idx_teammembers_user_id")
 }
 
 model teams {
