@@ -45,6 +45,10 @@ const options = {
                 name: "GlobalAdmin",
                 description: "Global Admin routes"
             },
+            {
+                name: "Club",
+                description: "Club Routes"
+            }
         ]
     },
     apis: [
@@ -55,6 +59,7 @@ const options = {
         "./src/api/admin/*.ts",
         "./src/api/auth/globalAuth/*.ts",
         "./src/api/global/*.ts",
+        "./src/api/club/*.ts",
     ], // Update this if you have more routes
 };
 

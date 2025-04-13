@@ -10,6 +10,7 @@ import { AdminPayload } from "../../../middleware/types.js";
 dotenv.config();
 
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
+const JWT_SECRET = process.env.JWT_SECRET!;
 
 const loginController = async (req: Request, res: Response): Promise<void> =>{
     const loginCredintials: LoginAdmin = req.body;
@@ -126,6 +127,36 @@ const getNewAccessTokenController = (req: Request, res: Response): void =>{
     }
 }
 
+const checkStatus = async (req: Request, res: Response): Promise<void> =>{
+    try{
+        const token = req.cookies?.adminaccesstoken;
+        const decoded = jwt.verify(token, JWT_SECRET) as AdminPayload;
+        const id = decoded.id
+        const club_id = decoded.club_id;
+        const adminRecord = await prisma.clubmembers.findFirst({
+            where:{
+                user_id: id,
+                club_id: club_id
+            }
+        });
+        if(!adminRecord){
+            res.status(403).json({
+                message: "No admin found"
+            });
+            return;
+        }
+        res.status(200).json({
+            message:"Admin is authenticated"
+        });
+        return;
+    }catch(err){
+        res.status(401).json({
+            message: "Invalid token"
+        });
+        return;
+    }
+}
 
 
-export {loginController, logoutController, getNewAccessTokenController}
+
+export {loginController, logoutController, getNewAccessTokenController, checkStatus}

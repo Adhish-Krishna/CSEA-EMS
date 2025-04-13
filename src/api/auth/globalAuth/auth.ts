@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { signupController, loginController, logoutController, getNewAccessTokenController } from "./controller.js";
+import { signupController, loginController, logoutController, getNewAccessTokenController, checkStatus } from "./controller.js";
 
 const globalAuthRouter = Router();
 
@@ -134,5 +134,48 @@ globalAuthRouter.post('/logout', logoutController);
  *         description: Invalid token - not a global admin token
  */
 globalAuthRouter.get('/getnewaccesstoken', getNewAccessTokenController);
+
+/**
+ *
+ * @swagger
+ * /auth/global/status:
+ *   get:
+ *     tags: [GlobalAdmin]
+ *     summary: Check global admin authentication status
+ *     description: Verifies if the global admin is authenticated by validating the access token
+ *     responses:
+ *       200:
+ *         description: Admin is authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Admin is authenticated
+ *       401:
+ *         description: Invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid token
+ *       404:
+ *         description: Admin not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No admin found
+ */
+
+globalAuthRouter.get('/status', checkStatus);
 
 export default globalAuthRouter;
