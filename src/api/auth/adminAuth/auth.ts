@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getNewAccessTokenController, loginController, logoutController } from "./controller.js";
+import { checkStatus, getNewAccessTokenController, loginController, logoutController } from "./controller.js";
 
 const adminAuthRouter = Router();
 
@@ -123,5 +123,49 @@ adminAuthRouter.post('/logout', logoutController);
  */
 
 adminAuthRouter.get('/getnewaccesstoken', getNewAccessTokenController);
+
+/**
+ * @swagger
+ * /auth/admin/status:
+ *   get:
+ *     tags: [AdminAuth]
+ *     summary: Check admin authentication status
+ *     description: Verifies if the current user is authenticated as an admin using the admin access token in cookies
+ *     responses:
+ *       200:
+ *         description: Admin is authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Admin is authenticated
+ *       401:
+ *         description: Invalid or expired token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid token
+ *       403:
+ *         description: User is not an admin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No admin found
+ *     security:
+ *       - cookieAuth: []
+ */
+
+adminAuthRouter.get('/status', checkStatus);
 
 export default adminAuthRouter;
