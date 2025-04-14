@@ -8,6 +8,7 @@ export interface CreateEventDTO {
     min_no_member: number;
     max_no_member: number;
     club_id: number;
+    eventConvenors?: string[];
     chief_guest?: string;
     exp_expense?: number;
     tot_amt_allot_su?: number;
@@ -93,6 +94,13 @@ export interface PrismaEvent {
     eventregistration: any[];
     teammembers: any[];
     id?: number;
+}
+
+export interface ClubMembers {
+    members: {
+        rollno: string;
+        role?: string;
+    }[];
 }
 
 

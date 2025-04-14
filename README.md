@@ -170,6 +170,7 @@ Trigger setup for DB - Karthi
 | ------------------------------- | ------ | ------------------------------------- | -------------- | -------- |
 | /admin/create-event             | POST   | Admin creating a event                | SU rya Prakash | **✅**   |
 | /admin/events-history?club_id=1 | GET    | Fetching past events history by admin | SU rya Prakash | **✅**   |
+| /admin/add-members | POST   | Adding club members by admin | Surya Prakash | **✅**   |
 
 ## Event Routes
 

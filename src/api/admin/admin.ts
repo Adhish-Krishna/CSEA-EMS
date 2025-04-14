@@ -3,7 +3,8 @@ import {
     putAttendance,
     createEventController,
     getPastEventsByClubController,
-    fetchProfile
+    fetchProfile,
+    addCubmembers
 } from './controller.js';
 
 
@@ -12,6 +13,7 @@ adminRouter.post('/create-event',createEventController);
 adminRouter.get('/events-history', getPastEventsByClubController);
 adminRouter.post('/attendance',putAttendance);
 adminRouter.get('/profile', fetchProfile);
+adminRouter.post('/add-members', addCubmembers);
 
 /**
  * @swagger
@@ -115,6 +117,12 @@ adminRouter.get('/profile', fetchProfile);
  *           type: integer
  *           description: ID of the club organizing the event
  *           example: 1
+ *         eventConvenors:
+ *           type: array
+ *           description: Array of roll numbers for event convenors (max 3)
+ *           items:
+ *             type: string
+ *           example: ["B220001CS", "B220045CS", "B220078EC"]
  *         chief_guest:
  *           type: string
  *           description: Name of the chief guest for the event (optional)
@@ -186,6 +194,7 @@ adminRouter.get('/profile', fetchProfile);
  *             min_no_member: 2
  *             max_no_member: 4
  *             club_id: 1
+ *             eventConvenors: ["B220001CS", "B220045CS", "B220078EC"]
  *             chief_guest: "Dr. Jane Smith"
  *             exp_expense: 25000.00
  *             tot_amt_allot_su: 15000.00
@@ -367,6 +376,123 @@ adminRouter.get('/profile', fetchProfile);
  *                   example: Internal server error
  */
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     ClubMembers:
+ *       type: object
+ *       required:
+ *         - members
+ *       properties:
+ *         members:
+ *           type: array
+ *           description: Array of members to add to the club
+ *           items:
+ *             type: object
+ *             required:
+ *               - rollno
+ *             properties:
+ *               rollno:
+ *                 type: string
+ *                 description: The roll number of the user to add as a club member
+ *                 example: "B220001CS"
+ *               role:
+ *                 type: string
+ *                 description: The role of the member in the club (optional)
+ *                 example: "Secretary"
+ */
 
+/**
+ * @swagger
+ * /admin/add-members:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Add multiple members to the admin's club
+ *     description: Allows a club admin to add multiple new members to their club in a single request
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ClubMembers'
+ *           example:
+ *             members:
+ *               - rollno: "B220001CS"
+ *                 role: "Secretary"
+ *               - rollno: "B220002EC"
+ *                 role: "Treasurer" 
+ *               - rollno: "B220003ME"
+ *     responses:
+ *       200:
+ *         description: Members added successfully or partially successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: "Members added successfully"
+ *                 - type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: "2 members added successfully, but some issues were encountered"
+ *                     errors:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           rollno:
+ *                             type: string
+ *                             example: "B220001CS"
+ *                           status:
+ *                             type: string
+ *                             example: "skipped"
+ *                           message:
+ *                             type: string
+ *                             example: "User is already a member of this club"
+ *                 - type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: "No action taken"
+ *       400:
+ *         description: Bad request or failed to add members
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Members array is required and cannot be empty"
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       rollno:
+ *                         type: string
+ *                         example: "B220001CS"
+ *                       status:
+ *                         type: string
+ *                         example: "failed"
+ *                       message:
+ *                         type: string
+ *                         example: "User not found"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to add club members"
+ */
 
 export default adminRouter;
