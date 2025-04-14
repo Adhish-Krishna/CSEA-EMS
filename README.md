@@ -160,9 +160,9 @@ Trigger setup for DB - Karthi
 | /auth/user/reset-password | POST   | -       | Adhish         | **✅**   |
 | /auth/club/login          | POST   | -       | Adhish         | **✅**   |
 | /auth/club/logout         | POST   | -       | Adhish         | **✅**   |
-| /auth/global/login        | POST   | -       | SU rya Prakash |          |
-| /auth/global/logout       | POST   | -       | SU rya Prakash |          |
-| /auth/global/signup       | POST   | -       | SU rya Prakash |          |
+| /auth/global/login        | POST   | -       | SU rya Prakash | **✅**   |
+| /auth/global/logout       | POST   | -       | SU rya Prakash | **✅**   |
+| /auth/global/signup       | POST   | -       | SU rya Prakash | **✅**   |
 
 ## Admin Routes
 
@@ -198,6 +198,6 @@ Trigger setup for DB - Karthi
 
 | Endpoint           | Method | Purpose | To be done by | progress |
 | ------------------ | ------ | ------- | ------------- | -------- |
-| /global/createclub | POST   | -       | Adhish        |          |
-| /global/addadmin   | POST   | -       | Adhish        |          |
+| /global/createclub | POST   | -       | Suryaprakash      |    **✅**      |
+| /global/addadmin   | POST   | -       | Suryaprakash       |      **✅**    |
 

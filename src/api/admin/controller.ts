@@ -49,6 +49,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
     try {
         const EventDetails: CreateEventDTO = req.body;
 
+        
         if (
             !EventDetails.name ||
             !EventDetails.date ||
@@ -57,13 +58,14 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             !EventDetails.min_no_member ||
             !EventDetails.max_no_member ||
             !EventDetails.club_id ||
-            !EventDetails.venue
+            !EventDetails.venue ||
+            !EventDetails.about
         ) {
             res.status(400).json({ message: "Missing required fields." });
             return;
         }
 
-        // Check for duplicate event (by name + date + venue)
+        
         const existingEvent = await prisma.events.findFirst({
             where: {
                 name: EventDetails.name,
@@ -77,7 +79,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             return;
         }
 
-
+       
         const event = await prisma.events.create({
             data: {
                 name: EventDetails.name,
@@ -88,6 +90,14 @@ const createEventController = async (req: Request, res: Response): Promise<void>
                 event_category: EventDetails.event_category,
                 min_no_member: EventDetails.min_no_member,
                 max_no_member: EventDetails.max_no_member,
+                poster: EventDetails.poster || null,
+                chief_guest: EventDetails.chief_guest || null,
+                exp_expense: EventDetails.exp_expense || null,
+                tot_amt_allot_su: EventDetails.tot_amt_allot_su || null,
+                tot_amt_spt_dor: EventDetails.tot_amt_spt_dor || null,
+                exp_no_aud: EventDetails.exp_no_aud || null,
+                faculty_obs_desig: EventDetails.faculty_obs_desig || null,
+                faculty_obs_dept: EventDetails.faculty_obs_dept || null
             },
         });
 
