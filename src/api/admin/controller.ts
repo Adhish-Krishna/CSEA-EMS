@@ -1,11 +1,11 @@
 import { Request,Response } from "express";
 import prisma from '../../prisma.js';
-import { 
+import {
     Attendance,
     CreateEventDTO,
     PastEventData,
-    PastEventsResponse, 
-    PrismaEvent 
+    PastEventsResponse,
+    PrismaEvent
 } from "./types.js";
 
 
@@ -77,7 +77,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             return;
         }
 
-       
+
         const event = await prisma.events.create({
             data: {
                 name: EventDetails.name,
@@ -115,14 +115,14 @@ const getPastEventsByClubController = async (req: Request, res: Response): Promi
     try {
       const { club_id } = req.query;
       console.log("club_id from query:", req.query.club_id);
-  
+
       if (!club_id) {
         res.status(400).json({ message: "Club ID is required." });
         return;
       }
-  
+
       const today = new Date();
-  
+
       const pastEvents = await prisma.events.findMany({
         where: {
           date: {
@@ -160,28 +160,28 @@ const getPastEventsByClubController = async (req: Request, res: Response): Promi
           teammembers: true,
         },
       }) as PrismaEvent[];
-  
+
       const formattedData: PastEventData[] = pastEvents.map(event => {
         const average_rating = event.feedback.length
           ? event.feedback.reduce((acc: number, f) => acc + (f.rating || 0), 0) / event.feedback.length
           : 0;
-  
-  
+
+
         const eventConvenors = event.eventconvenors.map((ec) => ({
           name: ec.users?.name || null,
           department: ec.users?.department || null,
           yearofstudy: ec.users?.yearofstudy || null,
         }));
-  
-      
+
+
         const eventWinners = event.eventwinners.map((w) => ({
           position: w.position,
           team_name: w.teams?.name || null,
         }));
-  
-       
+
+
         const total_attendance = event.teammembers.filter(member => member.is_present).length;
-  
+
         return {
           name: event.name,
           about: event.about,
@@ -195,22 +195,68 @@ const getPastEventsByClubController = async (req: Request, res: Response): Promi
           total_attendance,
         };
       });
-  
+
       const response: PastEventsResponse = {
         message: "Past events details retrieved successfully.",
         data: formattedData,
       };
-  
+
       res.status(200).json(response);
-  
+
     } catch (error) {
       console.error("Error fetching past events:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   };
 
+const fetchProfile = async (req: Request, res: Response): Promise<void> =>{
+    try{
+        const admin_id = req.admin_user_id;
+        const club_id = req.admin_club_id;
+        const adminDetails = await prisma.users.findFirst({
+            where:{
+                id: admin_id
+            },
+            select: {
+                name: true,
+                rollno: true,
+            }
+        });
+        const clubDetails = await prisma.clubs.findFirst({
+            where:{
+                id: club_id
+            },
+            select:{
+                id: true,
+                name: true,
+            }
+        });
+        if(!adminDetails || !clubDetails){
+            res.status(301).json({
+                message: "Admin or Club data not found"
+            });
+            return;
+        }
+        const responseData = {
+            name: adminDetails.name,
+            rollno: adminDetails.rollno,
+            club: clubDetails.name,
+        }
+        res.status(200).json({
+            message: "Admin profile fetched successfully",
+            data: responseData
+        });
+        return;
+    }catch(err){
+        res.status(500).json({
+            message: err
+        });
+    }
+}
+
 export  {
     putAttendance,
     createEventController,
-    getPastEventsByClubController
+    getPastEventsByClubController,
+    fetchProfile,
 };

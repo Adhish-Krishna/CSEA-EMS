@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { addClubAdminController, createClubController} from "./controller.js";
-import { globalAuthMiddleware } from "../../middleware/authMiddleware.js";
 
 const globalRouter = Router();
 
@@ -89,7 +88,7 @@ const globalRouter = Router();
  *       500:
  *         description: Server error
  */
-globalRouter.post('/createclub', globalAuthMiddleware, createClubController);
+globalRouter.post('/createclub', createClubController);
 
 /**
  * @swagger
@@ -146,7 +145,7 @@ globalRouter.post('/createclub', globalAuthMiddleware, createClubController);
  *       500:
  *         description: Server error
  */
-globalRouter.post('/addadmin', globalAuthMiddleware, addClubAdminController);
+globalRouter.post('/addadmin', addClubAdminController);
 
 
 export default globalRouter;

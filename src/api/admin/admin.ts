@@ -2,7 +2,8 @@ import { Router } from 'express';
 import {
     putAttendance,
     createEventController,
-    getPastEventsByClubController
+    getPastEventsByClubController,
+    fetchProfile
 } from './controller.js';
 
 
@@ -10,6 +11,7 @@ const adminRouter = Router();
 adminRouter.post('/create-event',createEventController);
 adminRouter.get('/events-history', getPastEventsByClubController);
 adminRouter.post('/attendance',putAttendance);
+adminRouter.get('/profile', fetchProfile);
 
 /**
  * @swagger
@@ -104,7 +106,7 @@ adminRouter.post('/attendance',putAttendance);
  *         - max_no_member
  *         - venue
  *         - club_id
- *         
+ *
  */
 
 /**
@@ -138,7 +140,7 @@ adminRouter.post('/attendance',putAttendance);
  *         description: Unauthorized
  *       500:
  *         description: Server error
- * 
+ *
  */
 
 
@@ -220,6 +222,57 @@ adminRouter.post('/attendance',putAttendance);
  *         description: Server error
  */
 
+/**
+ * @swagger
+ * /admin/profile:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Fetch admin profile information
+ *     description: Retrieves the authenticated admin's profile information including name, roll number, and club
+ *     responses:
+ *       200:
+ *         description: Admin profile retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Admin profile fetched successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: John Doe
+ *                     rollno:
+ *                       type: string
+ *                       example: B220001CS
+ *                     club:
+ *                       type: string
+ *                       example: Computer Science Engineers Association
+ *       301:
+ *         description: Admin or Club data not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Admin or Club data not found
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
 
 
 

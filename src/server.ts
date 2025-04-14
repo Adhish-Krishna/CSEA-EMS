@@ -49,10 +49,9 @@ app.use("/auth/admin", adminAuthRouter);
 app.use("/auth/global", globalAuthRouter);
 app.use("/user", userAuthMiddleware, userRouter);
 app.use("/event", adminAuthMiddleware, eventRouter);
-app.use("/admin", adminRouter);
 app.use("/logs",adminAuthMiddleware,logsRouter);
 app.use("/admin", adminAuthMiddleware,adminRouter);
-app.use("/global", globalRouter);
+app.use("/global", globalAuthMiddleware ,globalRouter);
 app.use("/club", clubRouter);
 
 app.use(errorLogger);
