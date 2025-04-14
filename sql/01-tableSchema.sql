@@ -21,14 +21,22 @@ CREATE TABLE clubs (
 -- Table: events
 CREATE TABLE events (
     id SERIAL PRIMARY KEY,
-    name TEXT,
-    about TEXT,
-    date DATE,
-    event_type TEXT,
-    venue TEXT,
-    event_category TEXT,
-    min_no_member INTEGER,
-    max_no_member INTEGER
+    name TEXT NOT NULL,
+    about TEXT NOT NULL,
+    date DATE NOT NULL,
+    event_type TEXT NOT NULL,
+    venue TEXT NOT NULL,
+    event_category TEXT NOT NULL,
+    min_no_member INTEGER NOT NULL,
+    max_no_member INTEGER NOT NULL,
+    chief_guest TEXT,
+    exp_expense DECIMAL(12, 2),
+    tot_amt_allot_su DECIMAL(12, 2),
+    tot_amt_spt_dor DECIMAL(12, 2),
+    exp_no_aud INTEGER,
+    faculty_obs_desig TEXT,
+    faculty_obs_dept TEXT,
+    poster BYTEA
 );
 
 -- Table: teams

@@ -80,25 +80,79 @@ adminRouter.get('/profile', fetchProfile);
  *       properties:
  *         name:
  *           type: string
+ *           description: Name of the event
+ *           example: "Coding Marathon"
  *         about:
  *           type: string
+ *           description: Description of the event
+ *           example: "A 24-hour coding competition"
  *         date:
  *           type: string
  *           format: date
+ *           description: Date of the event (YYYY-MM-DD)
+ *           example: "2025-05-15"
  *         event_type:
  *           type: string
+ *           description: Type of event (e.g., Competition, Workshop)
+ *           example: "Competition"
  *         event_category:
  *           type: string
+ *           description: Category of the event (e.g., Technical, Cultural)
+ *           example: "Technical"
  *         venue:
  *           type: string
+ *           description: Location where the event will be held
+ *           example: "Main Auditorium"
  *         min_no_member:
  *           type: integer
+ *           description: Minimum number of members allowed per team
+ *           example: 2
  *         max_no_member:
  *           type: integer
+ *           description: Maximum number of members allowed per team
+ *           example: 4
  *         club_id:
  *           type: integer
+ *           description: ID of the club organizing the event
+ *           example: 1
+ *         chief_guest:
+ *           type: string
+ *           description: Name of the chief guest for the event (optional)
+ *           example: "Dr. Jane Smith"
+ *         exp_expense:
+ *           type: number
+ *           format: decimal
+ *           description: Expected expenses for the event (optional)
+ *           example: 25000.00
+ *         tot_amt_allot_su:
+ *           type: number
+ *           format: decimal
+ *           description: Total amount allocated by student union (optional)
+ *           example: 15000.00
+ *         tot_amt_spt_dor:
+ *           type: number
+ *           format: decimal
+ *           description: Total amount supported by department of reputation (optional)
+ *           example: 10000.00
+ *         exp_no_aud:
+ *           type: integer
+ *           description: Expected number of audience (optional)
+ *           example: 200
+ *         faculty_obs_desig:
+ *           type: string
+ *           description: Faculty observer designation (optional)
+ *           example: "Assistant Professor"
+ *         faculty_obs_dept:
+ *           type: string
+ *           description: Faculty observer department (optional)
+ *           example: "Computer Science"
+ *         poster:
+ *           type: string
+ *           format: binary
+ *           description: Event poster image (optional)
  *       required:
  *         - name
+ *         - about
  *         - date
  *         - event_type
  *         - event_category
@@ -115,6 +169,7 @@ adminRouter.get('/profile', fetchProfile);
  *   post:
  *     tags: [Admin]
  *     summary: Create a new event by a club admin
+ *     description: Creates a new event with all available fields including optional ones
  *     requestBody:
  *       required: true
  *       content:
@@ -124,25 +179,63 @@ adminRouter.get('/profile', fetchProfile);
  *           example:
  *             name: "Coding Marathon"
  *             about: "A 24-hour coding competition"
- *             date: "2025-04-10"
+ *             date: "2025-05-15"
  *             event_type: "Competition"
- *             event_category: "Tech"
+ *             event_category: "Technical"
  *             venue: "Main Auditorium"
  *             min_no_member: 2
  *             max_no_member: 4
  *             club_id: 1
+ *             chief_guest: "Dr. Jane Smith"
+ *             exp_expense: 25000.00
+ *             tot_amt_allot_su: 15000.00
+ *             tot_amt_spt_dor: 10000.00
+ *             exp_no_aud: 200
+ *             faculty_obs_desig: "Assistant Professor"
+ *             faculty_obs_dept: "Computer Science"
  *     responses:
  *       201:
  *         description: Event created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Event created successfully."
  *       400:
  *         description: Missing required fields
- *       403:
- *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Missing required fields."
+ *       409:
+ *         description: Event already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Event already exists with the same name, date, and venue."
  *       500:
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Something went wrong."
  *
  */
-
 
 /**
  * @swagger
