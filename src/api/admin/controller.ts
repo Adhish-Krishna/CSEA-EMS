@@ -5,7 +5,8 @@ import {
     CreateEventDTO,
     PastEventData,
     PastEventsResponse,
-    PrismaEvent
+    PrismaEvent,
+    ClubMembers
 } from "./types.js";
 
 
@@ -79,7 +80,34 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             return;
         }
 
+        
+        if (EventDetails.eventConvenors && EventDetails.eventConvenors.length > 0) {
+            const convenorRollnos = EventDetails.eventConvenors.slice(0, 3);
+            
+            const convenorUsers = await prisma.users.findMany({
+                where: {
+                    rollno: {
+                        in: convenorRollnos.map(rollno => rollno.toLowerCase())
+                    }
+                },
+                select: {
+                    id: true,
+                    rollno: true
+                }
+            });
+
+            const nonExistentRollnos = convenorRollnos.filter(
+                rollno => !convenorUsers.some(user => user.rollno?.toLowerCase() === rollno.toLowerCase())
+            );
+            
+            if (nonExistentRollnos.length > 0) {
+                const message = `Event creation failed. The following users could not be added as convenors because they don't exist in the database: ${nonExistentRollnos.join(', ')}`;
+                res.status(400).json({ message });
+                return;
+            }
+        }
        
+        // Create the event only after validation
         const event = await prisma.events.create({
             data: {
                 name: EventDetails.name,
@@ -101,13 +129,68 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             },
         });
 
-        // Link event with organizing club
         await prisma.organizingclubs.create({
             data: {
                 club_id: EventDetails.club_id,
                 event_id: event.id,
             },
         });
+
+      
+        if (EventDetails.eventConvenors && EventDetails.eventConvenors.length > 0) {
+            const convenorRollnos = EventDetails.eventConvenors.slice(0, 3);
+            
+            const convenorUsers = await prisma.users.findMany({
+                where: {
+                    rollno: {
+                        in: convenorRollnos.map(rollno => rollno.toLowerCase())
+                    }
+                },
+                select: {
+                    id: true,
+                    rollno: true
+                }
+            });
+           
+            const nonMembers: string[] = [];
+            const validConvenors: {id: number}[] = [];
+
+           
+            for (const user of convenorUsers) {
+                const isMember = await prisma.clubmembers.findFirst({
+                    where: {
+                        user_id: user.id,
+                        club_id: EventDetails.club_id
+                    }
+                });
+                
+                if (isMember) {
+                    validConvenors.push({ id: user.id });
+                } else {
+                    nonMembers.push(user.rollno!);
+                }
+            }
+
+           
+            if (validConvenors.length > 0) {
+                for (const user of validConvenors) {
+                    await prisma.eventconvenors.create({
+                        data: {
+                            user_id: user.id,
+                            event_id: event.id,
+                            club_id: EventDetails.club_id
+                        }
+                    });
+                }
+            }
+
+            
+            if (nonMembers.length > 0) {
+                const message = `Event created successfully, but the following users could not be added as convenors because they are not members of the club: ${nonMembers.join(', ')}`;
+                res.status(201).json({ message });
+                return;
+            }
+        }
 
         res.status(201).json({
             message: "Event created successfully.",
@@ -264,9 +347,129 @@ const fetchProfile = async (req: Request, res: Response): Promise<void> =>{
     }
 }
 
+const addCubmembers = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const club_id = req.admin_club_id; 
+        const { members } = req.body as ClubMembers;
+
+        if (!members || !Array.isArray(members) || members.length === 0) {
+            res.status(400).json({
+                message: "Members array is required and cannot be empty"
+            });
+            return;
+        }
+
+        let successCount = 0;
+        const errorDetails = [] as Array<{rollno: string, status: string, message: string}>;
+        
+        for (const member of members) {
+            if (!member.rollno) {
+                errorDetails.push({
+                    rollno: member.rollno || "undefined",
+                    status: "failed",
+                    message: "Roll number is required"
+                });
+                continue;
+            }
+
+            try {
+                // Check if user exists
+                const user = await prisma.users.findUnique({
+                    where: {
+                        rollno: member.rollno.toLowerCase()
+                    }
+                });
+
+                if (!user) {
+                    errorDetails.push({
+                        rollno: member.rollno,
+                        status: "failed",
+                        message: "User not found"
+                    });
+                    continue;
+                }
+
+                // Check if user is already a member of this club
+                const existingClubMember = await prisma.clubmembers.findFirst({
+                    where: {
+                        user_id: user.id,
+                        club_id: club_id
+                    }
+                });
+
+                if (existingClubMember) {
+                    errorDetails.push({
+                        rollno: member.rollno,
+                        status: "skipped",
+                        message: "User is already a member of this club"
+                    });
+                    continue;
+                }
+
+                // Add the user to the club
+                await prisma.clubmembers.create({
+                    data: {
+                        user_id: user.id,
+                        club_id: club_id,
+                        role: member.role || "Member",
+                        is_admin: false // Regular member, not an admin
+                    }
+                });
+
+                successCount++;
+            } catch (err) {
+                errorDetails.push({
+                    rollno: member.rollno,
+                    status: "failed",
+                    message: "Error processing this member"
+                });
+                console.error(`Error adding club member ${member.rollno}:`, err);
+            }
+        }
+
+        // If there were only successful additions
+        if (successCount > 0 && errorDetails.length === 0) {
+            res.status(200).json({
+                message: "Members added successfully"
+            });
+            return;
+        }
+        
+        // If there were errors but also some successes
+        if (successCount > 0 && errorDetails.length > 0) {
+            res.status(200).json({
+                message: `${successCount} members added successfully, but some issues were encountered`,
+                errors: errorDetails
+            });
+            return;
+        }
+        
+        // If there were only errors
+        if (successCount === 0 && errorDetails.length > 0) {
+            res.status(400).json({
+                message: "Failed to add members",
+                errors: errorDetails
+            });
+            return;
+        }
+
+        res.status(200).json({
+            message: "No action taken"
+        });
+        return;
+    } catch (err) {
+        console.error("Error adding club members:", err);
+        res.status(500).json({
+            message: "Failed to add club members"
+        });
+        return;
+    }
+};
+
 export  {
     putAttendance,
     createEventController,
     getPastEventsByClubController,
     fetchProfile,
+    addCubmembers
 };
