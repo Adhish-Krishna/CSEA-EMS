@@ -168,6 +168,13 @@ CREATE TABLE globalAdmins (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+--Table: emailVerification
+CREATE TABLE emailVerification(
+    rollno VARCHAR(50) PRIMARY KEY,
+    code TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 CREATE INDEX idx_teamMembers_user_id ON teamMembers(user_id);
 CREATE INDEX idx_teamMembers_team_id ON teamMembers(team_id);

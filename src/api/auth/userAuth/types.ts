@@ -7,6 +7,7 @@ export interface SignUpUser{
     phoneno: bigint;
     yearofstudy: number;
     created_at: Date;
+    code: string;
 }
 
 export interface LoginUser{

@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS clubs;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS globalAdmins;
+DROP TABLE IF EXISTS emailVerification;
 
 -- Truncating Tables
 BEGIN;

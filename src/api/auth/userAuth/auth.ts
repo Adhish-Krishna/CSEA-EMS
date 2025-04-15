@@ -1,5 +1,5 @@
 import { Router} from 'express';
-import { loginController, signupController, logoutController, generateSecurityCodeController, verifySecurityCodeController, resetpasswordController, getNewAccessTokenController} from './controller.js';
+import { loginController, signupController, logoutController, generateSecurityCodeController, verifySecurityCodeController, resetpasswordController, getNewAccessTokenController, generateEmailCodeController} from './controller.js';
 
 const userAuthRouter = Router();
 
@@ -9,36 +9,47 @@ const userAuthRouter = Router();
  *   post:
  *     tags: [UserAuth]
  *     summary: Register a new user
- *     description: Creates a new user account
+ *     description: Creates a new user account after verifying the email code sent to the institutional email.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - name
+ *               - rollno
+ *               - password
+ *               - department
+ *               - phoneno
+ *               - yearofstudy
+ *               - code
  *             properties:
  *               name:
- *                  type: string
- *                  example: "johndoe"
+ *                 type: string
+ *                 example: "johndoe"
  *               rollno:
- *                  type: string
- *                  example: "23N206"
+ *                 type: string
+ *                 example: "23N206"
  *               password:
- *                  type: string
- *                  example: "securepassword"
+ *                 type: string
+ *                 example: "securepassword"
  *               department:
- *                  type: string
- *                  example: "CSE AI ML"
+ *                 type: string
+ *                 example: "CSE AI ML"
  *               phoneno:
- *                  type: bigint
- *                  example: 1234567890
+ *                 type: string
+ *                 example: "1234567890"
  *               yearofstudy:
- *                  type: number
- *                  example: 2
- *
+ *                 type: integer
+ *                 example: 2
+ *               code:
+ *                 type: string
+ *                 description: Email verification code sent to institutional email
+ *                 example: "123456"
  *     responses:
  *       201:
- *         description: User registered successfully
+ *         description: User signed up successfully
  *         content:
  *           application/json:
  *             schema:
@@ -46,9 +57,9 @@ const userAuthRouter = Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "User registered successfully"
+ *                   example: "User signed up successfully"
  *       400:
- *         description: Bad request
+ *         description: Bad request (missing fields, invalid phone, or code mismatch)
  *         content:
  *           application/json:
  *             schema:
@@ -57,8 +68,36 @@ const userAuthRouter = Router();
  *                 message:
  *                   type: string
  *                   example: "Require all fields"
+ *       409:
+ *         description: Conflict (user or phone already exists)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User already exists"
+ *       410:
+ *         description: Email verification code expired
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Email verification code expired"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
-
 userAuthRouter.post('/signup', signupController);
 
 /**
@@ -303,5 +342,58 @@ userAuthRouter.post('/resetpassword', resetpasswordController);
  */
 
 userAuthRouter.get('/getnewaccesstoken', getNewAccessTokenController);
+
+/**
+ * @swagger
+ * /auth/user/generateemailcode:
+ *   post:
+ *     tags: [UserAuth]
+ *     summary: Generate email verification code
+ *     description: Generates and sends an email verification code to the user's institutional email for signup verification
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               rollno:
+ *                 type: string
+ *                 example: "23N206"
+ *     responses:
+ *       201:
+ *         description: Email verification code created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Email verification code created"
+ *       400:
+ *         description: Roll no required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Roll no required"
+ *       409:
+ *         description: User already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User already exists"
+ *       500:
+ *         description: Server error
+ */
+userAuthRouter.post('/generateemailcode', generateEmailCodeController);
 
 export default userAuthRouter;

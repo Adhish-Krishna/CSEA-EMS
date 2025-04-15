@@ -33,4 +33,30 @@ const sendSecurityCodeEmail = (to: string, code: string) =>{
     });
 }
 
-export {sendSecurityCodeEmail}
+const sendEmailVerificationCode = (to: string, code: string) =>{
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: USER_EMAIL,
+            pass: EMAIL_APP_PASSWORD
+        },
+    });
+
+    const mailOtions = {
+        from: USER_EMAIL,
+        to: to,
+        subject: "EMS Email Verification",
+        text: `Your email verification code is: ${code}`
+    }
+
+    transporter.sendMail(mailOtions, (err, info)=>{
+        if(err){
+            console.log(err.message);
+        }
+        else{
+            console.log(info.response);
+        }
+    });
+}
+
+export {sendSecurityCodeEmail, sendEmailVerificationCode}

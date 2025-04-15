@@ -2,7 +2,7 @@ import {Request, Response} from 'express'
 import { SignUpUser, LoginUser } from './types';
 import prisma from '../../../prisma.js';
 import { validatePhoneNumber, generateEmail, generateAccessToken, hashPassword, checkPassword, generateSecurityCode, generateRefreshToken, generateSecurityToken } from './utils.js';
-import { sendSecurityCodeEmail } from '../../../mailer/sendMail.js';
+import { sendEmailVerificationCode, sendSecurityCodeEmail } from '../../../mailer/sendMail.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { SecurityCodePayload, UserPayload } from '../../../middleware/types';
@@ -21,13 +21,19 @@ const signupController = async (req: Request, res: Response): Promise<void> =>{
             })
             return;
         }
+        if(!user.code){
+            res.status(400).json({
+                message: "Email verification code required"
+            });
+            return;
+        }
         let olduser = await prisma.users.findFirst({
             where:{
                 rollno: user.rollno.toLowerCase()
             }
         });
         if(olduser){
-            res.status(400).json({
+            res.status(409).json({
                 message: "User already exists"
             });
             return;
@@ -44,12 +50,29 @@ const signupController = async (req: Request, res: Response): Promise<void> =>{
             }
         });
         if(olduser){
-            res.status(400).json({
+            res.status(409).json({
                 message: "Phone number already exists"
             });
             return;
         }
         user.email = generateEmail(user.rollno);
+        const email_code_record = await prisma.emailverification.findFirst({
+            where: {
+                rollno: user.rollno.toLowerCase()
+            }
+        });
+        if(!email_code_record){
+            res.status(410).json({
+                message: "Email verification code expired"
+            });
+            return;
+        }
+        if(email_code_record.code !== user.code){
+            res.status(400).json({
+                message: "Email verification codes not matched"
+            });
+            return;
+        }
         const new_user = await prisma.users.create({
             data: {
                 name : user.name,
@@ -95,7 +118,7 @@ const loginController = async (req: Request, res: Response): Promise<void> =>{
             }
         })
         if(!users){
-            res.status(401).json({
+            res.status(404).json({
                 message: "User does not exists"
             })
             return;
@@ -166,7 +189,7 @@ const generateSecurityCodeController = async (req: Request, res: Response): Prom
             }
         });
         if(!user){
-            res.status(401).json({
+            res.status(404).json({
                 message: "User does not exist"
             })
             return;
@@ -198,7 +221,7 @@ const generateSecurityCodeController = async (req: Request, res: Response): Prom
         }
         const user_email = user.email;
         sendSecurityCodeEmail(user_email!, code);
-        res.status(200).json({
+        res.status(201).json({
             message: "Security Code Created"
         });
         return;
@@ -219,7 +242,7 @@ const verifySecurityCodeController = async (req: Request, res: Response): Promis
         }
     });
     if(!userRecord){
-        res.status(401).json({
+        res.status(404).json({
             message: "User does not exists"
         });
         return;
@@ -231,7 +254,7 @@ const verifySecurityCodeController = async (req: Request, res: Response): Promis
         }
     });
     if(!securityRecord){
-        res.status(401).json({
+        res.status(404).json({
             message: "Security code not found"
         });
         return;
@@ -279,7 +302,7 @@ const resetpasswordController = async (req: Request, res: Response): Promise<voi
             }
         });
         if(!userRecord){
-            res.status(401).json({
+            res.status(404).json({
                 message: "User does not exists"
             });
             return;
@@ -338,4 +361,44 @@ const getNewAccessTokenController = (req: Request, res: Response): void =>{
     }
 }
 
-export {signupController, loginController, logoutController, generateSecurityCodeController, verifySecurityCodeController, resetpasswordController, getNewAccessTokenController};
+const generateEmailCodeController = async (req: Request, res: Response): Promise<void> =>{
+    try{
+        const {rollno} = req.body;
+        if(!rollno){
+            res.status(400).json({
+                message: "Roll no required"
+            });
+            return;
+        }
+        const user_record = await prisma.users.findFirst({
+            where:{
+                rollno: rollno.toLowerCase()
+            }
+        });
+        if(user_record){
+            res.status(409).json({
+                message: "User already exists"
+            });
+            return;
+        }
+        const code = generateSecurityCode();
+        const email = generateEmail(rollno);
+        await prisma.emailverification.create({
+            data:{
+                rollno: rollno.toLowerCase(),
+                code: code
+            }
+        });
+        sendEmailVerificationCode(email, code);
+        res.status(201).json({
+            message: "Email verification code created"
+        });
+        return;
+    }catch(err){
+        res.status(500).json({
+            message: err
+        });
+    }
+}
+
+export {signupController, loginController, logoutController, generateSecurityCodeController, verifySecurityCodeController, resetpasswordController, getNewAccessTokenController, generateEmailCodeController};
