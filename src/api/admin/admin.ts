@@ -4,7 +4,7 @@ import {
     createEventController,
     getPastEventsByClubController,
     fetchProfile,
-    addCubmembers
+    addClubmembers
 } from './controller.js';
 import multer from 'multer';
 
@@ -15,7 +15,7 @@ adminRouter.post('/create-event', upload.single('poster'), createEventController
 adminRouter.get('/events-history', getPastEventsByClubController);
 adminRouter.post('/attendance',putAttendance);
 adminRouter.get('/profile', fetchProfile);
-adminRouter.post('/add-members', addCubmembers);
+adminRouter.post('/add-members', addClubmembers);
 
 /**
  * @swagger
@@ -426,43 +426,52 @@ adminRouter.post('/add-members', addCubmembers);
  *                 role: "Treasurer"
  *               - rollno: "B220003ME"
  *     responses:
- *       200:
- *         description: Members added successfully or partially successful
+ *       201:
+ *         description: All members added successfully
  *         content:
  *           application/json:
  *             schema:
- *               oneOf:
- *                 - type: object
- *                   properties:
- *                     message:
- *                       type: string
- *                       example: "Members added successfully"
- *                 - type: object
- *                   properties:
- *                     message:
- *                       type: string
- *                       example: "2 members added successfully, but some issues were encountered"
- *                     errors:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           rollno:
- *                             type: string
- *                             example: "B220001CS"
- *                           status:
- *                             type: string
- *                             example: "skipped"
- *                           message:
- *                             type: string
- *                             example: "User is already a member of this club"
- *                 - type: object
- *                   properties:
- *                     message:
- *                       type: string
- *                       example: "No action taken"
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Members added successfully"
+ *       204:
+ *         description: Request processed but no action taken
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No action taken"
+ *       207:
+ *         description: Multi-Status - Some members added successfully but others failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "2 members added successfully, but some issues were encountered"
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       rollno:
+ *                         type: string
+ *                         example: "B220001CS"
+ *                       status:
+ *                         type: string
+ *                         example: "skipped"
+ *                       message:
+ *                         type: string
+ *                         example: "User is already a member of this club"
  *       400:
- *         description: Bad request or failed to add members
+ *         description: Bad request - Invalid input format
  *         content:
  *           application/json:
  *             schema:
@@ -471,6 +480,16 @@ adminRouter.post('/add-members', addCubmembers);
  *                 message:
  *                   type: string
  *                   example: "Members array is required and cannot be empty"
+ *       422:
+ *         description: Unprocessable Entity - Valid format but members cannot be processed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to add members"
  *                 errors:
  *                   type: array
  *                   items:
