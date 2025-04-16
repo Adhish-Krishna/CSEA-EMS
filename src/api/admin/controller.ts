@@ -49,8 +49,7 @@ const putAttendance = async (req:Request,res:Response) : Promise<void>=>{
 const createEventController = async (req: Request, res: Response): Promise<void> => {
     try {
         const EventDetails: CreateEventDTO = req.body;
-
-        
+        EventDetails.club_id = req.admin_club_id;
         if (
             !EventDetails.name ||
             !EventDetails.date ||
@@ -66,7 +65,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             return;
         }
 
-        
+
         const existingEvent = await prisma.events.findFirst({
             where: {
                 name: EventDetails.name,
@@ -80,10 +79,10 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             return;
         }
 
-        
+
         if (EventDetails.eventConvenors && EventDetails.eventConvenors.length > 0) {
             const convenorRollnos = EventDetails.eventConvenors.slice(0, 3);
-            
+
             const convenorUsers = await prisma.users.findMany({
                 where: {
                     rollno: {
@@ -99,15 +98,23 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             const nonExistentRollnos = convenorRollnos.filter(
                 rollno => !convenorUsers.some(user => user.rollno?.toLowerCase() === rollno.toLowerCase())
             );
-            
+
             if (nonExistentRollnos.length > 0) {
                 const message = `Event creation failed. The following users could not be added as convenors because they don't exist in the database: ${nonExistentRollnos.join(', ')}`;
                 res.status(400).json({ message });
                 return;
             }
         }
-       
-        // Create the event only after validation
+
+        // Create the event only after validation\
+        let buffer;
+        if(!EventDetails.poster){
+            buffer = null;
+        }
+        else{
+            const base64 = EventDetails.poster?.split(',')[1];
+            buffer = Buffer.from(base64!, 'base64');
+        }
         const event = await prisma.events.create({
             data: {
                 name: EventDetails.name,
@@ -118,7 +125,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
                 event_category: EventDetails.event_category,
                 min_no_member: EventDetails.min_no_member,
                 max_no_member: EventDetails.max_no_member,
-                poster: EventDetails.poster || null,
+                poster: buffer || null,
                 chief_guest: EventDetails.chief_guest || null,
                 exp_expense: EventDetails.exp_expense || null,
                 tot_amt_allot_su: EventDetails.tot_amt_allot_su || null,
@@ -136,10 +143,10 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             },
         });
 
-      
+
         if (EventDetails.eventConvenors && EventDetails.eventConvenors.length > 0) {
-            const convenorRollnos = EventDetails.eventConvenors.slice(0, 3);
-            
+            const convenorRollnos = EventDetails.eventConvenors;
+
             const convenorUsers = await prisma.users.findMany({
                 where: {
                     rollno: {
@@ -151,11 +158,11 @@ const createEventController = async (req: Request, res: Response): Promise<void>
                     rollno: true
                 }
             });
-           
+
             const nonMembers: string[] = [];
             const validConvenors: {id: number}[] = [];
 
-           
+
             for (const user of convenorUsers) {
                 const isMember = await prisma.clubmembers.findFirst({
                     where: {
@@ -163,7 +170,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
                         club_id: EventDetails.club_id
                     }
                 });
-                
+
                 if (isMember) {
                     validConvenors.push({ id: user.id });
                 } else {
@@ -171,7 +178,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
                 }
             }
 
-           
+
             if (validConvenors.length > 0) {
                 for (const user of validConvenors) {
                     await prisma.eventconvenors.create({
@@ -184,7 +191,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
                 }
             }
 
-            
+
             if (nonMembers.length > 0) {
                 const message = `Event created successfully, but the following users could not be added as convenors because they are not members of the club: ${nonMembers.join(', ')}`;
                 res.status(201).json({ message });
@@ -349,7 +356,7 @@ const fetchProfile = async (req: Request, res: Response): Promise<void> =>{
 
 const addCubmembers = async (req: Request, res: Response): Promise<void> => {
     try {
-        const club_id = req.admin_club_id; 
+        const club_id = req.admin_club_id;
         const { members } = req.body as ClubMembers;
 
         if (!members || !Array.isArray(members) || members.length === 0) {
@@ -361,7 +368,7 @@ const addCubmembers = async (req: Request, res: Response): Promise<void> => {
 
         let successCount = 0;
         const errorDetails = [] as Array<{rollno: string, status: string, message: string}>;
-        
+
         for (const member of members) {
             if (!member.rollno) {
                 errorDetails.push({
@@ -434,7 +441,7 @@ const addCubmembers = async (req: Request, res: Response): Promise<void> => {
             });
             return;
         }
-        
+
         // If there were errors but also some successes
         if (successCount > 0 && errorDetails.length > 0) {
             res.status(200).json({
@@ -443,7 +450,7 @@ const addCubmembers = async (req: Request, res: Response): Promise<void> => {
             });
             return;
         }
-        
+
         // If there were only errors
         if (successCount === 0 && errorDetails.length > 0) {
             res.status(400).json({

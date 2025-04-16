@@ -16,7 +16,7 @@ export interface CreateEventDTO {
     exp_no_aud?: number;
     faculty_obs_desig?: string;
     faculty_obs_dept?: string;
-    poster?: Buffer | null; 
+    poster?: string | null;
 }
 
 export interface Attendance {
@@ -30,12 +30,12 @@ export interface EventConvenor {
     department: string | null;
     yearofstudy: number | null;
 }
-  
+
 export interface EventWinner {
     position: number | null;
     team_name: string | null | undefined;
 }
-  
+
 export interface PastEventData {
     name: string | null;
     about: string | null;
@@ -48,7 +48,7 @@ export interface PastEventData {
     total_registered_teams: number;
     total_attendance: number;
 }
-  
+
 export interface PastEventsResponse {
     message: string;
     data: PastEventData[];
@@ -102,6 +102,3 @@ export interface ClubMembers {
         role?: string;
     }[];
 }
-
-
-
