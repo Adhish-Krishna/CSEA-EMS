@@ -366,7 +366,7 @@ const fetchProfile = async (req: Request, res: Response): Promise<void> =>{
     }
 }
 
-const addCubmembers = async (req: Request, res: Response): Promise<void> => {
+const addClubmembers = async (req: Request, res: Response): Promise<void> => {
     try {
         const club_id = req.admin_club_id;
         const { members } = req.body as ClubMembers;
@@ -570,6 +570,6 @@ export  {
     createEventController,
     getPastEventsByClubController,
     fetchProfile,
-    addCubmembers,
+    addClubmembers,
     getEventDetails
 };

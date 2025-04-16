@@ -4,7 +4,7 @@ import {
     createEventController,
     getPastEventsByClubController,
     fetchProfile,
-    addCubmembers,
+    addClubmembers,
     getEventDetails
 } from './controller.js';
 import multer from 'multer';
@@ -16,7 +16,7 @@ adminRouter.post('/create-event', upload.single('poster'), createEventController
 adminRouter.get('/events-history', getPastEventsByClubController);
 adminRouter.post('/attendance',putAttendance);
 adminRouter.get('/profile', fetchProfile);
-adminRouter.post('/add-members', addCubmembers);
+adminRouter.post('/add-members', addClubmembers);
 adminRouter.get('/events', getEventDetails); // Changed from path parameter to query parameter
 
 /**
