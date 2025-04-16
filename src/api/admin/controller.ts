@@ -48,8 +48,31 @@ const putAttendance = async (req:Request,res:Response) : Promise<void>=>{
 
 const createEventController = async (req: Request, res: Response): Promise<void> => {
     try {
-        const EventDetails: CreateEventDTO = req.body;
-        EventDetails.club_id = req.admin_club_id;
+        const EventDetails: CreateEventDTO = {
+            name: req.body.name,
+            about: req.body.about,
+            date: req.body.date,
+            event_type: req.body.event_type,
+            event_category: req.body.event_category,
+            min_no_member: Number(req.body.min_no_member),
+            max_no_member: Number(req.body.max_no_member),
+            club_id: req.admin_club_id,
+            venue: req.body.venue,
+            chief_guest: req.body.chief_guest,
+            exp_expense: req.body.exp_expense ? Number(req.body.exp_expense) : null,
+            tot_amt_allot_su: req.body.tot_amt_allot_su ? Number(req.body.tot_amt_allot_su) : null,
+            tot_amt_spt_dor: req.body.tot_amt_spt_dor ? Number(req.body.tot_amt_spt_dor) : null,
+            exp_no_aud: req.body.exp_no_aud ? Number(req.body.exp_no_aud) : null,
+            faculty_obs_desig: req.body.faculty_obs_desig,
+            faculty_obs_dept: req.body.faculty_obs_dept,
+        };
+        if (req.body.eventConvenors) {
+            try {
+                EventDetails.eventConvenors = JSON.parse(req.body.eventConvenors);
+            } catch {
+                EventDetails.eventConvenors = req.body.eventConvenors.split(',').map((s: string) => s.trim());
+            }
+        }
         if (
             !EventDetails.name ||
             !EventDetails.date ||
@@ -65,7 +88,6 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             return;
         }
 
-
         const existingEvent = await prisma.events.findFirst({
             where: {
                 name: EventDetails.name,
@@ -79,14 +101,13 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             return;
         }
 
-
         if (EventDetails.eventConvenors && EventDetails.eventConvenors.length > 0) {
             const convenorRollnos = EventDetails.eventConvenors.slice(0, 3);
 
             const convenorUsers = await prisma.users.findMany({
                 where: {
                     rollno: {
-                        in: convenorRollnos.map(rollno => rollno.toLowerCase())
+                        in: convenorRollnos.map((rollno: string) => rollno.toLowerCase())
                     }
                 },
                 select: {
@@ -96,24 +117,18 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             });
 
             const nonExistentRollnos = convenorRollnos.filter(
-                rollno => !convenorUsers.some(user => user.rollno?.toLowerCase() === rollno.toLowerCase())
+                (rollno: string) => !convenorUsers.some(user => user.rollno?.toLowerCase() === rollno.toLowerCase())
             );
 
             if (nonExistentRollnos.length > 0) {
                 const message = `Event creation failed. The following users could not be added as convenors because they don't exist in the database: ${nonExistentRollnos.join(', ')}`;
-                res.status(400).json({ message });
+                res.status(422).json({ message }); // Changed from 400 to 422 Unprocessable Entity
                 return;
             }
         }
-
-        // Create the event only after validation\
-        let buffer;
-        if(!EventDetails.poster){
-            buffer = null;
-        }
-        else{
-            const base64 = EventDetails.poster?.split(',')[1];
-            buffer = Buffer.from(base64!, 'base64');
+        let buffer = null;
+        if (req.file) {
+            buffer = req.file.buffer;
         }
         const event = await prisma.events.create({
             data: {
@@ -125,7 +140,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
                 event_category: EventDetails.event_category,
                 min_no_member: EventDetails.min_no_member,
                 max_no_member: EventDetails.max_no_member,
-                poster: buffer || null,
+                poster: buffer,
                 chief_guest: EventDetails.chief_guest || null,
                 exp_expense: EventDetails.exp_expense || null,
                 tot_amt_allot_su: EventDetails.tot_amt_allot_su || null,
@@ -143,14 +158,13 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             },
         });
 
-
         if (EventDetails.eventConvenors && EventDetails.eventConvenors.length > 0) {
             const convenorRollnos = EventDetails.eventConvenors;
 
             const convenorUsers = await prisma.users.findMany({
                 where: {
                     rollno: {
-                        in: convenorRollnos.map(rollno => rollno.toLowerCase())
+                        in: convenorRollnos.map((rollno: string) => rollno.toLowerCase())
                     }
                 },
                 select: {
@@ -160,8 +174,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
             });
 
             const nonMembers: string[] = [];
-            const validConvenors: {id: number}[] = [];
-
+            const validConvenors: { id: number }[] = [];
 
             for (const user of convenorUsers) {
                 const isMember = await prisma.clubmembers.findFirst({
@@ -178,7 +191,6 @@ const createEventController = async (req: Request, res: Response): Promise<void>
                 }
             }
 
-
             if (validConvenors.length > 0) {
                 for (const user of validConvenors) {
                     await prisma.eventconvenors.create({
@@ -191,10 +203,9 @@ const createEventController = async (req: Request, res: Response): Promise<void>
                 }
             }
 
-
             if (nonMembers.length > 0) {
                 const message = `Event created successfully, but the following users could not be added as convenors because they are not members of the club: ${nonMembers.join(', ')}`;
-                res.status(201).json({ message });
+                res.status(207).json({ message }); // Changed from 201 to 207 Multi-Status
                 return;
             }
         }

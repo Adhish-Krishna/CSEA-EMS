@@ -6,10 +6,12 @@ import {
     fetchProfile,
     addCubmembers
 } from './controller.js';
+import multer from 'multer';
 
+const upload = multer();
 
 const adminRouter = Router();
-adminRouter.post('/create-event',createEventController);
+adminRouter.post('/create-event', upload.single('poster'), createEventController);
 adminRouter.get('/events-history', getPastEventsByClubController);
 adminRouter.post('/attendance',putAttendance);
 adminRouter.get('/profile', fetchProfile);
@@ -421,7 +423,7 @@ adminRouter.post('/add-members', addCubmembers);
  *               - rollno: "B220001CS"
  *                 role: "Secretary"
  *               - rollno: "B220002EC"
- *                 role: "Treasurer" 
+ *                 role: "Treasurer"
  *               - rollno: "B220003ME"
  *     responses:
  *       200:

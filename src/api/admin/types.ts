@@ -9,14 +9,13 @@ export interface CreateEventDTO {
     max_no_member: number;
     club_id: number;
     eventConvenors?: string[];
-    chief_guest?: string;
-    exp_expense?: number;
-    tot_amt_allot_su?: number;
-    tot_amt_spt_dor?: number;
-    exp_no_aud?: number;
-    faculty_obs_desig?: string;
-    faculty_obs_dept?: string;
-    poster?: string | null;
+    chief_guest: string | null;
+    exp_expense: number | null;
+    tot_amt_allot_su: number | null;
+    tot_amt_spt_dor: number | null;
+    exp_no_aud: number | null;
+    faculty_obs_desig: string | null;
+    faculty_obs_dept: string | null;
 }
 
 export interface Attendance {
