@@ -101,3 +101,17 @@ export interface ClubMembers {
         role?: string;
     }[];
 }
+
+export interface EventDetails {
+    name: string | null;
+    about: string | null;
+    date: Date | null;
+    venue: string | null;
+    event_type: string | null;
+    event_category: string | null;
+}
+
+export interface EventDetailsResponse {
+    message: string;
+    data: EventDetails[];
+}
