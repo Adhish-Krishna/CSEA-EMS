@@ -4,7 +4,8 @@ import {
     createEventController,
     getPastEventsByClubController,
     fetchProfile,
-    addClubmembers
+    addClubmembers,
+    getEventDetails
 } from './controller.js';
 import multer from 'multer';
 
@@ -16,6 +17,7 @@ adminRouter.get('/events-history', getPastEventsByClubController);
 adminRouter.post('/attendance',putAttendance);
 adminRouter.get('/profile', fetchProfile);
 adminRouter.post('/add-members', addClubmembers);
+adminRouter.get('/events', getEventDetails); // Changed from path parameter to query parameter
 
 /**
  * @swagger
@@ -514,6 +516,84 @@ adminRouter.post('/add-members', addClubmembers);
  *                 message:
  *                   type: string
  *                   example: "Failed to add club members"
+ */
+
+/**
+ * @swagger
+ * /admin/events:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Get events by type for the admin's club
+ *     description: Fetches events (ongoing, past, upcoming, or present) for the admin's club based on the specified type query parameter
+ *     parameters:
+ *       - in: query
+ *         name: type
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [ongoing, past, upcoming, present]
+ *         description: The type of events to fetch (ongoing/present, past, or upcoming)
+ *     responses:
+ *       200:
+ *         description: Events fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "past events fetched successfully for your club"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       name:
+ *                         type: string
+ *                         example: "Coding Workshop"
+ *                       about:
+ *                         type: string
+ *                         example: "A beginner-friendly coding workshop"
+ *                       date:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-05-10T09:00:00Z"
+ *                       venue:
+ *                         type: string
+ *                         example: "CS Auditorium"
+ *                       event_type:
+ *                         type: string
+ *                         example: "Workshop"
+ *                       event_category:
+ *                         type: string
+ *                         example: "Technical"
+ *       400:
+ *         description: Invalid request - type parameter is invalid or club ID not available
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid event type. Type must be one of: ongoing, past, upcoming, present"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error fetching events"
+ *                 error:
+ *                   type: object
+ *                   description: Error object from the server
  */
 
 export default adminRouter;
