@@ -448,7 +448,7 @@ const addClubmembers = async (req: Request, res: Response): Promise<void> => {
 
         // If there were only successful additions
         if (successCount > 0 && errorDetails.length === 0) {
-            res.status(200).json({
+            res.status(201).json({
                 message: "Members added successfully"
             });
             return;
@@ -456,7 +456,7 @@ const addClubmembers = async (req: Request, res: Response): Promise<void> => {
 
         // If there were errors but also some successes
         if (successCount > 0 && errorDetails.length > 0) {
-            res.status(200).json({
+            res.status(207).json({
                 message: `${successCount} members added successfully, but some issues were encountered`,
                 errors: errorDetails
             });
@@ -465,14 +465,14 @@ const addClubmembers = async (req: Request, res: Response): Promise<void> => {
 
         // If there were only errors
         if (successCount === 0 && errorDetails.length > 0) {
-            res.status(400).json({
+            res.status(422).json({
                 message: "Failed to add members",
                 errors: errorDetails
             });
             return;
         }
 
-        res.status(200).json({
+        res.status(204).json({
             message: "No action taken"
         });
         return;

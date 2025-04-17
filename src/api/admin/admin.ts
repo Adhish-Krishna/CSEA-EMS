@@ -428,43 +428,52 @@ adminRouter.get('/events', getEventDetails); // Changed from path parameter to q
  *                 role: "Treasurer"
  *               - rollno: "B220003ME"
  *     responses:
- *       200:
- *         description: Members added successfully or partially successful
+ *       201:
+ *         description: All members added successfully
  *         content:
  *           application/json:
  *             schema:
- *               oneOf:
- *                 - type: object
- *                   properties:
- *                     message:
- *                       type: string
- *                       example: "Members added successfully"
- *                 - type: object
- *                   properties:
- *                     message:
- *                       type: string
- *                       example: "2 members added successfully, but some issues were encountered"
- *                     errors:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           rollno:
- *                             type: string
- *                             example: "B220001CS"
- *                           status:
- *                             type: string
- *                             example: "skipped"
- *                           message:
- *                             type: string
- *                             example: "User is already a member of this club"
- *                 - type: object
- *                   properties:
- *                     message:
- *                       type: string
- *                       example: "No action taken"
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Members added successfully"
+ *       204:
+ *         description: Request processed but no action taken
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No action taken"
+ *       207:
+ *         description: Multi-Status - Some members added successfully but others failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "2 members added successfully, but some issues were encountered"
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       rollno:
+ *                         type: string
+ *                         example: "B220001CS"
+ *                       status:
+ *                         type: string
+ *                         example: "skipped"
+ *                       message:
+ *                         type: string
+ *                         example: "User is already a member of this club"
  *       400:
- *         description: Bad request or failed to add members
+ *         description: Bad request - Invalid input format
  *         content:
  *           application/json:
  *             schema:
@@ -473,6 +482,16 @@ adminRouter.get('/events', getEventDetails); // Changed from path parameter to q
  *                 message:
  *                   type: string
  *                   example: "Members array is required and cannot be empty"
+ *       422:
+ *         description: Unprocessable Entity - Valid format but members cannot be processed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to add members"
  *                 errors:
  *                   type: array
  *                   items:
