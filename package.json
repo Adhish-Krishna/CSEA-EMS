@@ -5,10 +5,11 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "nodemon --ext ts --exec node --loader ts-node/esm src/server.ts"
-  },
+  "build": "tsc",
+  "start": "node dist/server.js",
+  "dev": "nodemon --ext ts --exec node --loader ts-node/esm src/server.ts",
+  "deploy": "npm install && npm run build"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Adhish-Krishna/Daddy-EMS.git"
