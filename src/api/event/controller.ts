@@ -1,18 +1,19 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
 import { WinnerDetails,DeleteWinners,UpdateEventDto } from './types.js';
-
+import fs from 'fs-extra';
+import path from 'path';
 
 const updateEventcontroller = async (req: Request, res: Response) : Promise<void>=> {
     const eventId = Number(req.params.id);
     const updates: UpdateEventDto = req.body;
-  
+
     try {
       const updatedEvent = await prisma.events.update({
         where: { id: eventId },
         data: updates,
       });
-  
+
       res.status(201).json({message : 'Event Updated successfully'});
     } catch (err) {
       console.error('Error updating event:', err);
@@ -21,7 +22,7 @@ const updateEventcontroller = async (req: Request, res: Response) : Promise<void
   };
 
 const AddingWinnerController = async (req: Request, res: Response) : Promise<void>=> {
-    const Winner: WinnerDetails = req.body; 
+    const Winner: WinnerDetails = req.body;
     const {event_id,team_id,position}= Winner;
     if(!event_id || !team_id || !position){
         res.status(400).json({
@@ -97,4 +98,111 @@ const removeWinnerController = async (req:Request,res:Response) : Promise<void>=
     }
 
 }
-export {updateEventcontroller,AddingWinnerController,removeWinnerController};
+
+const getEventDetails = async (req: Request, res: Response): Promise<void> =>{
+    try{
+        const id: number = parseInt(<any>req.query.id);
+        const eventRecord = await prisma.events.findFirst({
+            where:{
+                id: id
+            }
+        });
+        if(!eventRecord){
+            res.status(301).json({
+                message: "Event not found"
+            });
+            return;
+        }
+        else{
+            const convernorDetails = await prisma.eventconvenors.findMany({
+                where:{
+                    event_id: id
+                },
+                include:{
+                    users: true
+                }
+            });
+            const convenor: String[] = [];
+            convernorDetails.map((c)=>{
+                convenor.push(c.users.rollno!);
+            });
+            res.status(200).json({
+                name: eventRecord.name,
+                date: eventRecord.date,
+                venue: eventRecord.venue,
+                event_type: eventRecord.event_type,
+                event_category: eventRecord.event_category,
+                about: eventRecord.about,
+                chief_guest: eventRecord.chief_guest,
+                tot_amt_allot_su: eventRecord.tot_amt_allot_su,
+                tot_amt_spt_dor: eventRecord.tot_amt_spt_dor,
+                exp_expense: eventRecord.exp_expense,
+                epx_no_aud: eventRecord.exp_no_aud,
+                faculty_obs_dept: eventRecord.faculty_obs_dept,
+                faculty_obs_desig: eventRecord.faculty_obs_desig,
+                min_no_member: eventRecord.min_no_member,
+                max_no_member: eventRecord.max_no_member,
+                eventConvenors: convernorDetails?convenor:[],
+                poster: null
+            });
+            return;
+        }
+    }catch(err){
+        res.status(500).json({
+            message: "Issue in fetching event details"
+        });
+        return;
+    }
+}
+
+const getEventPoster = async (req: Request, res: Response): Promise<void> =>{
+    try{
+        const id: number = parseInt(<any>req.query.id);
+        const event = await prisma.events.findFirst({
+            where:{
+                id: id
+            },
+            select:{
+                poster: true
+            }
+        });
+
+        if(!event){
+            res.status(404).json({
+                message: "Event not found"
+            });
+            return;
+        }
+
+        if(!event.poster){
+            res.status(404).json({
+                message: "No poster available for this event"
+            });
+            return;
+        }
+        const posterPath = path.resolve(event.poster);
+        if (await fs.pathExists(posterPath)) {
+            const image = await fs.readFile(posterPath);
+            let contentType = 'image/png';
+            if (posterPath.endsWith('.jpg') || posterPath.endsWith('.jpeg')) {
+                contentType = 'image/jpeg';
+            }
+            res.status(200)
+              .setHeader('Content-Type', contentType)
+              .send(image);
+        } else {
+            res.status(404).json({
+                message: "Poster file not found on server"
+            });
+        }
+        return;
+    }catch(err){
+        console.error("Error fetching event poster:", err);
+        res.status(500).json({
+            message: "Issue in fetching event poster"
+        });
+        return;
+    }
+}
+
+export {updateEventcontroller,AddingWinnerController,removeWinnerController, getEventDetails, getEventPoster};

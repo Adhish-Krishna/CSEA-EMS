@@ -1,5 +1,7 @@
 import { Request,Response } from "express";
 import prisma from '../../prisma.js';
+import fs from 'fs-extra';
+import path from 'path';
 import {
     Attendance,
     CreateEventDTO,
@@ -9,7 +11,6 @@ import {
     ClubMembers,
     EventDetailsResponse
 } from "./types.js";
-
 
 const putAttendance = async (req:Request,res:Response) : Promise<void>=>{
     try{
@@ -123,13 +124,27 @@ const createEventController = async (req: Request, res: Response): Promise<void>
 
             if (nonExistentRollnos.length > 0) {
                 const message = `Event creation failed. The following users could not be added as convenors because they don't exist in the database: ${nonExistentRollnos.join(', ')}`;
-                res.status(422).json({ message }); // Changed from 400 to 422 Unprocessable Entity
+                res.status(422).json({ message });
                 return;
             }
         }
-        let buffer = null;
+        let posterPath = null;
         if (req.file) {
-            buffer = req.file.buffer;
+            try {
+                const uploadDir = 'uploads/posters';
+                await fs.ensureDir(uploadDir);
+                const fileExtension = req.file.originalname.split('.').pop() || req.file.mimetype.split('/').pop() || 'unknown';
+                const fileName = `${EventDetails.name.replace(/\s+/g, '-').trim()+EventDetails.date}.${fileExtension.trim().toLowerCase()}`;
+                const fullPath = path.join(uploadDir, fileName);
+                await fs.writeFile(fullPath, req.file.buffer);
+                posterPath = `${uploadDir}/${fileName}`;
+            } catch (error) {
+                console.error("Error saving poster file:", error);
+                res.status(500).json({
+                    message: "Failed to save poster image. Event not created."
+                });
+                return;
+            }
         }
         const event = await prisma.events.create({
             data: {
@@ -141,7 +156,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
                 event_category: EventDetails.event_category,
                 min_no_member: EventDetails.min_no_member,
                 max_no_member: EventDetails.max_no_member,
-                poster: buffer,
+                poster: posterPath,
                 chief_guest: EventDetails.chief_guest || null,
                 exp_expense: EventDetails.exp_expense || null,
                 tot_amt_allot_su: EventDetails.tot_amt_allot_su || null,
@@ -206,7 +221,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
 
             if (nonMembers.length > 0) {
                 const message = `Event created successfully, but the following users could not be added as convenors because they are not members of the club: ${nonMembers.join(', ')}`;
-                res.status(207).json({ message }); // Changed from 201 to 207 Multi-Status
+                res.status(207).json({ message });
                 return;
             }
         }

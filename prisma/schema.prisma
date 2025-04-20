@@ -76,7 +76,7 @@ model events {
   exp_no_aud        Int?
   faculty_obs_desig String?
   faculty_obs_dept  String?
-  poster            Bytes?
+  poster            String?
   eventconvenors    eventconvenors[]
   eventregistration eventregistration[]
   eventwinners      eventwinners[]
