@@ -8,7 +8,7 @@
   "build": "tsc",
   "start": "node dist/server.js",
   "dev": "nodemon --ext ts --exec node --loader ts-node/esm src/server.ts",
-  "deploy": "npm install && npm run build"
+  "deploy": "npm install && npx prisma generate && npm run build"
 },
   "repository": {
     "type": "git",
