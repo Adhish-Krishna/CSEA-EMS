@@ -21,6 +21,7 @@ const putAttendance = async (req:Request,res:Response) : Promise<void>=>{
             });
             return;
         }
+        
         const updatedAttendance = await prisma.teammembers.updateMany({
             where:{
                 event_id: attendance.event_id,
