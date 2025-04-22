@@ -1,6 +1,6 @@
 import { Router} from 'express';
 
-import {updateEventcontroller,AddingWinnerController,removeWinnerController, getEventDetails, getEventPoster} from './controller.js';
+import {updateEventcontroller,AddingWinnerController,removeWinnerController, getEventDetails, getEventPoster, getAllRegistrations} from './controller.js';
 const eventRouter = Router();
 
 
@@ -9,6 +9,7 @@ eventRouter.post('/addWinners',AddingWinnerController);
 eventRouter.post('/removeWinners',removeWinnerController);
 eventRouter.get('/eventdetails',getEventDetails);
 eventRouter.get('/eventposter', getEventPoster);
+eventRouter.get('/allregistration', getAllRegistrations);
 export default eventRouter;
 
 
@@ -292,4 +293,85 @@ export default eventRouter;
  *                 message:
  *                   type: string
  *                   example: Issue in fetching event poster
+ */
+
+/**
+ * @swagger
+ * /event/allregistration:
+ *   get:
+ *     summary: Get all registrations for a specific event
+ *     tags: [Event]
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the event to fetch registrations for
+ *     responses:
+ *       200:
+ *         description: Event registrations fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Fetched event registrations
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       team_name:
+ *                         type: string
+ *                         example: Team Innovators
+ *                       members:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             name:
+ *                               type: string
+ *                               example: John Doe
+ *                             rollno:
+ *                               type: string
+ *                               example: B190632CS
+ *                             department:
+ *                               type: string
+ *                               example: CSE
+ *                             yearofstudy:
+ *                               type: integer
+ *                               example: 3
+ *       301:
+ *         description: No registrations found for this event
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No registrations for this event
+ *       400:
+ *         description: Invalid event ID provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid Event Id
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Issue in fetching event registrations
  */

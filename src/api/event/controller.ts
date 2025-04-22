@@ -1,6 +1,6 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
-import { WinnerDetails,DeleteWinners,UpdateEventDto } from './types.js';
+import { WinnerDetails,DeleteWinners,UpdateEventDto, RegistrationData } from './types.js';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -205,4 +205,65 @@ const getEventPoster = async (req: Request, res: Response): Promise<void> =>{
     }
 }
 
-export {updateEventcontroller,AddingWinnerController,removeWinnerController, getEventDetails, getEventPoster};
+const getAllRegistrations = async (req: Request, res: Response): Promise<void> =>{
+    try{
+        const eventId = parseInt(<any>req.query.id);
+        if(isNaN(eventId)){
+            res.status(400).json({
+                message: "Invalid Event Id"
+            });
+            return;
+        }
+        const registrations = await prisma.eventregistration.findMany({
+            where:{
+                event_id: eventId
+            },
+            include:{
+                teams: {
+                    include:{
+                        teammembers: {
+                            include:{
+                                users:{
+                                    select:{
+                                        name: true,
+                                        rollno: true,
+                                        department: true,
+                                        yearofstudy: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        if(registrations.length == 0){
+            res.status(301).json({
+                message: "No registrations for this event"
+            });
+            return;
+        }
+        const filteredRegistrationsData: RegistrationData[] = []
+        registrations.map((registration)=>{
+            filteredRegistrationsData.push(
+                {
+                    team_id: registration.team_id,
+                    team_name: registration.teams.name,
+                    members: registration.teams.teammembers.map((teammember)=>teammember.users)
+                }
+            )
+        });
+        res.status(200).json({
+            message: "Fetched event registrations",
+            data: filteredRegistrationsData
+        });
+        return;
+    }catch(err){
+        res.status(500).json({
+            message: "Issue in fetching event registrations"
+        });
+        return;
+    }
+}
+
+export {updateEventcontroller,AddingWinnerController,removeWinnerController, getEventDetails, getEventPoster, getAllRegistrations};
