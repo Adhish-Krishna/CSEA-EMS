@@ -182,7 +182,7 @@ Trigger setup for DB - Karthi
 | /event/removePlaceHolders/:eventId | POST   | Providing the details of winners and runners by club admin of particular event | Pravith       | **✅**   |
 | /event/attendance                  | POST   | Marking attendance for particular event by                                     | Darshan       | **✅**   |
 | /event/register                    | POST   | User registering for a event                                                   | Darshan       | **✅**   |
-| /event/teamInvite/:eventId         | POST   | User requesting other users to be in their team                                | Karthi        |          |
+| /event/teamInvite/:eventId         | POST   | User requesting other users to be in their team                                | Karthi        | **✅**   |
 | /event/acceptTeamInvite/:eventId   | POST   | User accepting the other user's team invite                                    | Pravith       | **✅**   |
 
 ## User Routes
@@ -190,7 +190,7 @@ Trigger setup for DB - Karthi
 | Endpoint               | Method | Purpose                     | To be done by | progress |
 | ---------------------- | ------ | --------------------------- | ------------- | -------- |
 | /user/profile          | GET    | Fetching user details       | Darshan       | **✅**   |
-| /user/registeredEvents | GET    | Fetching Registered Events  | Karthi        |          |
+| /user/registeredEvents | GET    | Fetching Registered Events  | Karthi        | **✅**   |
 | /user/membership       | GET    | Fetching membership details | Pravith       | **✅**   |
 | /user/invitations      | GET    | Fetching current Invitation | Darshan       | **✅**   |
 | /user/feedback/        | POST   | Feedback submission by user | Adhish        | **✅**   |
