@@ -7,7 +7,7 @@ import prisma from '../../prisma.js';
  */
 export async function get_club_id(event_id: number): Promise<number | undefined> {
     const organizingClub = await prisma.organizingclubs.findFirst({
-        where: { event_id },
+        where: { event_id : Number(event_id) },
         select: { club_id: true }
     });
     return organizingClub?.club_id;

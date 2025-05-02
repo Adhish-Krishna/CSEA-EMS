@@ -21,6 +21,7 @@ const putAttendance = async (req:Request,res:Response) : Promise<void>=>{
             });
             return;
         }
+        /* Prform validation*/
         const updatedAttendance = await prisma.teammembers.updateMany({
             where:{
                 event_id: attendance.event_id,
@@ -240,8 +241,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
 
 const getPastEventsByClubController = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { club_id } = req.query;
-      console.log("club_id from query:", req.query.club_id);
+      const club_id = req.admin_club_id
 
       if (!club_id) {
         res.status(400).json({ message: "Club ID is required." });
@@ -554,7 +554,9 @@ const getEventDetails = async (req: Request, res: Response): Promise<void> => {
                 date: true,
                 venue: true,
                 event_type: true,
-                event_category: true
+                event_category: true,
+                min_no_member:true,
+                max_no_member:true
             }
         });
 
@@ -581,11 +583,14 @@ const getEventDetails = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+
+ 
+
 export  {
     putAttendance,
     createEventController,
     getPastEventsByClubController,
     fetchProfile,
     addClubmembers,
-    getEventDetails
+    getEventDetails,
 };

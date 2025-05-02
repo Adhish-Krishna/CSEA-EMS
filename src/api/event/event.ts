@@ -1,6 +1,6 @@
 import { Router} from 'express';
 
-import {updateEventcontroller,AddingWinnerController,removeWinnerController, getEventDetails, getEventPoster, getAllRegistrations} from './controller.js';
+import {updateEventcontroller,AddingWinnerController,removeWinnerController, getEventDetails, getEventPoster, getAllRegistrations,getWinners,getFeedback} from './controller.js';
 const eventRouter = Router();
 
 
@@ -10,6 +10,9 @@ eventRouter.post('/removeWinners',removeWinnerController);
 eventRouter.get('/eventdetails',getEventDetails);
 eventRouter.get('/eventposter', getEventPoster);
 eventRouter.get('/allregistration', getAllRegistrations);
+
+eventRouter.get('/winners/:event_id',getWinners)
+eventRouter.get('/feedback/:event_id',getFeedback)
 export default eventRouter;
 
 
