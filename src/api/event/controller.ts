@@ -142,8 +142,7 @@ const getEventDetails = async (req: Request, res: Response): Promise<void> =>{
                 faculty_obs_desig: eventRecord.faculty_obs_desig,
                 min_no_member: eventRecord.min_no_member,
                 max_no_member: eventRecord.max_no_member,
-                eventConvenors: convernorDetails?convenor:[],
-                poster: null
+                eventConvenors: convernorDetails?convenor:[]
         }});
             return;
         }
@@ -272,7 +271,7 @@ const getAllRegistrations = async (req: Request, res: Response): Promise<void> =
 
 const getFeedback = async(req:Request,res:Response) => {
     try {
-        const {event_id} = req.params;  
+        const {event_id} = req.params;
         const event = await prisma.events.findUnique({
             where:{ id : Number(event_id) }
         })
@@ -280,10 +279,10 @@ const getFeedback = async(req:Request,res:Response) => {
         const rawfeedback = await prisma.feedback.findMany({
             where:{event_id : Number(event_id)},
             include:{
-                users: true 
+                users: true
             }
         })
-        
+
         const feedbacks = rawfeedback.map(feedback => ({
             ...feedback,
             users: {
@@ -308,19 +307,19 @@ const getWinners = async(req:Request,res:Response) => {
         if(!event) { res.status(404).json({message:`Event with ${event_id} is not Found`});return; }
         const Winners = await prisma.eventwinners.findMany({
             where: { event_id : Number(event_id) },
-            include: { 
+            include: {
                 teams : { include : { teammembers : { include : {
                     users : { select : {
                         id : true,name:true,email:true,
                         rollno: true,department:true,
                         yearofstudy: true
                     } }
-                } } } } 
+                } } } }
             }
         })
-        
+
         res.status(200).json({message:"Winner fetched Successfully",data:Winners})
-        
+
     } catch (error) {
         res.status(500).json({message:"Winner fetched failed"})
     }
