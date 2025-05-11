@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { 
-    acceptTeamInviteController, 
-    feedbackController, 
+import {
+    acceptTeamInviteController,
+    feedbackController,
     rejectTeamInviteController,
     fetchMembersController,
     RegisterController,
@@ -13,18 +13,19 @@ import {
     getUpcomingEventsController,
     getRegisteredEvents
 } from './controller.js';
+import { userAuthMiddleware } from '../../middleware/authMiddleware.js';
 
 
 const userRouter = Router();
-userRouter.post('/register', RegisterController);
-userRouter.post('/sendTeamInvitaion',sendTeamInvitation);
-userRouter.post('/acceptTeamInvite', acceptTeamInviteController);
-userRouter.get('/membershipDetails', fetchMembersController);
-userRouter.post('/rejectTeamInvite', rejectTeamInviteController);
-userRouter.get('/fetch/invitations', fetchInvitations);
-userRouter.get('/fetch/profile', fetchProfile);
-userRouter.get('/registeredevents',getRegisteredEvents)
-userRouter.post('/feedback', feedbackController);
+userRouter.post('/register', userAuthMiddleware, RegisterController);
+userRouter.post('/sendTeamInvitaion',userAuthMiddleware, sendTeamInvitation);
+userRouter.post('/acceptTeamInvite', userAuthMiddleware, acceptTeamInviteController);
+userRouter.get('/membershipDetails', userAuthMiddleware, fetchMembersController);
+userRouter.post('/rejectTeamInvite', userAuthMiddleware, rejectTeamInviteController);
+userRouter.get('/fetch/invitations', userAuthMiddleware, fetchInvitations);
+userRouter.get('/fetch/profile', userAuthMiddleware, fetchProfile);
+userRouter.get('/registeredevents',userAuthMiddleware, getRegisteredEvents)
+userRouter.post('/feedback', userAuthMiddleware, feedbackController);
 
 // Removed '/events' POST route that was using fetchAllEventsController
 

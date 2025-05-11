@@ -1,18 +1,19 @@
 import { Router} from 'express';
 
 import {updateEventcontroller,AddingWinnerController,removeWinnerController, getEventDetails, getEventPoster, getAllRegistrations,getWinners,getFeedback} from './controller.js';
+import { adminAuthMiddleware } from '../../middleware/authMiddleware.js';
 const eventRouter = Router();
 
 
-eventRouter.put('/:id',updateEventcontroller);
-eventRouter.post('/addWinners',AddingWinnerController);
-eventRouter.post('/removeWinners',removeWinnerController);
+eventRouter.put('/:id', adminAuthMiddleware, updateEventcontroller);
+eventRouter.post('/addWinners', adminAuthMiddleware, AddingWinnerController);
+eventRouter.post('/removeWinners', adminAuthMiddleware, removeWinnerController);
 eventRouter.get('/eventdetails',getEventDetails);
 eventRouter.get('/eventposter', getEventPoster);
-eventRouter.get('/allregistration', getAllRegistrations);
+eventRouter.get('/allregistration',  adminAuthMiddleware, getAllRegistrations);
 
-eventRouter.get('/winners/:event_id',getWinners)
-eventRouter.get('/feedback/:event_id',getFeedback)
+eventRouter.get('/winners/:event_id', adminAuthMiddleware, getWinners)
+eventRouter.get('/feedback/:event_id', adminAuthMiddleware, getFeedback)
 export default eventRouter;
 
 
