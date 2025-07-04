@@ -59,4 +59,34 @@ const sendEmailVerificationCode = (to: string, code: string) =>{
     });
 }
 
-export {sendSecurityCodeEmail, sendEmailVerificationCode}
+
+const sendInvitation = ({to,user_email,user_name,event_name,team_name}:
+    {to: string,user_name:string,user_email:string, event_name: string,team_name:string}) =>{
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: USER_EMAIL,
+            pass: EMAIL_APP_PASSWORD
+        },
+    });
+
+    const mailOtions = {
+        from: USER_EMAIL,
+        to: to,
+        subject: `Team invitation from ${user_email}`,
+        text: `You have been inivited by ${user_name} - ${user_email} from the Team - ${team_name} to The Event - ${event_name}.
+        Check The ems_portal to accept or reject invitation`
+    }
+
+    transporter.sendMail(mailOtions, (err, info)=>{
+        if(err){
+            console.log(err.message);
+        }
+        else{
+            console.log(info.response);
+        }
+    });
+}
+
+
+export {sendSecurityCodeEmail, sendEmailVerificationCode,sendInvitation}

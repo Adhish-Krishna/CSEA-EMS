@@ -36,7 +36,7 @@ CREATE TABLE events (
     exp_no_aud INTEGER,
     faculty_obs_desig TEXT,
     faculty_obs_dept TEXT,
-    poster BYTEA
+    poster TEXT
 );
 
 -- Table: teams

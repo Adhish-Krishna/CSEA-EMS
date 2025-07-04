@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { 
-    acceptTeamInviteController, 
-    feedbackController, 
+import {
+    acceptTeamInviteController,
+    feedbackController,
     rejectTeamInviteController,
     fetchMembersController,
     RegisterController,
@@ -9,18 +9,23 @@ import {
     fetchProfile,
     getPastEventsController,
     getOngoingEventsController,
-    getUpcomingEventsController
+    sendTeamInvitation,
+    getUpcomingEventsController,
+    getRegisteredEvents
 } from './controller.js';
+import { userAuthMiddleware } from '../../middleware/authMiddleware.js';
 
 
 const userRouter = Router();
-userRouter.post('/register', RegisterController);
-userRouter.post('/acceptTeamInvite', acceptTeamInviteController);
-userRouter.get('/membershipDetails', fetchMembersController);
-userRouter.post('/rejectTeamInvite', rejectTeamInviteController);
-userRouter.get('/fetch/invitations', fetchInvitations);
-userRouter.get('/fetch/profile', fetchProfile);
-userRouter.post('/feedback', feedbackController);
+userRouter.post('/register', userAuthMiddleware, RegisterController);
+userRouter.post('/sendTeamInvitaion',userAuthMiddleware, sendTeamInvitation);
+userRouter.post('/acceptTeamInvite', userAuthMiddleware, acceptTeamInviteController);
+userRouter.get('/membershipDetails', userAuthMiddleware, fetchMembersController);
+userRouter.post('/rejectTeamInvite', userAuthMiddleware, rejectTeamInviteController);
+userRouter.get('/fetch/invitations', userAuthMiddleware, fetchInvitations);
+userRouter.get('/fetch/profile', userAuthMiddleware, fetchProfile);
+userRouter.get('/registeredevents',userAuthMiddleware, getRegisteredEvents)
+userRouter.post('/feedback', userAuthMiddleware, feedbackController);
 
 // Removed '/events' POST route that was using fetchAllEventsController
 
@@ -555,4 +560,143 @@ export default userRouter;
  *                 message:
  *                   type: string
  *                   example: Error fetching upcoming events
+ */
+
+
+/**
+ * @swagger
+ * /user/sendTeamInvitaion:
+ *   post:
+ *     tags: [User]
+ *     summary: Send a team invitation
+ *     description: Allows a team member to invite another user to join their team for a specific event.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - from_team_id
+ *               - to_user_id
+ *               - event_id
+ *             properties:
+ *               from_team_id:
+ *                 type: integer
+ *                 example: 12
+ *               to_user_id:
+ *                 type: integer
+ *                 example: 45
+ *               event_id:
+ *                 type: integer
+ *                 example: 8
+ *     responses:
+ *       201:
+ *         description: Team invitation has been sent
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Team invitation has been sent
+ *       400:
+ *         description: Missing details, unauthorized team access, or team is full
+ *       404:
+ *         description: Event, Team, or User not found
+ *       500:
+ *         description: Error has occurred while sending team invitation
+ */
+
+/**
+ * @swagger
+ * /user/registrations:
+ *   get:
+ *     tags: [User]
+ *     summary: Get all events the user has registered for
+ *     description: Fetches all the events in which the authenticated user is registered along with their team details and members.
+ *     responses:
+ *       200:
+ *         description: Registered Events fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Registered Events fetched successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       team_id:
+ *                         type: integer
+ *                         example: 2
+ *                       team_name:
+ *                         type: string
+ *                         example: Team Alpha
+ *                       event:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 10
+ *                           name:
+ *                             type: string
+ *                             example: Innovation Expo
+ *                           about:
+ *                             type: string
+ *                             example: A showcase of student projects and innovations.
+ *                           date:
+ *                             type: string
+ *                             format: date-time
+ *                             example: 2025-05-29T00:00:00.000Z
+ *                           event_type:
+ *                             type: string
+ *                             example: Exhibition
+ *                           venue:
+ *                             type: string
+ *                             example: Main Hall
+ *                           event_category:
+ *                             type: string
+ *                             example: Technical
+ *                           chief_guest:
+ *                             type: string
+ *                             nullable: true
+ *                             example: null
+ *                           max_no_member:
+ *                             type: integer
+ *                             example: 5
+ *                           min_no_member:
+ *                             type: integer
+ *                             example: 2
+ *                       members:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: integer
+ *                               example: 101
+ *                             name:
+ *                               type: string
+ *                               example: Student One
+ *                             email:
+ *                               type: string
+ *                               format: email
+ *                               example: student1@example.com
+ *                             rollno:
+ *                               type: string
+ *                               example: 20CS001
+ *                             department:
+ *                               type: string
+ *                               example: Computer Science
+ *                             yearofstudy:
+ *                               type: integer
+ *                               example: 2
+ *       500:
+ *         description: Error fetching registered events
  */

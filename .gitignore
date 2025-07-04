@@ -9,3 +9,4 @@ loki-data
 tempo-data
 /.env
 /.log
+/uploads

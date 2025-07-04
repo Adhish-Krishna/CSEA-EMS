@@ -1,5 +1,7 @@
 import { Request,Response } from "express";
 import prisma from '../../prisma.js';
+import fs from 'fs-extra';
+import path from 'path';
 import {
     Attendance,
     CreateEventDTO,
@@ -10,7 +12,6 @@ import {
     EventDetailsResponse
 } from "./types.js";
 
-
 const putAttendance = async (req:Request,res:Response) : Promise<void>=>{
     try{
         const attendance : Attendance = req.body;
@@ -20,6 +21,7 @@ const putAttendance = async (req:Request,res:Response) : Promise<void>=>{
             });
             return;
         }
+        /* Prform validation*/
         const updatedAttendance = await prisma.teammembers.updateMany({
             where:{
                 event_id: attendance.event_id,
@@ -123,13 +125,27 @@ const createEventController = async (req: Request, res: Response): Promise<void>
 
             if (nonExistentRollnos.length > 0) {
                 const message = `Event creation failed. The following users could not be added as convenors because they don't exist in the database: ${nonExistentRollnos.join(', ')}`;
-                res.status(422).json({ message }); // Changed from 400 to 422 Unprocessable Entity
+                res.status(422).json({ message });
                 return;
             }
         }
-        let buffer = null;
+        let posterPath = null;
         if (req.file) {
-            buffer = req.file.buffer;
+            try {
+                const uploadDir = 'uploads/posters';
+                await fs.ensureDir(uploadDir);
+                const fileExtension = req.file.originalname.split('.').pop() || req.file.mimetype.split('/').pop() || 'unknown';
+                const fileName = `${EventDetails.name.replace(/\s+/g, '-').trim()+EventDetails.date}.${fileExtension.trim().toLowerCase()}`;
+                const fullPath = path.join(uploadDir, fileName);
+                await fs.writeFile(fullPath, req.file.buffer);
+                posterPath = `${uploadDir}/${fileName}`;
+            } catch (error) {
+                console.error("Error saving poster file:", error);
+                res.status(500).json({
+                    message: "Failed to save poster image. Event not created."
+                });
+                return;
+            }
         }
         const event = await prisma.events.create({
             data: {
@@ -141,7 +157,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
                 event_category: EventDetails.event_category,
                 min_no_member: EventDetails.min_no_member,
                 max_no_member: EventDetails.max_no_member,
-                poster: buffer,
+                poster: posterPath,
                 chief_guest: EventDetails.chief_guest || null,
                 exp_expense: EventDetails.exp_expense || null,
                 tot_amt_allot_su: EventDetails.tot_amt_allot_su || null,
@@ -206,7 +222,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
 
             if (nonMembers.length > 0) {
                 const message = `Event created successfully, but the following users could not be added as convenors because they are not members of the club: ${nonMembers.join(', ')}`;
-                res.status(207).json({ message }); // Changed from 201 to 207 Multi-Status
+                res.status(207).json({ message });
                 return;
             }
         }
@@ -225,8 +241,7 @@ const createEventController = async (req: Request, res: Response): Promise<void>
 
 const getPastEventsByClubController = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { club_id } = req.query;
-      console.log("club_id from query:", req.query.club_id);
+      const club_id = req.admin_club_id
 
       if (!club_id) {
         res.status(400).json({ message: "Club ID is required." });
@@ -448,7 +463,7 @@ const addClubmembers = async (req: Request, res: Response): Promise<void> => {
 
         // If there were only successful additions
         if (successCount > 0 && errorDetails.length === 0) {
-            res.status(200).json({
+            res.status(201).json({
                 message: "Members added successfully"
             });
             return;
@@ -456,7 +471,7 @@ const addClubmembers = async (req: Request, res: Response): Promise<void> => {
 
         // If there were errors but also some successes
         if (successCount > 0 && errorDetails.length > 0) {
-            res.status(200).json({
+            res.status(207).json({
                 message: `${successCount} members added successfully, but some issues were encountered`,
                 errors: errorDetails
             });
@@ -465,14 +480,14 @@ const addClubmembers = async (req: Request, res: Response): Promise<void> => {
 
         // If there were only errors
         if (successCount === 0 && errorDetails.length > 0) {
-            res.status(400).json({
+            res.status(422).json({
                 message: "Failed to add members",
                 errors: errorDetails
             });
             return;
         }
 
-        res.status(200).json({
+        res.status(204).json({
             message: "No action taken"
         });
         return;
@@ -487,42 +502,42 @@ const addClubmembers = async (req: Request, res: Response): Promise<void> => {
 
 const getEventDetails = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { type } = req.query; 
+        const { type } = req.query;
         const club_id = req.admin_club_id;
-        
+
         if (!club_id) {
             res.status(400).json({ message: "Club ID is required" });
             return;
         }
-        
-        if (!type || !['ongoing', 'past', 'upcoming'].includes(type as string)) {
+
+        if (!type || !['ongoing', 'past', 'upcoming', 'present'].includes(type as string)) {
             res.status(400).json({ message: "Invalid event type. Type must be one of: ongoing, past, upcoming, present" });
             return;
         }
-        
+
         const today = new Date();
         const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const tomorrowOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
-        
+
         let dateFilter = {};
         let eventType = type as string;
-        
-       
+
+
         if (eventType === 'present') {
             eventType = 'ongoing';
         }
-        
+
         if (eventType === 'past') {
             dateFilter = { lt: todayOnly };
         } else if (eventType === 'ongoing') {
-            dateFilter = { 
+            dateFilter = {
                 gte: todayOnly,
                 lt: tomorrowOnly
             };
         } else if (eventType === 'upcoming') {
             dateFilter = { gte: tomorrowOnly };
         }
-        
+
         const events = await prisma.events.findMany({
             where: {
                 date: dateFilter,
@@ -533,37 +548,43 @@ const getEventDetails = async (req: Request, res: Response): Promise<void> => {
                 }
             },
             select: {
+                id: true,
                 name: true,
                 about: true,
                 date: true,
                 venue: true,
                 event_type: true,
-                event_category: true
+                event_category: true,
+                min_no_member:true,
+                max_no_member:true
             }
         });
-        
+
         let sortedEvents = [...events];
         if (eventType === 'past') {
             sortedEvents.sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
         } else {
             sortedEvents.sort((a, b) => (a.date?.getTime() || 0) - (b.date?.getTime() || 0));
         }
-        
+
         const response: EventDetailsResponse = {
             message: `${eventType} events fetched successfully for your club`,
             data: sortedEvents
         };
-        
+
         res.status(200).json(response);
-        
+
     } catch (error) {
         console.error(`Error fetching ${req.query.type} events:`, error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: `Error fetching events`,
             error: error
         });
     }
 };
+
+
+ 
 
 export  {
     putAttendance,
@@ -571,5 +592,5 @@ export  {
     getPastEventsByClubController,
     fetchProfile,
     addClubmembers,
-    getEventDetails
+    getEventDetails,
 };
