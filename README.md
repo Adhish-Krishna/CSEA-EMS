@@ -160,16 +160,16 @@ Trigger setup for DB - Karthi
 | /auth/user/reset-password | POST   | -       | Adhish         | **✅**   |
 | /auth/club/login          | POST   | -       | Adhish         | **✅**   |
 | /auth/club/logout         | POST   | -       | Adhish         | **✅**   |
-| /auth/global/login        | POST   | -       | SU rya Prakash | **✅**   |
-| /auth/global/logout       | POST   | -       | SU rya Prakash | **✅**   |
-| /auth/global/signup       | POST   | -       | SU rya Prakash | **✅**   |
+| /auth/global/login        | POST   | -       | Surya Prakash | **✅**   |
+| /auth/global/logout       | POST   | -       | Surya Prakash | **✅**   |
+| /auth/global/signup       | POST   | -       | Surya Prakash | **✅**   |
 
 ## Admin Routes
 
 | Endpoint                        | Method | Purpose                               | To be done By  | Progress |
 | ------------------------------- | ------ | ------------------------------------- | -------------- | -------- |
-| /admin/create-event             | POST   | Admin creating a event                | SU rya Prakash | **✅**   |
-| /admin/events-history?club_id=1 | GET    | Fetching past events history by admin | SU rya Prakash | **✅**   |
+| /admin/create-event             | POST   | Admin creating a event                | Surya Prakash | **✅**   |
+| /admin/events-history?club_id=1 | GET    | Fetching past events history by admin | Surya Prakash | **✅**   |
 | /admin/add-members | POST   | Adding club members by admin | Surya Prakash | **✅**   |
 
 ## Event Routes
@@ -199,6 +199,6 @@ Trigger setup for DB - Karthi
 
 | Endpoint           | Method | Purpose | To be done by | progress |
 | ------------------ | ------ | ------- | ------------- | -------- |
-| /global/createclub | POST   | -       | Suryaprakash      |    **✅**      |
-| /global/addadmin   | POST   | -       | Suryaprakash       |      **✅**    |
+| /global/createclub | POST   | -       | Surya Prakash      |    **✅**      |
+| /global/addadmin   | POST   | -       | Surya Prakash       |      **✅**    |
 
