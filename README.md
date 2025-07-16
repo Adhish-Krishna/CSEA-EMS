@@ -4,7 +4,7 @@
 
 ## Overview
 
-Daddy-EMS is a comprehensive event management system designed to simplify the process of planning, organizing, and managing events. This system provides the tools you need to handle registrations, scheduling, attendee management, and more.
+CSEA-EMS is a comprehensive event management system designed to simplify the process of planning, organizing, and managing events. This system provides the tools you need to handle registrations, scheduling, attendee management, and more.
 
 ## Prerequisites
 
@@ -17,8 +17,8 @@ Daddy-EMS is a comprehensive event management system designed to simplify the pr
 1. Clone the repository
    
    ```bash
-   git clone https://github.com/Adhish-Krishna/Daddy-EMS.git
-   cd Daddy-EMS
+   git clone https://github.com/Adhish-Krishna/CSEA-EMS.git
+   cd CSEA-EMS
    ```
 2. Install dependencies
    
