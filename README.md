@@ -1,4 +1,4 @@
-# **Daddy - EMS**
+# **CSEA - EMS**
 
 > The Event Management System - Streamline your event planning and management
 
