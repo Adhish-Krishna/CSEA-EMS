@@ -1,10 +1,10 @@
-# **Daddy - EMS**
+# **CSEA - EMS**
 
 > The Event Management System - Streamline your event planning and management
 
 ## Overview
 
-Daddy-EMS is a comprehensive event management system designed to simplify the process of planning, organizing, and managing events. This system provides the tools you need to handle registrations, scheduling, attendee management, and more.
+CSEA-EMS is a comprehensive event management system designed to simplify the process of planning, organizing, and managing events. This system provides the tools you need to handle registrations, scheduling, attendee management, and more.
 
 ## Prerequisites
 
@@ -17,8 +17,8 @@ Daddy-EMS is a comprehensive event management system designed to simplify the pr
 1. Clone the repository
    
    ```bash
-   git clone https://github.com/Adhish-Krishna/Daddy-EMS.git
-   cd Daddy-EMS
+   git clone https://github.com/Adhish-Krishna/CSEA-EMS.git
+   cd CSEA-EMS
    ```
 2. Install dependencies
    
@@ -160,16 +160,16 @@ Trigger setup for DB - Karthi
 | /auth/user/reset-password | POST   | -       | Adhish         | **✅**   |
 | /auth/club/login          | POST   | -       | Adhish         | **✅**   |
 | /auth/club/logout         | POST   | -       | Adhish         | **✅**   |
-| /auth/global/login        | POST   | -       | SU rya Prakash | **✅**   |
-| /auth/global/logout       | POST   | -       | SU rya Prakash | **✅**   |
-| /auth/global/signup       | POST   | -       | SU rya Prakash | **✅**   |
+| /auth/global/login        | POST   | -       | Surya Prakash | **✅**   |
+| /auth/global/logout       | POST   | -       | Surya Prakash | **✅**   |
+| /auth/global/signup       | POST   | -       | Surya Prakash | **✅**   |
 
 ## Admin Routes
 
 | Endpoint                        | Method | Purpose                               | To be done By  | Progress |
 | ------------------------------- | ------ | ------------------------------------- | -------------- | -------- |
-| /admin/create-event             | POST   | Admin creating a event                | SU rya Prakash | **✅**   |
-| /admin/events-history?club_id=1 | GET    | Fetching past events history by admin | SU rya Prakash | **✅**   |
+| /admin/create-event             | POST   | Admin creating a event                | Surya Prakash | **✅**   |
+| /admin/events-history?club_id=1 | GET    | Fetching past events history by admin | Surya Prakash | **✅**   |
 | /admin/add-members | POST   | Adding club members by admin | Surya Prakash | **✅**   |
 
 ## Event Routes
@@ -182,7 +182,7 @@ Trigger setup for DB - Karthi
 | /event/removePlaceHolders/:eventId | POST   | Providing the details of winners and runners by club admin of particular event | Pravith       | **✅**   |
 | /event/attendance                  | POST   | Marking attendance for particular event by                                     | Darshan       | **✅**   |
 | /event/register                    | POST   | User registering for a event                                                   | Darshan       | **✅**   |
-| /event/teamInvite/:eventId         | POST   | User requesting other users to be in their team                                | Karthi        |          |
+| /event/teamInvite/:eventId         | POST   | User requesting other users to be in their team                                | Karthi        | **✅**   |
 | /event/acceptTeamInvite/:eventId   | POST   | User accepting the other user's team invite                                    | Pravith       | **✅**   |
 
 ## User Routes
@@ -190,7 +190,7 @@ Trigger setup for DB - Karthi
 | Endpoint               | Method | Purpose                     | To be done by | progress |
 | ---------------------- | ------ | --------------------------- | ------------- | -------- |
 | /user/profile          | GET    | Fetching user details       | Darshan       | **✅**   |
-| /user/registeredEvents | GET    | Fetching Registered Events  | Karthi        |          |
+| /user/registeredEvents | GET    | Fetching Registered Events  | Karthi        | **✅**   |
 | /user/membership       | GET    | Fetching membership details | Pravith       | **✅**   |
 | /user/invitations      | GET    | Fetching current Invitation | Darshan       | **✅**   |
 | /user/feedback/        | POST   | Feedback submission by user | Adhish        | **✅**   |
@@ -199,6 +199,6 @@ Trigger setup for DB - Karthi
 
 | Endpoint           | Method | Purpose | To be done by | progress |
 | ------------------ | ------ | ------- | ------------- | -------- |
-| /global/createclub | POST   | -       | Suryaprakash      |    **✅**      |
-| /global/addadmin   | POST   | -       | Suryaprakash       |      **✅**    |
+| /global/createclub | POST   | -       | Surya Prakash      |    **✅**      |
+| /global/addadmin   | POST   | -       | Surya Prakash       |      **✅**    |
 

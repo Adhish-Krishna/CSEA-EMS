@@ -126,7 +126,7 @@ const getEventDetails = async (req: Request, res: Response): Promise<void> =>{
             convernorDetails.map((c)=>{
                 convenor.push(c.users.rollno!);
             });
-            res.status(200).json({
+            res.status(200).json({ message:"Fetched Event detials successfully",data:{
                 name: eventRecord.name,
                 date: eventRecord.date,
                 venue: eventRecord.venue,
@@ -142,9 +142,8 @@ const getEventDetails = async (req: Request, res: Response): Promise<void> =>{
                 faculty_obs_desig: eventRecord.faculty_obs_desig,
                 min_no_member: eventRecord.min_no_member,
                 max_no_member: eventRecord.max_no_member,
-                eventConvenors: convernorDetails?convenor:[],
-                poster: null
-            });
+                eventConvenors: convernorDetails?convenor:[]
+        }});
             return;
         }
     }catch(err){
@@ -215,28 +214,30 @@ const getAllRegistrations = async (req: Request, res: Response): Promise<void> =
             return;
         }
         const registrations = await prisma.eventregistration.findMany({
-            where:{
-                event_id: eventId
+            where: {
+              event_id: eventId,
             },
-            include:{
-                teams: {
-                    include:{
-                        teammembers: {
-                            include:{
-                                users:{
-                                    select:{
-                                        name: true,
-                                        rollno: true,
-                                        department: true,
-                                        yearofstudy: true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
+            include: {
+              teams: {
+                include: {
+                  teammembers: {
+                    select: {
+                      is_present: true,
+                      users: {
+                        select: {
+                          name: true,
+                          rollno: true,
+                          department: true,
+                          yearofstudy: true,
+                          id: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          });
         if(registrations.length == 0){
             res.status(301).json({
                 message: "No registrations for this event"
@@ -249,7 +250,9 @@ const getAllRegistrations = async (req: Request, res: Response): Promise<void> =
                 {
                     team_id: registration.team_id,
                     team_name: registration.teams.name,
-                    members: registration.teams.teammembers.map((teammember)=>teammember.users)
+                    members: registration.teams.teammembers.map((teammember)=>(
+                        { ...teammember.users , is_present: teammember.is_present, }
+                    ))
                 }
             )
         });
@@ -266,4 +269,62 @@ const getAllRegistrations = async (req: Request, res: Response): Promise<void> =
     }
 }
 
-export {updateEventcontroller,AddingWinnerController,removeWinnerController, getEventDetails, getEventPoster, getAllRegistrations};
+const getFeedback = async(req:Request,res:Response) => {
+    try {
+        const {event_id} = req.params;
+        const event = await prisma.events.findUnique({
+            where:{ id : Number(event_id) }
+        })
+        if(!event) { res.status(404).json({message:`Event with ${event_id} is not Found`});return; }
+        const rawfeedback = await prisma.feedback.findMany({
+            where:{event_id : Number(event_id)},
+            include:{
+                users: true
+            }
+        })
+
+        const feedbacks = rawfeedback.map(feedback => ({
+            ...feedback,
+            users: {
+              ...feedback.users,
+              password: undefined,
+              phoneno:undefined
+            },
+          }));
+        res.status(200).json({message:"Fetched feedback successfully",data:feedbacks})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:"Error While fetching Feedback"})
+    }
+}
+
+const getWinners = async(req:Request,res:Response) => {
+    try {
+        const {event_id} = req.params;
+        const event = await prisma.events.findUnique({
+            where:{ id : Number(event_id) }
+        })
+        if(!event) { res.status(404).json({message:`Event with ${event_id} is not Found`});return; }
+        const Winners = await prisma.eventwinners.findMany({
+            where: { event_id : Number(event_id) },
+            include: {
+                teams : { include : { teammembers : { include : {
+                    users : { select : {
+                        id : true,name:true,email:true,
+                        rollno: true,department:true,
+                        yearofstudy: true
+                    } }
+                } } } }
+            }
+        })
+
+        res.status(200).json({message:"Winner fetched Successfully",data:Winners})
+
+    } catch (error) {
+        res.status(500).json({message:"Winner fetched failed"})
+    }
+}
+
+export {updateEventcontroller,AddingWinnerController,removeWinnerController, getEventDetails, getEventPoster, getAllRegistrations,
+    getFeedback,getWinners
+};

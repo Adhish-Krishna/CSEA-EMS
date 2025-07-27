@@ -1,6 +1,7 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
 import {Feedback, TeamInvite, EventRegistration, ClubMember, Club, MembershipDetails, Invite, EventListItem, EventsResponse} from './types.js';
+import { sendInvitation } from '../../mailer/sendMail.js';
 
 const RegisterController = async(req : Request,res:Response): Promise<void> =>{
     try{    
@@ -71,6 +72,66 @@ const RegisterController = async(req : Request,res:Response): Promise<void> =>{
     }catch(error){
         console.error('Error registering for event:', error);
         res.status(500).json({ message: 'Failed to register for event' });
+    }
+}
+
+const sendTeamInvitation = async(req:Request,res:Response):Promise<void> => {
+    try {
+        const invite:TeamInvite = req.body;
+        if(!invite.from_team_id || !invite.to_user_id || ! invite.event_id)
+            { res.status(404).json({message:'The Required Detials are not found'});return; 
+        }
+        const event = await prisma.events.findUnique({
+            where : { id : Number(invite.event_id) }
+        })
+
+        if(!event) { res.status(404).json({message:'Event not found'});return; }
+        const team = await prisma.teams.findUnique({
+            where: { id:Number(invite.from_team_id) },
+        })
+        if(!team) { res.status(404).json({message:"Team not found"});return; }
+        const user = await prisma.users.findUnique({
+            where: { id : Number(invite.to_user_id) }
+        })
+        if(!user || !user.email) { res.status(404).json({message:"User not found"});return; }
+
+        const teamember = await prisma.teammembers.findMany({
+            where: { team_id: invite.from_team_id, user_id : req.user_id }
+        })
+
+        if(teamember.length === 0) { res.status(400).json({message: "You are not part of this team"});return; }
+
+        const currentMembers = await prisma.teammembers.count({
+            where:{
+                team_id:Number(invite.from_team_id),
+                event_id:Number(invite.event_id)
+            }
+        });
+
+        if(event.max_no_member <= currentMembers) { res.status(400).json({message:"Team already has max no of people"});return; }
+        
+        const invitation = await prisma.invitation.create({
+            data: {
+                ...invite,from_user_id:req.user_id
+            }
+        })
+        const from_user = await prisma.users.findUnique({
+            where: { id: req.user_id }
+        })
+        if (!from_user || !from_user.name || !from_user.email) {
+            res.status(400).json({ message: "Inviter user details are incomplete" });
+            return;
+        }
+
+        sendInvitation({to : user?.email , user_name : from_user?.name , 
+            user_email : from_user?.email , event_name : event?.name ,
+            team_name : team.name || ''  })
+        
+
+        res.status(201).json({message:"Team inviatate has been sent"})
+
+    } catch (error) {
+        res.status(500).json({message:"Error has occured while sending team invitation"})
     }
 }
 
@@ -214,6 +275,15 @@ const feedbackController = async (req: Request, res: Response): Promise<void> =>
     try{
         const userFeedback: Feedback = req.body;
         const user_id = req.user_id;
+        const team = await prisma.teammembers.findMany({
+            where:{user_id : req.user_id , event_id : userFeedback.event_id}
+        })
+
+        if(team.length <= 0) {
+            res.status(404).json({message: "You have not registered for this event"});
+            return;
+        }
+
         const feedbackdata = await prisma.feedback.create({
             data:{
                 user_id: user_id,
@@ -597,6 +667,76 @@ const getUpcomingEventsController = async (req: Request, res: Response): Promise
     }
 };
 
+
+const getRegisteredEvents = async(req:Request,res:Response) => {
+    try{
+        const user_id = req.user_id;
+        const registrations = await prisma.teammembers.findMany({
+            where: { user_id : user_id },
+            include:{
+                events: {
+                    select:{
+                        id:true,
+                        name:true,
+                        about:true,
+                        date:true,
+                        event_type:true,
+                        venue:true,
+                        event_category:true,
+                        chief_guest:true,
+                        max_no_member:true,
+                        min_no_member:true,
+                    }
+                },
+                teams: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        })
+        const result = await Promise.all(registrations.map(async (reg) => {
+            const members = await prisma.teammembers.findMany({
+                where: { team_id: reg.team_id },
+                include: {
+                    users: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            rollno: true,
+                            department: true,
+                            yearofstudy: true
+                        }
+                    }
+                }
+            });
+        
+            return {
+                team_id: reg.team_id,
+                team_name: reg.teams?.name || null,
+                event: reg.events,
+                members: members.map(m => ({
+                    id: m.users.id,
+                    name: m.users.name,
+                    email: m.users.email,
+                    rollno: m.users.rollno,
+                    department: m.users.department,
+                    yearofstudy: m.users.yearofstudy
+                }))
+            };
+        }));
+        res.status(200).json({message:"Registered Events fetched successfully",data:result})
+    }catch(error){
+        res.status(500).json({
+            message: "Error fetching registered  events",
+            error: error
+        });
+        return;
+    }
+} 
+
 export {
     RegisterController,
     fetchMembersController,
@@ -607,5 +747,7 @@ export {
     fetchProfile,
     getPastEventsController,
     getOngoingEventsController,
-    getUpcomingEventsController
+    getUpcomingEventsController,
+    sendTeamInvitation,
+    getRegisteredEvents
 };
