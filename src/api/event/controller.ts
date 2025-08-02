@@ -140,7 +140,15 @@ const updateEventcontroller = async (req: Request, res: Response): Promise<void>
                     res.status(207).json({ message });
                     return;
                 }
+            } else {
+                // If empty array, remove all convenors
+                    res.status(400).json({ 
+                        message: "Cannot remove all convenors. An event must have at least one convenor." 
+                    });
+                    return;
+
             }
+
             // Remove eventConvenors from updates object since we handled it separately
             delete updates.eventConvenors;
         }
