@@ -5,7 +5,7 @@ import { adminAuthMiddleware } from '../../middleware/authMiddleware.js';
 const eventRouter = Router();
 
 
-eventRouter.put('/:id', adminAuthMiddleware, updateEventcontroller);
+
 eventRouter.post('/addWinners', adminAuthMiddleware, AddingWinnerController);
 eventRouter.post('/removeWinners', adminAuthMiddleware, removeWinnerController);
 eventRouter.get('/eventdetails',getEventDetails);
@@ -14,6 +14,7 @@ eventRouter.get('/allregistration',  adminAuthMiddleware, getAllRegistrations);
 
 eventRouter.get('/winners/:event_id', adminAuthMiddleware, getWinners)
 eventRouter.get('/feedback/:event_id', adminAuthMiddleware, getFeedback)
+eventRouter.put('/:id', adminAuthMiddleware, updateEventcontroller);
 export default eventRouter;
 
 
