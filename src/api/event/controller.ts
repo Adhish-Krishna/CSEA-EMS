@@ -379,8 +379,8 @@ const getEventPoster = async (req: Request, res: Response): Promise<void> =>{
 
 const getAllRegistrations = async (req: Request, res: Response): Promise<void> =>{
     try{
-        const eventId = parseInt(<any>req.query.id);
-        if(isNaN(eventId)){
+        const eventId = Number(req.params.event_id) || null;
+        if(!eventId){
             res.status(400).json({
                 message: "Invalid Event Id"
             });

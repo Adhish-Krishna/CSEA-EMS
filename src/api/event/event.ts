@@ -10,7 +10,7 @@ eventRouter.post('/addWinners', adminAuthMiddleware, AddingWinnerController);
 eventRouter.post('/removeWinners', adminAuthMiddleware, removeWinnerController);
 eventRouter.get('/eventdetails',getEventDetails);
 eventRouter.get('/eventposter', getEventPoster);
-eventRouter.get('/allregistration',  adminAuthMiddleware, getAllRegistrations);
+eventRouter.get('/allregistration/:event_id',  adminAuthMiddleware, getAllRegistrations);
 
 eventRouter.get('/winners/:event_id', adminAuthMiddleware, getWinners)
 eventRouter.get('/feedback/:event_id', adminAuthMiddleware, getFeedback)
