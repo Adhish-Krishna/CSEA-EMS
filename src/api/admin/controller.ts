@@ -9,7 +9,10 @@ import {
     PastEventsResponse,
     PrismaEvent,
     ClubMembers,
-    EventDetailsResponse
+    EventDetailsResponse,
+    ClubMemberDTO,
+    GetClubMembersResponse,
+    RemoveClubMemberResponse
 } from "./types.js";
 
 const putAttendance = async (req:Request,res:Response) : Promise<void>=>{
@@ -584,7 +587,182 @@ const getEventDetails = async (req: Request, res: Response): Promise<void> => {
 };
 
 
- 
+const getclubmembers = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const club_id = req.admin_club_id;
+        if (!club_id) {
+            res.status(400).json({ message: "Club ID is required" });
+            return;
+        }
+        const members = await prisma.clubmembers.findMany({
+            where: { club_id: Number(club_id) },
+            include: {
+                users: {
+                    select: {
+                        id: true,
+                        name: true,
+                        rollno: true,
+                        department: true,
+                        yearofstudy: true
+                    }
+                }
+            }
+        });
+        if (members.length === 0) {
+            res.status(404).json({ message: "No members found for this club" });
+            return;
+        }
+        const formattedMembers: ClubMemberDTO[] = members.map(member => ({
+            id: member.users.id,
+            name: member.users.name,
+            rollno: member.users.rollno,
+            department: member.users.department,
+            yearofstudy: member.users.yearofstudy,
+            role: member.role || "Member"
+        }));
+        const response: GetClubMembersResponse = {
+            message: "Club members fetched successfully",
+            data: formattedMembers
+        };
+        res.status(200).json(response);
+        return
+
+    } catch (error) {
+        console.error("Error fetching club members:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+const removeClubMemberController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const club_id = req.admin_club_id;
+        const { rollno } = req.body ;
+
+        if (!rollno || typeof rollno !== 'string' || rollno.trim() === '') {
+            res.status(400).json({
+                message: "Roll number is required and cannot be empty"
+            });
+            return;
+        }
+
+        const normalizedRollno = rollno.toLowerCase().trim();
+
+        // Check if user exists
+        const user = await prisma.users.findUnique({
+            where: {
+                rollno: normalizedRollno
+            },
+            select: {
+                id: true,
+                rollno: true,
+                name: true
+            }
+        });
+
+        if (!user) {
+            res.status(404).json({
+                message: "User not found",
+                errors: [{
+                    rollno: rollno,
+                    status: "failed",
+                    message: "User with this roll number does not exist"
+                }]
+            });
+            return;
+        }
+
+        // Check if user is a member of this club
+        const existingClubMember = await prisma.clubmembers.findFirst({
+            where: {
+                user_id: user.id,
+                club_id: club_id
+            }
+        });
+
+        if (!existingClubMember) {
+            res.status(404).json({
+                message: "User is not a member of this club",
+                errors: [{
+                    rollno: rollno,
+                    status: "failed",
+                    message: "User is not a member of this club"
+                }]
+            });
+            return;
+        }
+
+        // Check if user is an admin of this club
+        if (existingClubMember.is_admin) {
+            res.status(403).json({
+                message: "Cannot remove club admin",
+                errors: [{
+                    rollno: rollno,
+                    status: "failed",
+                    message: "Cannot remove a club admin. Please revoke admin privileges first."
+                }]
+            });
+            return;
+        }
+        // Check if user is a convenor for any ongoing/upcoming events
+        const today = new Date();
+        const futureEvents = await prisma.eventconvenors.findMany({
+            where: {
+                user_id: user.id,
+                club_id: club_id,
+                events: {
+                    date: {
+                        gte: today
+                    }
+                }
+            },
+            include: {
+                events: {
+                    select: {
+                        name: true,
+                        date: true
+                    }
+                }
+            }
+        });
+
+        if (futureEvents.length > 0) {
+            const eventNames = futureEvents.map(e => e.events.name).join(', ');
+            res.status(409).json({
+                message: "Cannot remove member who is a convenor for upcoming events",
+                errors: [{
+                    rollno: rollno,
+                    status: "failed",
+                    message: `User is a convenor for upcoming events: ${eventNames}. Please reassign convenor roles first.`
+                }]
+            });
+            return;
+        }
+
+        // Remove the user from the club
+        await prisma.clubmembers.delete({
+            where: {
+                id: existingClubMember.id
+            }
+        });
+
+        const response: RemoveClubMemberResponse = {
+            message: `Member ${user.name || user.rollno} removed from club successfully`
+        };
+
+        res.status(200).json(response);
+
+    } catch (err) {
+        console.error("Error removing club member:", err);
+        res.status(500).json({
+            message: "Failed to remove club member",
+            errors: [{
+                rollno: req.body.rollno || "unknown",
+                status: "failed",
+                message: "Internal server error"
+            }]
+        });
+    }
+};
 
 export  {
     putAttendance,
@@ -593,4 +771,6 @@ export  {
     fetchProfile,
     addClubmembers,
     getEventDetails,
+    getclubmembers,
+    removeClubMemberController
 };

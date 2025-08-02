@@ -18,6 +18,23 @@ const RegisterController = async(req : Request,res:Response): Promise<void> =>{
             res.status(404).json({message: 'Event not found'});
             return;
         }
+        const existingRegistration = await prisma.teammembers.findFirst({
+            where: {
+                user_id: user_id,
+                event_id: event_registration.event_id
+            },
+            include: {
+                teams: true
+            }
+        });
+
+        if (existingRegistration) {
+            res.status(409).json({
+                message: 'You have already registered for this event',
+                team_name: existingRegistration.teams?.name || 'Unknown Team'
+            });
+            return;
+        }
         let teamName : string;
         if (event.min_no_member === 1 && event.max_no_member === 1) {
             const user = await prisma.users.findUnique({
@@ -39,7 +56,12 @@ const RegisterController = async(req : Request,res:Response): Promise<void> =>{
             }
             teamName = user.rollno;
         }else{
-            teamName = event_registration.teamName;
+            if (event_registration.teamName && event_registration.teamName.trim() !== '') {
+                teamName = event_registration.teamName;
+            }else{
+                res.status(400).json({message: 'Team name is required'});
+                return;
+            }
         }
         const team = await prisma.teams.create({
             data: {

@@ -48,10 +48,10 @@ const sendEmailVerificationCode = (to: string, code: string) =>{
         subject: "EMS Email Verification",
         text: `Your email verification code is: ${code}`
     }
-
+    console.log("Sending email to: ", to);
     transporter.sendMail(mailOtions, (err, info)=>{
         if(err){
-            console.log(err.message);
+            console.log("EMail " ,err.message);
         }
         else{
             console.log(info.response);

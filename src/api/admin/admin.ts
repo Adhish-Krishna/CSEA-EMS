@@ -5,7 +5,9 @@ import {
     getPastEventsByClubController,
     fetchProfile,
     addClubmembers,
-    getEventDetails
+    getEventDetails,
+    getclubmembers,
+    removeClubMemberController
 } from './controller.js';
 import multer from 'multer';
 
@@ -18,7 +20,8 @@ adminRouter.post('/attendance',putAttendance);
 adminRouter.get('/profile', fetchProfile);
 adminRouter.post('/add-members', addClubmembers);
 adminRouter.get('/events', getEventDetails); // Changed from path parameter to query parameter
-
+adminRouter.get('/getclubmembers', getclubmembers); // Assuming this is for fetching club members
+adminRouter.post('/remove-member', removeClubMemberController); // New route for removing club members
 /**
  * @swagger
  * /admin/attendance:
@@ -594,6 +597,228 @@ adminRouter.get('/events', getEventDetails); // Changed from path parameter to q
  *                 error:
  *                   type: object
  *                   description: Error object from the server
+ */
+
+/**
+ * @swagger
+ * /admin/getclubmembers:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Get all members of the admin's club
+ *     description: Retrieves a list of all members belonging to the authenticated admin's club with their details
+ *     responses:
+ *       200:
+ *         description: Club members fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Club members fetched successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       name:
+ *                         type: string
+ *                         example: "John Doe"
+ *                       rollno:
+ *                         type: string
+ *                         example: "21cs001"
+ *                       department:
+ *                         type: string
+ *                         example: "Computer Science"
+ *                       yearofstudy:
+ *                         type: integer
+ *                         example: 3
+ *                       role:
+ *                         type: string
+ *                         example: "Member"
+ *       400:
+ *         description: Bad request - Club ID is required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Club ID is required"
+ *       404:
+ *         description: No members found for this club
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No members found for this club"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     RemoveClubMemberRequest:
+ *       type: object
+ *       required:
+ *         - rollno
+ *       properties:
+ *         rollno:
+ *           type: string
+ *           description: Roll number of the member to remove
+ *           example: "21cs001"
+ */
+
+/**
+ * @swagger
+ * /admin/remove-member:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Remove a member from the admin's club
+ *     description: Removes a member from the authenticated admin's club by roll number. Prevents removal of admins and members who are convenors for upcoming events
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RemoveClubMemberRequest'
+ *           example:
+ *             rollno: "21cs001"
+ *     responses:
+ *       200:
+ *         description: Member removed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Member John Doe removed from club successfully"
+ *       400:
+ *         description: Bad request - Roll number is required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Roll number is required and cannot be empty"
+ *       403:
+ *         description: Forbidden - Cannot remove club admin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Cannot remove club admin"
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       rollno:
+ *                         type: string
+ *                         example: "21cs001"
+ *                       status:
+ *                         type: string
+ *                         example: "failed"
+ *                       message:
+ *                         type: string
+ *                         example: "Cannot remove a club admin. Please revoke admin privileges first."
+ *       404:
+ *         description: User not found or not a member of this club
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User is not a member of this club"
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       rollno:
+ *                         type: string
+ *                         example: "21cs001"
+ *                       status:
+ *                         type: string
+ *                         example: "failed"
+ *                       message:
+ *                         type: string
+ *                         example: "User is not a member of this club"
+ *       409:
+ *         description: Conflict - Cannot remove member who is a convenor for upcoming events
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Cannot remove member who is a convenor for upcoming events"
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       rollno:
+ *                         type: string
+ *                         example: "21cs001"
+ *                       status:
+ *                         type: string
+ *                         example: "failed"
+ *                       message:
+ *                         type: string
+ *                         example: "User is a convenor for upcoming events: Sports Meet 2024. Please reassign convenor roles first."
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to remove club member"
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       rollno:
+ *                         type: string
+ *                         example: "21cs001"
+ *                       status:
+ *                         type: string
+ *                         example: "failed"
+ *                       message:
+ *                         type: string
+ *                         example: "Internal server error"
  */
 
 export default adminRouter;
