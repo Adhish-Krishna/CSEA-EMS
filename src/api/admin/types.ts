@@ -17,6 +17,27 @@ export interface CreateEventDTO {
     faculty_obs_desig: string | null;
     faculty_obs_dept: string | null;
 }
+// Add this to your types.ts file
+export interface ClubMemberDTO {
+    id: number;
+    name: string | null;
+    rollno: string | null;
+    department: string | null;
+    yearofstudy: number | null;
+    role: string;
+}
+export interface RemoveClubMemberResponse {
+    message: string;
+    errors?: Array<{
+        rollno: string;
+        status: string;
+        message: string;
+    }>;
+}
+export interface GetClubMembersResponse {
+    message: string;
+    data: ClubMemberDTO[];
+}
 
 export interface Attendance {
     user_id : number,
