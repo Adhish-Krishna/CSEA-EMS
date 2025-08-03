@@ -11,7 +11,8 @@ import {
     getOngoingEventsController,
     sendTeamInvitation,
     getUpcomingEventsController,
-    getRegisteredEvents
+    getRegisteredEvents,
+    updateProfile
 } from './controller.js';
 import { userAuthMiddleware } from '../../middleware/authMiddleware.js';
 
@@ -24,6 +25,7 @@ userRouter.get('/membershipDetails', userAuthMiddleware, fetchMembersController)
 userRouter.post('/rejectTeamInvite', userAuthMiddleware, rejectTeamInviteController);
 userRouter.get('/fetch/invitations', userAuthMiddleware, fetchInvitations);
 userRouter.get('/fetch/profile', userAuthMiddleware, fetchProfile);
+userRouter.post('/update/profile', userAuthMiddleware, updateProfile);
 userRouter.get('/registeredevents',userAuthMiddleware, getRegisteredEvents)
 userRouter.post('/feedback', userAuthMiddleware, feedbackController);
 
@@ -611,7 +613,7 @@ export default userRouter;
 
 /**
  * @swagger
- * /user/registrations:
+ * /user/registeredevents:
  *   get:
  *     tags: [User]
  *     summary: Get all events the user has registered for

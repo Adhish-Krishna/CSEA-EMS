@@ -401,4 +401,19 @@ const generateEmailCodeController = async (req: Request, res: Response): Promise
     }
 }
 
-export {signupController, loginController, logoutController, generateSecurityCodeController, verifySecurityCodeController, resetpasswordController, getNewAccessTokenController, generateEmailCodeController};
+const checkStatus = (req: Request, res: Response): void => {
+    res.status(200).json({
+        message: "User is authenticated"
+    });
+}
+
+export {signupController, 
+    loginController, 
+    logoutController, 
+    generateSecurityCodeController, 
+    verifySecurityCodeController, 
+    resetpasswordController, 
+    getNewAccessTokenController, 
+    generateEmailCodeController,
+    checkStatus
+};

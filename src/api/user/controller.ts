@@ -1,6 +1,6 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
-import {Feedback, TeamInvite, EventRegistration, ClubMember, Club, MembershipDetails, Invite, EventListItem, EventsResponse} from './types.js';
+import {Feedback, TeamInvite, EventRegistration, ClubMember, Club, MembershipDetails, Invite, EventListItem, EventsResponse, UpdateProfileRequest,UpdateProfileResponse } from './types.js';
 import { sendInvitation } from '../../mailer/sendMail.js';
 
 const RegisterController = async(req : Request,res:Response): Promise<void> =>{
@@ -96,6 +96,88 @@ const RegisterController = async(req : Request,res:Response): Promise<void> =>{
         res.status(500).json({ message: 'Failed to register for event' });
     }
 }
+
+const updateProfile = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user_id = req.user_id;
+        const updates: UpdateProfileRequest = req.body;
+
+        // Validate that user exists
+        const existingUser = await prisma.users.findUnique({
+            where: { id: user_id },
+            select: { id: true }
+        });
+
+        if (!existingUser) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+
+        // Prepare data for updating (exclude rollno and any undefined values)
+        const dataToUpdate: any = {};
+        
+        if (updates.name !== undefined) {
+            dataToUpdate.name = updates.name;
+        }
+        if (updates.department !== undefined) {
+            dataToUpdate.department = updates.department;
+        }
+        if (updates.email !== undefined) {
+            dataToUpdate.email = updates.email;
+        }
+        if (updates.phoneno !== undefined) {
+            dataToUpdate.phoneno = updates.phoneno;
+        }
+        if (updates.yearofstudy !== undefined) {
+            dataToUpdate.yearofstudy = Number(updates.yearofstudy);
+        }
+
+        if (Object.keys(dataToUpdate).length === 0) {
+            res.status(400).json({ message: "No valid fields provided for update" });
+            return;
+        }
+
+        await prisma.users.update({
+            where: { id: user_id },
+            data: dataToUpdate
+        });
+        const updatedProfile = await prisma.users.findUnique({
+            where: { id: user_id },
+            select: {
+                name: true,
+                rollno: true,
+                department: true,
+                email: true,
+                phoneno: true,
+                yearofstudy: true
+            }
+        });
+
+        if (!updatedProfile) {
+            res.status(404).json({ message: "User not found after update" });
+            return;
+        }
+        const serializedProfile = JSON.parse(JSON.stringify(updatedProfile, (key, value) => 
+            typeof value === 'bigint' ? value.toString() : value
+        ));
+
+        const response: UpdateProfileResponse = {
+            message: "User profile updated successfully",
+            profile: serializedProfile
+        };
+
+        res.status(200).json(response);
+        return;
+
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+        res.status(500).json({
+            message: "Error while updating user profile",
+            error: error instanceof Error ? error.message : String(error)
+        });
+        return;
+    }
+};
 
 const sendTeamInvitation = async(req:Request,res:Response):Promise<void> => {
     try {
@@ -771,5 +853,6 @@ export {
     getOngoingEventsController,
     getUpcomingEventsController,
     sendTeamInvitation,
-    getRegisteredEvents
+    getRegisteredEvents,
+    updateProfile
 };

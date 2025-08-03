@@ -1,5 +1,16 @@
 import { Router} from 'express';
-import { loginController, signupController, logoutController, generateSecurityCodeController, verifySecurityCodeController, resetpasswordController, getNewAccessTokenController, generateEmailCodeController} from './controller.js';
+import { loginController,
+    signupController,
+    logoutController,
+    generateSecurityCodeController,
+    verifySecurityCodeController,
+    resetpasswordController,
+    getNewAccessTokenController,
+    generateEmailCodeController,
+    checkStatus
+} from './controller.js';
+
+import { userAuthMiddleware } from '../../../middleware/authMiddleware.js';
 
 const userAuthRouter = Router();
 
@@ -395,5 +406,5 @@ userAuthRouter.get('/getnewaccesstoken', getNewAccessTokenController);
  *         description: Server error
  */
 userAuthRouter.post('/generateemailcode', generateEmailCodeController);
-
+userAuthRouter.get('/status', userAuthMiddleware,checkStatus);
 export default userAuthRouter;
