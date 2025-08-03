@@ -9,6 +9,25 @@ export interface Feedback{
     feedback: string;
     rating: number;
 }
+export interface UpdateProfileRequest {
+    name?: string;
+    department?: string;
+    email?: string;
+    phoneno?: string;
+    yearofstudy?: number;
+}
+
+export interface UpdateProfileResponse {
+    message: string;
+    profile?: {
+        name: string | null;
+        rollno: string | null;
+        department: string | null;
+        email: string | null;
+        phoneno: string | null;
+        yearofstudy: number | null;
+    };
+}
 
 export interface EventRegistration {
     event_id: number;

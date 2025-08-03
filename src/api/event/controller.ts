@@ -412,7 +412,7 @@ const getAllRegistrations = async (req: Request, res: Response): Promise<void> =
             },
           });
         if(registrations.length == 0){
-            res.status(301).json({
+            res.status(200).json({
                 message: "No registrations for this event"
             });
             return;
