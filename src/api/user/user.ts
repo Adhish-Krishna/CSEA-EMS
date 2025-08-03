@@ -613,7 +613,7 @@ export default userRouter;
 
 /**
  * @swagger
- * /user/registrations:
+ * /user/registeredevents:
  *   get:
  *     tags: [User]
  *     summary: Get all events the user has registered for
