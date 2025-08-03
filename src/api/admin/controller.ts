@@ -12,7 +12,8 @@ import {
     EventDetailsResponse,
     ClubMemberDTO,
     GetClubMembersResponse,
-    RemoveClubMemberResponse
+    RemoveClubMemberResponse,
+    UpdateEventPosterResponse
 } from "./types.js";
 
 const putAttendance = async (req:Request,res:Response) : Promise<void>=>{
@@ -764,6 +765,106 @@ const removeClubMemberController = async (req: Request, res: Response): Promise<
     }
 };
 
+const updateEventPosterController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const eventId = Number(req.params.id);
+        const club_id = req.admin_club_id;
+
+        // Validate event ID
+        if (!eventId || isNaN(eventId)) {
+            res.status(400).json({ message: 'Invalid event ID' });
+            return;
+        }
+
+        // Check if file is provided
+        if (!req.file) {
+            res.status(400).json({ message: 'No poster file provided' });
+            return;
+        }
+
+        // Check if event exists and belongs to admin's club
+        const existingEvent = await prisma.events.findFirst({
+            where: {
+                id: eventId,
+                organizingclubs: {
+                    some: {
+                        club_id: club_id
+                    }
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                date: true,
+                poster: true
+            }
+        });
+
+        if (!existingEvent) {
+            res.status(404).json({ message: 'Event not found or you do not have permission to update this event' });
+            return;
+        }
+
+        let newPosterPath = null;
+
+        try {
+            // Create upload directory if it doesn't exist
+            const uploadDir = 'uploads/posters';
+            await fs.ensureDir(uploadDir);
+
+            // Generate new filename
+            const fileExtension = req.file.originalname.split('.').pop() || req.file.mimetype.split('/').pop() || 'unknown';
+            const fileName = `${existingEvent.name.replace(/\s+/g, '-').trim()}-${existingEvent.date.toISOString().split('T')[0]}.${fileExtension.trim().toLowerCase()}`;
+            const fullPath = path.join(uploadDir, fileName);
+
+            // Remove old poster file if it exists
+            if (existingEvent.poster) {
+                try {
+                    const oldPosterPath = path.resolve(existingEvent.poster);
+                    if (await fs.pathExists(oldPosterPath)) {
+                        await fs.remove(oldPosterPath);
+                        console.log(`Old poster file removed: ${oldPosterPath}`);
+                    }
+                } catch (fileError) {
+                    console.warn('Could not remove old poster file:', fileError);
+                    // Continue with upload even if old file removal fails
+                }
+            }
+
+            // Save new poster file
+            await fs.writeFile(fullPath, req.file.buffer);
+            newPosterPath = `${uploadDir}/${fileName}`;
+
+            // Update database with new poster path
+            await prisma.events.update({
+                where: { id: eventId },
+                data: { poster: newPosterPath }
+            });
+
+            const response: UpdateEventPosterResponse = {
+                message: 'Event poster updated successfully',
+                posterPath: newPosterPath
+            };
+
+            res.status(200).json(response);
+
+        } catch (fileError) {
+            console.error("Error handling poster file:", fileError);
+            res.status(500).json({
+                message: "Failed to update poster image"
+            });
+            return;
+        }
+
+    } catch (error) {
+        console.error('Error updating event poster:', error);
+        res.status(500).json({ 
+            message: 'Internal server error while updating event poster',
+            error: error instanceof Error ? error.message : String(error)
+        });
+    }
+};
+
 export  {
     putAttendance,
     createEventController,
@@ -772,5 +873,6 @@ export  {
     addClubmembers,
     getEventDetails,
     getclubmembers,
-    removeClubMemberController
+    removeClubMemberController,
+    updateEventPosterController
 };

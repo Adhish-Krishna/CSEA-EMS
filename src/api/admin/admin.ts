@@ -7,7 +7,8 @@ import {
     addClubmembers,
     getEventDetails,
     getclubmembers,
-    removeClubMemberController
+    removeClubMemberController,
+    updateEventPosterController
 } from './controller.js';
 import multer from 'multer';
 
@@ -15,6 +16,7 @@ const upload = multer();
 
 const adminRouter = Router();
 adminRouter.post('/create-event', upload.single('poster'), createEventController);
+adminRouter.post('/update-poster/:id', upload.single('poster'), updateEventPosterController);
 adminRouter.get('/events-history', getPastEventsByClubController);
 adminRouter.post('/attendance',putAttendance);
 adminRouter.get('/profile', fetchProfile);

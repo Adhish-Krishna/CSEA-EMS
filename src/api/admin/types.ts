@@ -34,6 +34,10 @@ export interface RemoveClubMemberResponse {
         message: string;
     }>;
 }
+export interface UpdateEventPosterResponse {
+    message: string;
+    posterPath?: string;
+}
 export interface GetClubMembersResponse {
     message: string;
     data: ClubMemberDTO[];
