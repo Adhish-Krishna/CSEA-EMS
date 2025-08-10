@@ -1,5 +1,127 @@
 /**
  * @swagger
+ * /user/fetchTeamMembersOfEvent:
+ *   post:
+ *     tags: [User]
+ *     summary: Fetch team members of a particular event for the current user
+ *     description: Returns the team ID and members for the current user and event. If not registered, returns a not registered message.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/FetchTeamMembersRequest'
+ *     responses:
+ *       200:
+ *         description: Team members fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/FetchTeamMembersResponse'
+ *       404:
+ *         description: Not registered
+ *       400:
+ *         description: event_id is required
+ *       500:
+ *         description: Internal server error
+ *
+ * components:
+ *   schemas:
+ *     FetchTeamMembersRequest:
+ *       type: object
+ *       required:
+ *         - event_id
+ *       properties:
+ *         event_id:
+ *           type: integer
+ *           description: The event ID
+ *           example: 12
+ *     TeamMemberInfo:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 101
+ *         name:
+ *           type: string
+ *           example: John Doe
+ *         email:
+ *           type: string
+ *           example: johndoe@example.com
+ *         rollno:
+ *           type: string
+ *           example: 22CSR045
+ *         department:
+ *           type: string
+ *           example: CSE - AIML
+ *         yearofstudy:
+ *           type: integer
+ *           example: 2
+ *     FetchTeamMembersResponse:
+ *       type: object
+ *       properties:
+ *         team_id:
+ *           type: integer
+ *           example: 5
+ *         members:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/TeamMemberInfo'
+ */
+
+/**
+ * @swagger
+ * /user/removeTeamMember:
+ *   post:
+ *     tags: [User]
+ *     summary: Remove a team member from a team for a given event
+ *     description: Removes a team member by user ID and event ID. Only allowed for authorized users.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RemoveTeamMemberRequest'
+ *     responses:
+ *       200:
+ *         description: Team member removed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/RemoveTeamMemberResponse'
+ *       404:
+ *         description: Team member not found
+ *       400:
+ *         description: event_id and user_id are required
+ *       500:
+ *         description: Internal server error
+ *
+ * components:
+ *   schemas:
+ *     RemoveTeamMemberRequest:
+ *       type: object
+ *       required:
+ *         - event_id
+ *         - user_id
+ *       properties:
+ *         event_id:
+ *           type: integer
+ *           description: The event ID
+ *           example: 12
+ *         user_id:
+ *           type: integer
+ *           description: The user ID to remove
+ *           example: 101
+ *     RemoveTeamMemberResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: Team member removed successfully
+ */
+
+/**
+ * @swagger
  * /user/getUserIdByRollNo:
  *   post:
  *     tags: [User]
@@ -59,7 +181,9 @@ import {
     getUpcomingEventsController,
     getRegisteredEvents,
     updateProfile,
-    getUserIdByRollNoController
+    getUserIdByRollNoController,
+    fetchTeamMembersOfEventController,
+    removeTeamMemberController
 } from './controller.js';
 import { userAuthMiddleware } from '../../middleware/authMiddleware.js';
 
@@ -78,6 +202,12 @@ userRouter.post('/feedback', userAuthMiddleware, feedbackController);
 
 // Route to get user ID by roll number
 userRouter.post('/getUserIdByRollNo', userAuthMiddleware, getUserIdByRollNoController);
+
+// Route to fetch team members of a particular event for the current user
+userRouter.post('/fetchTeamMembersOfEvent', userAuthMiddleware, fetchTeamMembersOfEventController);
+
+// Route to remove a team member by user ID and event ID
+userRouter.post('/removeTeamMember', userAuthMiddleware, removeTeamMemberController);
 
 // Removed '/events' POST route that was using fetchAllEventsController
 
