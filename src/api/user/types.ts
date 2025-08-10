@@ -3,7 +3,13 @@ export interface TeamInvite {
     to_user_id:number;
     event_id: number;
 }
+export interface GetUserIdByRollNoRequest {
+    rollno: string;
+}
 
+export interface GetUserIdByRollNoResponse {
+    user_id: number;
+}
 export interface Feedback{
     event_id: number;
     feedback: string;
