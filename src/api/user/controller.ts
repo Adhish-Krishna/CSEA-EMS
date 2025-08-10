@@ -1,6 +1,30 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
-import {Feedback, TeamInvite, EventRegistration, ClubMember, Club, MembershipDetails, Invite, EventListItem, EventsResponse, UpdateProfileRequest,UpdateProfileResponse } from './types.js';
+import {Feedback, TeamInvite, EventRegistration, ClubMember, Club, MembershipDetails, Invite, EventListItem, EventsResponse, UpdateProfileRequest,UpdateProfileResponse, GetUserIdByRollNoRequest, GetUserIdByRollNoResponse } from './types.js';
+
+// Controller to get user ID by roll number
+const getUserIdByRollNoController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { rollno } = req.body as GetUserIdByRollNoRequest;
+        if (!rollno || typeof rollno !== 'string') {
+            res.status(400).json({ message: 'rollno is required and must be a string' });
+            return;
+        }
+        const user = await prisma.users.findUnique({
+            where: { rollno },
+            select: { id: true }
+        });
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+        const response: GetUserIdByRollNoResponse = { user_id: user.id };
+        res.status(200).json(response);
+    } catch (error) {
+        console.error('Error fetching user ID by rollno:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
 import { sendInvitation } from '../../mailer/sendMail.js';
 
 const RegisterController = async(req : Request,res:Response): Promise<void> =>{
@@ -854,5 +878,6 @@ export {
     getUpcomingEventsController,
     sendTeamInvitation,
     getRegisteredEvents,
-    updateProfile
+    updateProfile,
+    getUserIdByRollNoController
 };

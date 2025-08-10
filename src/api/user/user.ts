@@ -1,3 +1,49 @@
+/**
+ * @swagger
+ * /user/getUserIdByRollNo:
+ *   post:
+ *     tags: [User]
+ *     summary: Get user ID by roll number
+ *     description: Returns the user ID for a given roll number if the user exists.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/GetUserIdByRollNoRequest'
+ *     responses:
+ *       200:
+ *         description: User ID found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/GetUserIdByRollNoResponse'
+ *       400:
+ *         description: rollno is required and must be a string
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ *
+ * components:
+ *   schemas:
+ *     GetUserIdByRollNoRequest:
+ *       type: object
+ *       required:
+ *         - rollno
+ *       properties:
+ *         rollno:
+ *           type: string
+ *           description: The roll number of the user
+ *           example: 22CSR045
+ *     GetUserIdByRollNoResponse:
+ *       type: object
+ *       properties:
+ *         user_id:
+ *           type: integer
+ *           description: The user ID
+ *           example: 101
+ */
 import { Router } from 'express';
 import {
     acceptTeamInviteController,
@@ -12,7 +58,8 @@ import {
     sendTeamInvitation,
     getUpcomingEventsController,
     getRegisteredEvents,
-    updateProfile
+    updateProfile,
+    getUserIdByRollNoController
 } from './controller.js';
 import { userAuthMiddleware } from '../../middleware/authMiddleware.js';
 
@@ -28,6 +75,9 @@ userRouter.get('/fetch/profile', userAuthMiddleware, fetchProfile);
 userRouter.post('/update/profile', userAuthMiddleware, updateProfile);
 userRouter.get('/registeredevents',userAuthMiddleware, getRegisteredEvents)
 userRouter.post('/feedback', userAuthMiddleware, feedbackController);
+
+// Route to get user ID by roll number
+userRouter.post('/getUserIdByRollNo', userAuthMiddleware, getUserIdByRollNoController);
 
 // Removed '/events' POST route that was using fetchAllEventsController
 
