@@ -330,6 +330,7 @@ const sendTeamInvitation = async(req:Request,res:Response):Promise<void> => {
 const acceptTeamInviteController = async (req: Request, res: Response): Promise<void> =>{
     const user_id=req.user_id;
     const Invite: TeamInvite = req.body;
+    Invite.to_user_id=user_id;
     try{
         if(!Invite.from_team_id || !Invite.to_user_id || !Invite.event_id){
             res.status(400).json({
@@ -604,7 +605,8 @@ const fetchInvitations = async (req:Request,res:Response) : Promise<void>=>{
                 event_id: invitation.event_id,
                 event_name : eventName?.name || 'Unknown Event Name',
                 from_user_name: user?.name || 'Unknown User',
-                teamName: team?.name || 'Unknown team'
+                teamName: team?.name || 'Unknown team',
+                from_team_id:invitation?.from_team_id|| 'Unknown team id'
             };
         }));
         
