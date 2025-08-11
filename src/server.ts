@@ -60,8 +60,6 @@ app.use(requestLogger);
 setupSwagger(app);
 
 clearSecurityCodes();
-
-
 app.get("/", (req: Request, res: Response) => {
     logger.info("Root endpoint accessed");
     res.json({
