@@ -1,9 +1,42 @@
+
+export interface FetchTeamMembersRequest {
+    event_id: number;
+}
+
+export interface TeamMemberInfo {
+    id: number;
+    name: string | null;
+    email: string | null;
+    rollno: string | null;
+    department: string | null;
+    yearofstudy: number | null;
+}
+
+export interface FetchTeamMembersResponse {
+    team_id: number;
+    members: TeamMemberInfo[];
+}
+
+export interface RemoveTeamMemberRequest {
+    event_id: number;
+    user_id: number;
+}
+
+export interface RemoveTeamMemberResponse {
+    message: string;
+}
 export interface TeamInvite {
     from_team_id: number;
     to_user_id:number;
     event_id: number;
 }
+export interface GetUserIdByRollNoRequest {
+    rollno: string;
+}
 
+export interface GetUserIdByRollNoResponse {
+    user_id: number;
+}
 export interface Feedback{
     event_id: number;
     feedback: string;

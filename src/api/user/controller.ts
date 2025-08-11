@@ -1,6 +1,94 @@
 import {Request, Response} from 'express'
 import prisma from '../../prisma.js';
-import {Feedback, TeamInvite, EventRegistration, ClubMember, Club, MembershipDetails, Invite, EventListItem, EventsResponse, UpdateProfileRequest,UpdateProfileResponse } from './types.js';
+import {Feedback, TeamInvite, EventRegistration, ClubMember, Club, MembershipDetails, Invite, EventListItem, EventsResponse, UpdateProfileRequest,UpdateProfileResponse, GetUserIdByRollNoRequest, GetUserIdByRollNoResponse, FetchTeamMembersRequest, FetchTeamMembersResponse, RemoveTeamMemberRequest, RemoveTeamMemberResponse } from './types.js';
+// Controller to fetch team members of a particular event for the current user
+const fetchTeamMembersOfEventController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user_id = req.user_id;
+        const { event_id } = req.body as FetchTeamMembersRequest;
+        if (!event_id) {
+            res.status(400).json({ message: 'event_id is required' });
+            return;
+        }
+        // Find the team for this user and event
+        const teamMember = await prisma.teammembers.findFirst({
+            where: { user_id, event_id },
+            select: { team_id: true }
+        });
+        if (!teamMember) {
+            res.status(404).json({ message: 'Not registered' });
+            return;
+        }
+        // Get all members of this team for the event
+        const members = await prisma.teammembers.findMany({
+            where: { team_id: teamMember.team_id, event_id },
+            select: { user_id: true }
+        });
+    const userIds = members.map((m: { user_id: number }) => m.user_id);
+        const users = await prisma.users.findMany({
+            where: { id: { in: userIds } },
+            select: { id: true, name: true, email: true, rollno: true, department: true, yearofstudy: true }
+        });
+        const response: FetchTeamMembersResponse = {
+            team_id: teamMember.team_id,
+            members: users
+        };
+        res.status(200).json(response);
+    } catch (error) {
+        console.error('Error fetching team members:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// Controller to remove a team member by user ID and event ID
+const removeTeamMemberController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { event_id, user_id } = req.body as RemoveTeamMemberRequest;
+        if (!event_id || !user_id) {
+            res.status(400).json({ message: 'event_id and user_id are required' });
+            return;
+        }
+        // Find the team for this user and event
+        const teamMember = await prisma.teammembers.findFirst({
+            where: { user_id, event_id },
+            select: { id: true }
+        });
+        if (!teamMember) {
+            res.status(404).json({ message: 'Team member not found' });
+            return;
+        }
+        await prisma.teammembers.delete({ where: { id: teamMember.id } });
+        const response: RemoveTeamMemberResponse = { message: 'Team member removed successfully' };
+        res.status(200).json(response);
+    } catch (error) {
+        console.error('Error removing team member:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// Controller to get user ID by roll number
+const getUserIdByRollNoController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { rollno } = req.body as GetUserIdByRollNoRequest;
+        if (!rollno || typeof rollno !== 'string') {
+            res.status(400).json({ message: 'rollno is required and must be a string' });
+            return;
+        }
+        const user = await prisma.users.findUnique({
+            where: { rollno },
+            select: { id: true }
+        });
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+        const response: GetUserIdByRollNoResponse = { user_id: user.id };
+        res.status(200).json(response);
+    } catch (error) {
+        console.error('Error fetching user ID by rollno:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
 import { sendInvitation } from '../../mailer/sendMail.js';
 
 const RegisterController = async(req : Request,res:Response): Promise<void> =>{
@@ -242,6 +330,7 @@ const sendTeamInvitation = async(req:Request,res:Response):Promise<void> => {
 const acceptTeamInviteController = async (req: Request, res: Response): Promise<void> =>{
     const user_id=req.user_id;
     const Invite: TeamInvite = req.body;
+    Invite.to_user_id=user_id;
     try{
         if(!Invite.from_team_id || !Invite.to_user_id || !Invite.event_id){
             res.status(400).json({
@@ -516,7 +605,8 @@ const fetchInvitations = async (req:Request,res:Response) : Promise<void>=>{
                 event_id: invitation.event_id,
                 event_name : eventName?.name || 'Unknown Event Name',
                 from_user_name: user?.name || 'Unknown User',
-                teamName: team?.name || 'Unknown team'
+                teamName: team?.name || 'Unknown team',
+                from_team_id:invitation?.from_team_id|| 'Unknown team id'
             };
         }));
         
@@ -599,8 +689,8 @@ const getPastEventsController = async (req: Request, res: Response): Promise<voi
 
        
         const pastEvents: EventListItem[] = events
-            .filter(event => event.date !== null)
-            .map(event => {
+            .filter((event: any) => event.date !== null)
+            .map((event: any) => {
                 // Get club name
                 const clubName = event.organizingclubs[0]?.clubs?.name || null;
                 
@@ -667,8 +757,8 @@ const getOngoingEventsController = async (req: Request, res: Response): Promise<
 
        
         const ongoingEvents: EventListItem[] = events
-            .filter(event => event.date !== null)
-            .map(event => {
+            .filter((event: any) => event.date !== null)
+            .map((event: any) => {
                
                 const clubName = event.organizingclubs[0]?.clubs?.name || null;
                 
@@ -733,8 +823,8 @@ const getUpcomingEventsController = async (req: Request, res: Response): Promise
 
        
         const upcomingEvents: EventListItem[] = events
-            .filter(event => event.date !== null)
-            .map(event => {
+            .filter((event: any) => event.date !== null)
+            .map((event: any) => {
               
                 const clubName = event.organizingclubs[0]?.clubs?.name || null;
                 
@@ -800,7 +890,7 @@ const getRegisteredEvents = async(req:Request,res:Response) => {
                 }
             }
         })
-        const result = await Promise.all(registrations.map(async (reg) => {
+    const result = await Promise.all(registrations.map(async (reg: any) => {
             const members = await prisma.teammembers.findMany({
                 where: { team_id: reg.team_id },
                 include: {
@@ -821,7 +911,7 @@ const getRegisteredEvents = async(req:Request,res:Response) => {
                 team_id: reg.team_id,
                 team_name: reg.teams?.name || null,
                 event: reg.events,
-                members: members.map(m => ({
+                members: members.map((m: any) => ({
                     id: m.users.id,
                     name: m.users.name,
                     email: m.users.email,
@@ -854,5 +944,8 @@ export {
     getUpcomingEventsController,
     sendTeamInvitation,
     getRegisteredEvents,
-    updateProfile
+    updateProfile,
+    getUserIdByRollNoController,
+    fetchTeamMembersOfEventController,
+    removeTeamMemberController
 };
