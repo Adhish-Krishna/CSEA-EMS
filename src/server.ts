@@ -9,7 +9,7 @@ import globalAuthRouter from "./api/auth/globalAuth/auth.js";
 import userRouter from "./api/user/user.js";
 import eventRouter from "./api/event/event.js";
 import clubRouter from './api/club/club.js';
-
+import formsRouter from "./api/forms/forms.js";
 import logsRouter from "./api/logs/logs.js";
 import globalRouter from "./api/global/global.js";
 import { setupSwagger } from "./swagger.js";
@@ -79,7 +79,7 @@ app.use("/logs",adminAuthMiddleware,logsRouter);
 app.use("/admin", adminAuthMiddleware,adminRouter);
 app.use("/global", globalAuthMiddleware ,globalRouter);
 app.use("/club", clubRouter);
-
+app.use("/forms", formsRouter);
 app.use(errorLogger);
 
 
@@ -93,6 +93,7 @@ app.use((err: any, req: Request, res: Response, next: any) => {
         error: process.env.NODE_ENV === 'production' ? undefined : err.message
     });
 });
+
 
 app.listen(PORT, () => {
     logger.info(`Server running on : http://localhost:${PORT}`);
