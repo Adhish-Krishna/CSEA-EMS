@@ -16,6 +16,31 @@ interface RegisterTeamRequest {
     eventid: number;
 }
 
+function getDeptAndYear(rollno: string): { department: string, yearofstudy: number } {
+    rollno = rollno.toLowerCase();
+
+    if (/^23n2/.test(rollno) || /^24n4/.test(rollno)) {
+        return { department: "CSE (AI & ML)", yearofstudy: 3 };
+    }
+    if (/^24n2/.test(rollno) || /^25n4/.test(rollno)) {
+        return { department: "CSE (AI & ML)", yearofstudy: 2 };
+    }
+    if (/^23z2/.test(rollno) || /^24z43/.test(rollno) || /^25z43/.test(rollno)) {
+        return { department: "CSE - G1", yearofstudy: rollno.startsWith("25") ? 2 : 3 };
+    }
+    if (/^23z3/.test(rollno) || /^24z46/.test(rollno) || /^25z46/.test(rollno)) {
+        return { department: "CSE - G2", yearofstudy: rollno.startsWith("25") ? 2 : 3 };
+    }
+    if (/^24z2/.test(rollno)) {
+        return { department: "CSE - G1", yearofstudy: 2 };
+    }
+    if (/^24z3/.test(rollno)) {
+        return { department: "CSE - G2", yearofstudy: 2 };
+    }
+    // Default fallback
+    return { department: "Unknown", yearofstudy: 0 };
+}
+
 const registerTeamWithPlayersController = async (req: Request, res: Response): Promise<void> => {
     try {
         const {
@@ -56,17 +81,16 @@ const registerTeamWithPlayersController = async (req: Request, res: Response): P
             let user = await prisma.users.findUnique({
                 where: { rollno: player.rollno }
             });
-
+            const { department, yearofstudy } = getDeptAndYear(player.rollno);
             if (!user) {
-                const randomPhone = Math.floor(1000000000 + Math.random() * 9000000000);
                 user = await prisma.users.create({
                     data: {
                         name: player.name,
-                        rollno: player.rollno,
-                        department: "Unknown",
+                        rollno: player.rollno.toLowerCase(),
+                        department,
                         email: `${player.rollno}@psgtech.ac.com`,
                         phoneno: player.phnno,
-                        yearofstudy: 3
+                        yearofstudy
                     }
                 });
             }
