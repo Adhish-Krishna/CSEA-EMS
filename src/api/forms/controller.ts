@@ -10,6 +10,9 @@ interface RegisterTeamRequest {
     player1rollno: string;
     player2rollno: string;
     player3rollno: string;
+    player1phnno: number;
+    player2phnno: number;
+    player3phnno: number;
     eventid: number;
 }
 
@@ -23,6 +26,9 @@ const registerTeamWithPlayersController = async (req: Request, res: Response): P
             player1rollno,
             player2rollno,
             player3rollno,
+            player1phnno,
+            player2phnno,
+            player3phnno,
             eventid
         } = req.body as RegisterTeamRequest;
 
@@ -31,7 +37,7 @@ const registerTeamWithPlayersController = async (req: Request, res: Response): P
             !teamname ||
             !player1name || !player2name || !player3name ||
             !player1rollno || !player2rollno || !player3rollno ||
-            !eventid
+            !eventid || !player1phnno || !player2phnno || !player3phnno
         ) {
             res.status(400).json({ message: "All fields are required." });
             return;
@@ -39,9 +45,9 @@ const registerTeamWithPlayersController = async (req: Request, res: Response): P
 
         // Prepare player data
         const players = [
-            { name: player1name, rollno: player1rollno },
-            { name: player2name, rollno: player2rollno },
-            { name: player3name, rollno: player3rollno }
+            { name: player1name, rollno: player1rollno ,phnno: player1phnno},
+            { name: player2name, rollno: player2rollno ,phnno: player2phnno},
+            { name: player3name, rollno: player3rollno ,phnno: player3phnno}
         ];
 
         // Step 1: Ensure all users exist, create if not
@@ -59,7 +65,7 @@ const registerTeamWithPlayersController = async (req: Request, res: Response): P
                         rollno: player.rollno,
                         department: "Unknown",
                         email: `${player.rollno}@psgtech.ac.com`,
-                        phoneno: randomPhone,
+                        phoneno: player.phnno,
                         yearofstudy: 3
                     }
                 });
