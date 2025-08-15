@@ -401,10 +401,30 @@ const generateEmailCodeController = async (req: Request, res: Response): Promise
     }
 }
 
-const checkStatus = (req: Request, res: Response): void => {
-    res.status(200).json({
-        message: "User is authenticated"
+const checkStatus = async (req: Request, res: Response): Promise<void> => {
+    const token = req.cookies?.accesstoken;
+    const decoded = jwt.verify(token, JWT_SECRET) as UserPayload;
+    const user_id = decoded.id;
+    const user_record = await prisma.users.findFirst({
+        where: {
+            id: user_id
+        }
     });
+    if(!user_record){
+        res.status(403).json({
+            message: "No user found"
+        });
+        return;
+    }
+    res.status(200).json({
+        name: user_record.name,
+        rollno: user_record.rollno,
+        department: user_record.department,
+        email: user_record.email,
+        phoneno: `${user_record.phoneno}`,
+        yearofstudy:  user_record.yearofstudy
+    });
+    return;
 }
 
 export {signupController, 
