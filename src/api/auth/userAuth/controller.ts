@@ -97,7 +97,12 @@ const signupController = async (req: Request, res: Response): Promise<void> =>{
             sameSite: 'none'
         });
         res.status(201).json({
-            message: "User signed up successfully",
+            name: new_user.name,
+            rollno: new_user.rollno,
+            department: new_user.department,
+            email: new_user.email,
+            phoneno: `${new_user.phoneno}`,
+            yearofstudy:  new_user.yearofstudy
         });
         return;
     }
@@ -142,7 +147,12 @@ const loginController = async (req: Request, res: Response): Promise<void> =>{
             sameSite: 'none'
         });
         res.status(200).json({
-            message: "User logged in successfully"
+            name: users.name,
+            rollno: users.rollno,
+            department: users.department,
+            email: users.email,
+            phoneno: `${users.phoneno}`,
+            yearofstudy:  users.yearofstudy
         })
         return;
     }
