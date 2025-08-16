@@ -97,6 +97,7 @@ const signupController = async (req: Request, res: Response): Promise<void> =>{
             sameSite: 'none'
         });
         res.status(201).json({
+            id: new_user.id,
             name: new_user.name,
             rollno: new_user.rollno,
             department: new_user.department,
@@ -147,6 +148,7 @@ const loginController = async (req: Request, res: Response): Promise<void> =>{
             sameSite: 'none'
         });
         res.status(200).json({
+            id: users.id,
             name: users.name,
             rollno: users.rollno,
             department: users.department,
@@ -427,6 +429,7 @@ const checkStatus = async (req: Request, res: Response): Promise<void> => {
         return;
     }
     res.status(200).json({
+        id: user_record.id,
         name: user_record.name,
         rollno: user_record.rollno,
         department: user_record.department,

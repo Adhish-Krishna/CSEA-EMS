@@ -430,7 +430,7 @@ const acceptTeamInviteController = async (req: Request, res: Response): Promise<
 const rejectTeamInviteController = async (req: Request ,res:Response) :Promise<void>=>{
     const user_id=req.user_id;
     const Invite: TeamInvite = req.body;
-    if(!Invite.from_team_id || !Invite.to_user_id || !Invite.event_id){
+    if(!(Invite.from_team_id && Invite.to_user_id && Invite.event_id)){
         res.status(400).json({
             message: "Require all fields"
         })
