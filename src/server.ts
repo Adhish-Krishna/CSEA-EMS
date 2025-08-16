@@ -28,10 +28,7 @@ const app: Express = express();
 
 const corsOptions = {
   origin: function (origin: string | undefined, callback: Function) {
-    // Allow requests with no origin (like mobile apps or Postman)
     if (!origin) return callback(null, true);
-    
-    // List of allowed origins
     const allowedOrigins = [
       'http://localhost:3000',    
       'http://localhost:3001',    
@@ -53,6 +50,7 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
   optionsSuccessStatus: 200 
 };
+
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -80,6 +78,7 @@ app.use("/admin", adminAuthMiddleware,adminRouter);
 app.use("/global", globalAuthMiddleware ,globalRouter);
 app.use("/club", clubRouter);
 app.use("/forms", formsRouter);
+
 app.use(errorLogger);
 
 
@@ -97,4 +96,5 @@ app.use((err: any, req: Request, res: Response, next: any) => {
 
 app.listen(PORT, () => {
     logger.info(`Server running on : http://localhost:${PORT}`);
+    console.log(`Server running on : http://localhost:${PORT}`);
 });

@@ -9,8 +9,6 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
 const JWT_TOKEN_EXPIRY_MINUTES = process.env.JWT_TOKEN_EXPIRY_MINUTES!;
 const JWT_REFRESH_TOKEN_EXPIRY_MINUTES = process.env.JWT_REFRESH_TOKEN_EXPIRY_MINUTES!;
 
-//signup util
-
 const validatePhoneNumber = (phoneno: bigint)=>{
     if(phoneno.toString().length == 10){
         return true;
