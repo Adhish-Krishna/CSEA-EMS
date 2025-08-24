@@ -79,8 +79,9 @@ const registerTeamWithPlayersController = async (req: Request, res: Response): P
         const userIds: number[] = [];
         for (const player of players) {
             let user = await prisma.users.findUnique({
-                where: { rollno: player.rollno }
+                where: { rollno: player.rollno.toLowerCase() }
             });
+            console.log(user);
             const { department, yearofstudy } = getDeptAndYear(player.rollno);
             if (!user) {
                 user = await prisma.users.create({
@@ -88,7 +89,7 @@ const registerTeamWithPlayersController = async (req: Request, res: Response): P
                         name: player.name,
                         rollno: player.rollno.toLowerCase(),
                         department,
-                        email: `${player.rollno}@psgtech.ac.com`,
+                        email: `${player.rollno.toLowerCase()}@psgtech.ac.in`,
                         phoneno: player.phnno,
                         yearofstudy
                     }
