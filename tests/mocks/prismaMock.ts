@@ -14,6 +14,9 @@ export interface PrismaMock {
     create: Fn;
     update: Fn;
   };
+  clubmembers: {
+    findFirst: Fn;
+  };
 }
 
 export const prismaMock: PrismaMock = {
@@ -30,6 +33,9 @@ export const prismaMock: PrismaMock = {
     findFirst: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
+  },
+  clubmembers: {
+    findFirst: jest.fn(),
   },
 };
 
