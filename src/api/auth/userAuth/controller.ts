@@ -118,6 +118,10 @@ const signupController = async (req: Request, res: Response): Promise<void> =>{
 const loginController = async (req: Request, res: Response): Promise<void> =>{
     const user: LoginUser = req.body;
     try{
+        if (!user?.rollno || !user?.password) {
+            res.status(400).json({ message: "Roll no and password are required" });
+            return;
+        }
         const users = await prisma.users.findFirst({
             where: {
                 rollno: user.rollno.toLowerCase()
