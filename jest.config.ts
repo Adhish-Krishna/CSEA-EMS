@@ -19,6 +19,8 @@ const config: Config = {
   },
   extensionsToTreatAsEsm: ['.ts'],
   collectCoverageFrom: ['src/**/*.ts'],
+  verbose: true,   // show “√ TCx …” lines
+  silent: true,    // hide console.log from tests and app code
 };
 
 export default config;

@@ -65,6 +65,7 @@ describe('User Login Flow', () => {
       id: 101,
       rollno: rollno.toLowerCase(),
     });
+    // no console logs
   });
 
   // TC8: wrong password
@@ -84,6 +85,7 @@ describe('User Login Flow', () => {
 
     expect(res.status).toBe(401);
     expect(String(res.body.message || '')).toMatch(/wrong password/i);
+    // no console logs
   });
 
   // TC9: non-existent user
@@ -99,6 +101,7 @@ describe('User Login Flow', () => {
 
     expect(res.status).toBe(404);
     expect(String(res.body.message || '')).toMatch(/does not exist/i);
+    // no console logs
   });
 
   // TC10: missing credentials
@@ -111,5 +114,6 @@ describe('User Login Flow', () => {
 
     expect(res.status).toBe(400);
     expect(String(res.body.message || '')).toMatch(/required/i);
+    // no console logs
   });
 });

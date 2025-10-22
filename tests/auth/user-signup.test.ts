@@ -97,6 +97,7 @@ describe('User Signup Flow', () => {
       rollno,
       department: baseSignupBody.department,
     });
+    // no console logs; rely on Jest verbose output
   });
 
   // TC2: Invalid verification code
@@ -116,6 +117,7 @@ describe('User Signup Flow', () => {
 
     expect(res.status).toBe(400);
     expect(String(res.body.message || '')).toMatch(/code/i);
+    // no console logs
   });
 
   // TC3: Expired verification code (410)
@@ -131,6 +133,7 @@ describe('User Signup Flow', () => {
 
     // Swagger for signup documents 410 on expiry
     expect(res.status).toBe(410);
+    // no console logs
   });
 
   // TC4: Existing user (conflict)
@@ -145,6 +148,7 @@ describe('User Signup Flow', () => {
     const res = await request(app).post('/auth/user/signup').send(baseSignupBody);
 
     expect(res.status).toBe(409);
+    // no console logs
   });
 
   // TC5: Missing required fields
@@ -156,6 +160,7 @@ describe('User Signup Flow', () => {
       .send({ rollno, password: 'x', code: '123456' }); // missing name, department, phone, year
 
     expect(res.status).toBe(400);
+    // no console logs
   });
 
   // TC6: Invalid phone number
@@ -174,5 +179,6 @@ describe('User Signup Flow', () => {
 
     expect(res.status).toBe(400);
     expect(String(res.body.message || '')).toMatch(/phone/i);
+    // no console logs
   });
 });
