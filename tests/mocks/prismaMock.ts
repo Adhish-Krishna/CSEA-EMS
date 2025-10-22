@@ -5,7 +5,7 @@ export interface PrismaMock {
   usersecuritycode: { findFirst: Fn; create: Fn; update: Fn; };
   clubmembers: { findFirst: Fn; };
   globaladmins: { findFirst: Fn; create: Fn; };
-  events: { findFirst: Fn; create: Fn; };
+  events: { findFirst: Fn; create: Fn; update: Fn; };
   organizingclubs: { create: Fn; };
   eventconvenors: { create: Fn; };
 }
@@ -16,7 +16,7 @@ export const prismaMock: PrismaMock = {
   usersecuritycode: { findFirst: jest.fn(), create: jest.fn(), update: jest.fn() },
   clubmembers: { findFirst: jest.fn() },
   globaladmins: { findFirst: jest.fn(), create: jest.fn() },
-  events: { findFirst: jest.fn(), create: jest.fn() },
+  events: { findFirst: jest.fn(), create: jest.fn(), update: jest.fn() },
   organizingclubs: { create: jest.fn() },
   eventconvenors: { create: jest.fn() },
 };
